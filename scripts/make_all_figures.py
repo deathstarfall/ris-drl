@@ -13,23 +13,29 @@ R = ROOT / "results"
 
 def J(path):
     f = R / path
-    return json.loads(f.read_text()) if f.exists() else (print(f"[skip] missing {path}") or None)
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else (print(f"[skip] missing {path}") or None)
 
 def fig_baseline_bars(baselines):
-    ax = plt.figure(figsize=(6, 3.8)).gca()
-    names = list(baselines); means = [baselines[k]["mean"] for k in names]
-    sds   = [baselines[k]["sd"] for k in names]
+    """baselines: {name: raw eval json} — derives mean/SD from rates itself (no hand-typing)."""
+    names  = list(baselines)
+    rates  = {k: np.asarray(v["rates"], dtype=float) for k, v in baselines.items()}
+    means  = [rates[k].mean() for k in names]
+    sds    = [rates[k].std(ddof=1) for k in names]
+    fig, ax = plt.subplots(figsize=(6, 3.8))
     ax.bar(range(len(names)), means, yerr=sds, capsize=4, color="#4a7dbd")
-    ax.set_xticks(range(len(names))); ax.set_xticklabels(names)
-    ax.set_ylabel("sum rate (bps/Hz)"); ax.set_title("Baselines on the frozen 500-channel test set")
-    plt.tight_layout(); plt.savefig(FIGS / "fig_baselines.pdf"); plt.savefig(FIGS / "fig_baselines.png"); plt.close()
+    ax.set_xticks(range(len(names))); ax.set_xticklabels(names, rotation=15)
+    ax.set_ylabel("sum rate (bps/Hz) — mean ± SD (n=500, frozen test set)")
+    ax.set_title("Baselines on the frozen 500-channel test set (DD-006)")
+    plt.tight_layout()
+    plt.savefig(FIGS / "fig_baselines.pdf"); plt.savefig(FIGS / "fig_baselines.png"); plt.close()
+    print(f"[figs] fig_baselines written: {[f'{n}={m:.2f}' for n, m in zip(names, means)]}")
 
 def fig_reward_band(agent):
     dfs = []
     for s in range(5):
         f = R / agent / f"seed{s}" / "metrics.json"
         if not f.exists(): print(f"[skip] {agent} seed{s} missing"); return
-        dfs.append(json.loads(f.read_text()))
+        dfs.append(json.loads(f.read_text(encoding="utf-8")))
     band = seed_band(dfs); steps = sorted(band)
     mu  = [band[s]["mean"] for s in steps]; sdv = [band[s]["sd"] for s in steps]
     plt.figure(figsize=(6, 3.8))
@@ -89,13 +95,13 @@ def summary_table():
         if rnd: row.update(paired_vs_random(d["rates"], rnd["rates"], label))
         cols.append(row)
     if not cols: print("[skip] no results yet"); return
-    md = ["| Method | mean | SD | SEM | Δ vs random | p (Wilcoxon) | 95% CI of gain | %channels>random |",
+    md = ["| Method | mean | SD | SEM | Gain vs random | p (Wilcoxon) | 95% CI of gain | %channels>random |",
           "|---|---|---|---|---|---|---|---|"]
     for c in cols:
         md.append(f"| {c['method']} | {c['mean']:.2f} | {c.get('sd','-'):.2f} | {c.get('sem','-'):.3f} | "
                   f"{c.get('mean_gain',''):.2f} | {c.get('p_wilcoxon',''):.1e} | "
                   f"{c.get('ci95','')} | {100*c.get('frac_channels_positive',0):.0f}% |")
-    (ROOT / "results" / "summary_table.md").write_text("\n".join(md))
+    (ROOT / "results" / "summary_table.md").write_text("\n".join(md), encoding="utf-8")
     print("\n".join(md))
 
 if __name__ == "__main__":
