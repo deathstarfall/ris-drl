@@ -1,0 +1,14 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Experiments
+ckpt/
+*.pt
+results/**/local_*
+*.log
+
+# Keep in git (do NOT ignore): src/, configs/, scripts/, tests/, docs/, paper/, data/*.npz, results/**/*.json
