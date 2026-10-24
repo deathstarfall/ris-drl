@@ -144,7 +144,8 @@ def channels_to_tensors(chs: List[Dict]):
 
 
 def batch_slice(T: Dict, idx: np.ndarray) -> Dict:
-    return {k: (v[idx] if torch.is_tensor(v) and v.shape[0] == len(idx) else v) for k, v in T.items()}
+    n = int(T["h_r"].shape[0])
+    return {k: (v[idx] if torch.is_tensor(v) and v.dim() >= 1 and v.shape[0] == n else v) for k, v in T.items()}
 
 
 def evaluate_on_channels(model: UnrolledPG, T: Dict, chunk: int = 128) -> float:

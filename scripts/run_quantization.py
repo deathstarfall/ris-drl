@@ -53,7 +53,7 @@ def main() -> int:
                     help="AO phases from run_gate2.py / run_ao_reference.py")
     ap.add_argument("--ckpt", default=None,
                     help="optional unfolding ckpt (results/unfold/unfold_L6_rate.pt)")
-    ap.add_argument("--out", default="results/ao/quantization.json")
+    ap.add_argument("--out", default="results/bits_sweep.json")
     ap.add_argument("--bits", type=int, nargs="+", default=[2, 3, 4], help="frozen set {2,3,4}")
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
@@ -113,10 +113,18 @@ def main() -> int:
         print(f"{name:<12}" + "".join(f"{c:>14}" for c in [f"{r_inf.mean():.3f}"] + cells))
         result["methods"][name] = row
 
+    dd009 = {
+        "bits": bits_list,
+        "mean_rate_by_method": {
+            name: [result["methods"][name]["per_bits"][str(b)]["mean"] for b in bits_list]
+            for name in result["methods"]
+        },
+        "detail": result,
+    }
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(result, indent=2))
-    print(f"\nSaved {out}  (paper figure via scripts/make_all_figures.py — Ayansh)")
+    out.write_text(json.dumps(dd009, indent=2))
+    print(f"\nSaved {out}  (DD-009: bits + mean_rate_by_method; rich data under 'detail')")
     return 0
 
 

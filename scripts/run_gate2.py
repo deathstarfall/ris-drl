@@ -198,7 +198,13 @@ def main() -> int:
                      "iters_ok": iters_ok, "verdict": "PASS" if pass_gate else "FAIL"},
     }
     (out / f"ao_{stem}.json").write_text(json.dumps(payload, indent=2))
-    (out / "ao_rates.json").write_text(json.dumps(payload, indent=2))
+    dd009 = {
+        "rates": ao_rates.tolist(),
+        "iters": [int(i) for i in ao_iters],
+        "convergence": [r["history"] for r in ao_res],
+        "channel_seed": int(channel_seed),
+    }
+    (out / "ao_rates.json").write_text(json.dumps(dd009, indent=2))
     return 0 if pass_gate else 1
 
 

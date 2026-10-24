@@ -84,3 +84,20 @@
 - We flagged these as merge-collision candidates in the team chat; my tests
   self-configure sys.path and my modules use dual-mode imports
   (package-relative with flat fallback), so PR2 adds zero shared-file conflicts.
+
+
+| Yours | Heading |
+|---|---|
+| B1 | `## DD-014 (D3): (B1) Torch sum-rate twin lives in src/ao_riemannian.py` |
+| B2 | `## DD-015 (D3): (B2) §6.2 gain-line pairing fix (einsum km,mk->k)` |
+| B3 | `## DD-016 (D3): (B3) ch.get("P", 1.0) power-key default (superseded by DD-005's P array)` |
+| B4 | `## DD-017 (D3): (B4) float64/complex128 in bound + unfolding` |
+| B5 | `## DD-018 (D3): (B5) CG sign: ascent on f (+rgrad), not minimization form` |
+| B6 | `## DD-019 (D3): (B6) CG restarts + tol-hit%/stall% honest reporting` |
+| B7 | `## DD-020 (D3): (B7) theta=0 init shared by AO + unfolding` |
+| B8 | `## DD-021 (D3): (B8) rate loss main; circular + MSE = ablations` |
+| B9 | `## DD-022 (D3): (B9) CSI-error + quantization protocols (decide on ĥ, score on h)` |
+| B10 | `## DD-023 (D3): (B10) extra scripts/ entry points; never write data/` |
+| B11 | `## DD-024 (D3): (B11) ratio compression at high SNR (note: DD-011b blockage helps)` |
+| B12 | `## DD-025 (D3): (B12) no conftest.py / __init__.py from my side` |
+

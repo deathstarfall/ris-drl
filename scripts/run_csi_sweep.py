@@ -54,7 +54,7 @@ def perturbed(ch: dict, eps: float, rng: np.random.Generator) -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser(description="CSI-error sweep (Balraj)")
     ap.add_argument("--channels", default="data/test_channels.npz")
-    ap.add_argument("--out", default="results/ao/csi_sweep.json")
+    ap.add_argument("--out", default="results/unfold/csi_sweep.json")
     ap.add_argument("--eps", type=float, nargs="+", default=EPS_DEFAULT)
     ap.add_argument("--ckpt", default=None, help="optional unfolding ckpt for the sweep")
     ap.add_argument("--max-channels", type=int, default=0)
@@ -130,10 +130,19 @@ def main() -> int:
         print(f"{eps:>8.2f}" + "".join(f"{c:>14}" for c in cells)
               + f"   ({time.perf_counter() - t0:.1f} s)")
 
+    dd009 = {
+        "eps": list(args.eps),
+        "mean_rate_by_method": {
+            name: [result["methods"][name][str(e)]["mean"] for e in args.eps]
+            for name in result["methods"]
+            if result["methods"][name][str(args.eps[0])]["mean"] is not None
+        },
+        "detail": result,
+    }
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(result, indent=2))
-    print(f"\nSaved {out}")
+    out.write_text(json.dumps(dd009, indent=2))
+    print(f"\nSaved {out}  (DD-009: eps + mean_rate_by_method; rich data under 'detail')")
     return 0
 
 
