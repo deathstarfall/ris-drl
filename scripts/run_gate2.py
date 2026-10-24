@@ -40,6 +40,21 @@ from ao_riemannian import (  # noqa: E402
     random_rates, run_ao_dataset, sum_rate_numpy,
 )
 
+SEED_KEYS = ("channel_seed", "gen_seed", "seed")
+
+def read_channel_seed(ch_path, chs):
+    try:
+        z = np.load(ch_path, allow_pickle=True)
+        for k in SEED_KEYS:
+            if k in z.files:
+                return int(np.asarray(z[k]).reshape(-1)[0])
+    except Exception:
+        pass
+    for ch in chs:
+        for k in SEED_KEYS:
+            if k in ch:
+                return int(np.asarray(ch[k]).reshape(-1)[0])
+    return None
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="G2 — AO bound gate (Balraj)")
@@ -54,6 +69,8 @@ def main() -> int:
     ap.add_argument("--workers", type=int, default=1)
     ap.add_argument("--seed", type=int, default=0, help="RNG seed for the random baseline")
     ap.add_argument("--skip-pg", action="store_true", help="skip the PG sanity twin")
+    ap.add_argument("--channel-seed", type=int, default=0)
+    ap.add_argument("--progress-every", type=int, default=25)
     args = ap.parse_args()
 
     ch_path = Path(args.channels)
@@ -67,6 +84,12 @@ def main() -> int:
     stem = ch_path.stem
 
     chs = load_channel_npz(ch_path)
+    channel_seed = args.channel_seed if args.channel_seed > 0 else read_channel_seed(ch_path, chs)
+    if channel_seed is None:
+        print("ERROR: channel_seed not in npz. Run with --channel-seed 2000.")
+        return 2
+    if channel_seed != 2000:
+        print(f"WARNING: channel_seed={channel_seed} != 2000 — evaluate.py will reject this JSON.")
     if args.max_channels > 0:
         chs = chs[: args.max_channels]
     n = len(chs)
@@ -76,7 +99,8 @@ def main() -> int:
 
     # --- AO on the saved channels -----------------------------------------------
     t0 = time.perf_counter()
-    ao_res = run_ao_dataset(chs, iters=args.iters, tol=args.tol, workers=args.workers)
+    ao_res = run_ao_dataset(chs, iters=args.iters, tol=args.tol,
+                            workers=args.workers, progress_every=args.progress_every)    
     wall = time.perf_counter() - t0
 
     ao_rates = np.array([r["rate"] for r in ao_res])
@@ -156,8 +180,9 @@ def main() -> int:
     np.savez_compressed(out / f"ao_{stem}_history.npz", history=hist,
                         iters=ao_iters, tol_hit=tol_hits)
 
-    (out / f"ao_{stem}.json").write_text(json.dumps({
+    payload = {
         "stem": stem, "n": n, "N": N, "seed": args.seed,
+        "method": "ao", "channel_seed": int(channel_seed),
         "config": {"iters": args.iters, "tol": args.tol, "n_random": args.n_random},
         "ao": {"mean": float(ao_rates.mean()), "sd": float(ao_rates.std(ddof=1)),
                "median_iters": float(np.median(ao_iters)), "max_iters": int(ao_iters.max()),
@@ -171,7 +196,9 @@ def main() -> int:
         "best_of_random": {"mean": float(best200.mean()), "sd": float(best200.std(ddof=1))},
         "criteria": {"ao_random_ratio": ratio, "ratio_min": 1.3,
                      "iters_ok": iters_ok, "verdict": "PASS" if pass_gate else "FAIL"},
-    }, indent=2))
+    }
+    (out / f"ao_{stem}.json").write_text(json.dumps(payload, indent=2))
+    (out / "ao_rates.json").write_text(json.dumps(payload, indent=2))
     return 0 if pass_gate else 1
 
 

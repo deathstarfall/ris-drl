@@ -413,7 +413,8 @@ def run_ao_dataset(chs: List[Dict], iters: int = 200, tol: float = 1e-4,
         for i, ch in enumerate(chs):
             results.append(ao_riemannian(ch, iters=iters, tol=tol))
             if progress_every and (i + 1) % progress_every == 0:
-                print(f"  [run_ao_dataset] {i + 1}/{len(chs)} channels done", flush=True)
+                part = np.mean([r["rate"] for r in results])
+                print(f"  [run_ao_dataset] {i + 1}/{len(chs)} done | partial mean = {part:.3f} bps/Hz", flush=True)
         return results
 
     import multiprocessing as mp
