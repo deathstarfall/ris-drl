@@ -4,7 +4,7 @@ import numpy as np, yaml, pathlib
 _ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 def _cfg():
-    return yaml.safe_load(open(_ROOT / "configs" / "env.yaml"))
+    return yaml.safe_load(open(_ROOT / "configs" / "env.yaml", encoding="utf-8"))
 
 def pl_direct_db(d_m):
     """BS -> user, NLoS UMi: 128.1 + 37.6 log10(d_km)"""
@@ -28,9 +28,14 @@ def gen_channel(rng, cfg, zone=None):
     d_tu = float(np.linalg.norm(u - ris))
     d_bu = float(np.linalg.norm(u - bs))
 
-    g_direct = 10 ** (-pl_direct_db(d_bu) / 10)            # linear profile, BS->user
-    g_casc   = 10 ** (-pl_cascade_db(d_bt, d_tu) / 10)     # linear profile, cascade
-    M, N, K  = cfg["dims"]["M"], cfg["dims"]["N"], cfg["dims"]["K"]
+    # ---- direct link: UMi NLoS formula + behind-the-wall blockage (DD-011b) ----
+    blockage_db = cfg["channel"].get("direct_blockage_db", 0.0)
+    g_direct = 10 ** (-(pl_direct_db(d_bu) + blockage_db) / 10)
+
+    # ---- cascade link: two-hop Wu-Zhang path loss ----
+    g_casc = 10 ** (-pl_cascade_db(d_bt, d_tu) / 10)
+
+    M, N, K = cfg["dims"]["M"], cfg["dims"]["N"], cfg["dims"]["K"]
     cn = lambda s: (rng.normal(size=s) + 1j * rng.normal(size=s)) / np.sqrt(2)
 
     ch = dict(

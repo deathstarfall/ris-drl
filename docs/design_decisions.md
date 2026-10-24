@@ -62,3 +62,9 @@ DD-010 (D2): G1 thresholds are stated constants in scripts/run\_gate1.py; changi
 
 DD-zero (D1): Power-normalized ZF ⇒ Heff@W = c·I. Interference-free = off-diagonals zero, not identity. Corrected the over-strict test; per-user SNR = |c\_gain(k)|²/σ², and the whole optimization problem is now pure phase alignment.
 
+DD-013 (D1): PR1 was committed to main directly by mistake (b86d366). Accepted as-is;
+
+&#x20;            retroactive consumer review by Shreyansh requested as a PR-review comment.
+
+&#x20;            Rule reminder: branch FIRST (`git switch -c feat/...`), commit second, PR third.
+
