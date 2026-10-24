@@ -79,15 +79,34 @@ def _to_ch_torch(ch: Dict, device: str = "cpu") -> Dict:
 
 
 def load_channel_npz(path) -> List[Dict]:
-    """Load one of Ayansh's frozen datasets (np.savez_compressed(..., chs=object_array)).
+    """Load the frozen dataset — supports object-array and stacked-array layouts."""
+    z = np.load(path, allow_pickle=True)
+    files = list(z.files)
 
-    NEVER regenerates channels — G2 discipline: the optimizer only ever sees saved data.
-    """
-    raw = np.load(path, allow_pickle=True)["chs"]
-    chs = []
-    for ch in raw:
-        chs.append({k: (np.asarray(v) if k != "sigma2" and k != "P" else v) for k, v in ch.items()})
-    return chs
+    for k in ("chs", "channels"):                       # layout A: object array
+        if k in files:
+            return [{kk: (np.asarray(v) if kk not in ("sigma2", "P") else v)
+                     for kk, v in ch.items()} for ch in z[k]]
+
+    if all(k in files for k in ("h_d", "G", "h_r")):    # layout B: stacked arrays
+        h_d, G, h_r = np.asarray(z["h_d"]), np.asarray(z["G"]), np.asarray(z["h_r"])
+        n = h_d.shape[0]
+        s2 = np.asarray(z["sigma2"]).reshape(-1) if "sigma2" in files else np.full(n, 1e-9)
+        P = np.asarray(z["P"]).reshape(-1) if "P" in files else None
+        out = []
+        for i in range(n):
+            ch = {"h_d": h_d[i], "G": G[i], "h_r": h_r[i], "sigma2": float(s2[i])}
+            if P is not None:
+                ch["P"] = float(P[i] if P.size > 1 else P[0])
+            for k in files:                             # metadata (u_pos etc.)
+                if k in ("h_d", "G", "h_r", "sigma2", "P"):
+                    continue
+                arr = np.asarray(z[k])
+                ch[k] = arr.item() if arr.shape == () else arr[i]
+            out.append(ch)
+        return out
+
+    raise KeyError(f"Unrecognized npz layout. Keys = {files}")
 
 
 # --------------------------------------------------------------------------------------
