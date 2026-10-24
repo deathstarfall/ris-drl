@@ -1,0 +1,87 @@
+% paper/sections/sec4b_deep_unfolding.tex — Balraj Singh (24BCE0531) — runbook §4.2 paper ownership
+% \input this from paper/main.tex as Section 4's unfolding subsection (\subsection level).
+% All numbers are macros populated by scripts/make_all_figures.py from results/ — nothing
+% hand-typed. \providecommand fallbacks exist only so the file compiles pre-integration.
+
+\subsection{Deep Unfolding: A Learned Projected-Gradient Optimizer}
+\label{sec:unfolding}
+
+The model-free agents of Section~\ref{sec:drl_methods} must discover from
+scratch that maximizing the sum rate calls for ascent on
+\eqref{eq:sum_rate}. Model-driven design instead builds that knowledge in
+explicitly: we \emph{unfold} $L$ projected-gradient ascent steps on the true
+objective into a fixed-depth network and train the few remaining degrees of
+freedom end-to-end. Concretely, the $L$-layer optimizer executes
+\begin{equation}
+\boldsymbol{\theta}^{(l+1)}
+\;=\; \operatorname{wrap}\!\Bigl(\boldsymbol{\theta}^{(l)}
++ \alpha_l \, \nabla_{\!\boldsymbol{\theta}}
+R\bigl(\boldsymbol{\theta}^{(l)}\bigr)\Bigr),
+\qquad
+\alpha_l = e^{\rho_l} > 0,
+\qquad l = 0, \dots, L-1,
+\label{eq:unrolled_pg}
+\end{equation}
+with $L = 6$ layers, initialization
+$\boldsymbol{\theta}^{(0)} = \boldsymbol{0}$ (identical to the AO bound of
+Section~\ref{sec:ao_bound}, so the two are never separated by initialization
+luck), and $\operatorname{wrap}(\boldsymbol{\theta}) =
+\boldsymbol{\theta} - 2\pi\lfloor \boldsymbol{\theta}/2\pi \rfloor$, the
+projection back onto $[0,2\pi)^N$ under which the rate
+\eqref{eq:sum_rate} is exactly periodic. The only trainable parameters are the
+$L$ real numbers $\rho_l$; the layer map itself is the exact gradient of the
+frozen system model, evaluated by automatic differentiation through
+\eqref{eq:zf}--\eqref{eq:sum_rate} with second-order graphs enabled so that the
+training signal flows \emph{through} the internal gradients.
+
+\subsubsection{Training Objective}
+The network is trained to maximize the achievable rate itself:
+\begin{equation}
+\mathcal{L}_{\mathrm{rate}}
+\;=\;
+-\,\frac{1}{|\mathcal{B}|}\sum_{\boldsymbol{h} \in \mathcal{B}}
+R\bigl(\boldsymbol{\theta}^{(L)}(\boldsymbol{h})\bigr),
+\label{eq:rate_loss}
+\end{equation}
+minimized by Adam over mini-batches $\mathcal{B}$ of the $1500$ training
+channels. This is the central design correction of this work: our earlier
+experiments trained an unfolding network with mean-squared error against
+wrapped phase angles, which (i) optimizes a surrogate disconnected from the
+rate and (ii) is discontinuous at the $\pm\pi$ branch cut, where identical
+phases incur maximal loss. We retain both defective objectives as ablations:
+a smooth circular surrogate
+$\mathcal{L}_{\mathrm{circ}} = \operatorname{mean}\bigl(1 -
+\cos\bigl(\operatorname{wrap}(\boldsymbol{\theta}^{(L)} -
+\boldsymbol{\theta}_{\mathrm{AO}})\bigr)\bigr)$ against the AO reference
+phases, and the original wrapped-angle MSE
+$\mathcal{L}_{\mathrm{MSE}} = \operatorname{mean}\bigl(\|
+\operatorname{wrap}\,\boldsymbol{\theta}^{(L)} -
+\operatorname{wrap}\,\boldsymbol{\theta}_{\mathrm{AO}} \|^2\bigr)$,
+reproducing its deficit in Section~\ref{sec:results_bound}.
+
+\subsubsection{Why Unfolding Decides Fast}
+At inference the unfolded optimizer performs exactly $L = 6$ fixed
+gradient evaluations---no line search, no iterative-until-convergence
+loop---on a single frozen test channel, and its latency
+is therefore a deterministic constant independent of channel difficulty. The
+Riemannian AO bound of Section~\ref{sec:ao_bound}, by contrast, iterates with
+Armijo line searches until a first-order tolerance is met. The measured
+per-decision latencies and the resulting quality--latency trade are reported
+in Section~\ref{sec:results_bound}; the claim we defend is the \emph{relative}
+one (unfolding is orders of magnitude faster than the bound it approximates),
+with the absolute milliseconds table reported as measured on the training
+dtype.
+
+\subsubsection{Protocol}
+The unfolding is trained on the $1500$ training channels with the identical
+budget, evaluation schedule, frozen test set, and five-seed protocol as every
+model-free agent, and the same one-hyperparameter tuning rule (the Adam
+learning rate over a three-point grid). The circular and MSE ablations
+additionally require AO reference phases on the training split, which are
+produced once by the reference script and stored under \texttt{results/ao/}.
+
+% ---- auto-populated macros (make_all_figures.py) ------------------------------
+\providecommand{\UnfoldingLayers}{6}
+\providecommand{\UnfoldLRgrid}{\{3\cdot10^{-2},\,10^{-2},\,3\cdot10^{-3}\}}
+The depth is $L = \UnfoldingLayers$ and the learning-rate grid is
+\UnfoldLRgrid{}; no other hyperparameter is tuned.
