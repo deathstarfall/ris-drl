@@ -1,0 +1,26 @@
+# RIS-DRL 2.0 — TD3 configuration
+# Owner: Shreyansh. Frozen after the G2 sign-off.
+agent: td3
+seed: 0
+device: cpu
+
+env_steps: 200000
+start_steps: 2000
+eval_every: 2000
+
+buffer: 300000
+batch: 256
+hidden: [256, 256]
+lr_actor: 3.0e-4
+lr_critic: 1.0e-3
+gamma: 1.0            # inert: every transition is terminal (contextual bandit)
+tau: 0.005
+policy_delay: 2
+target_noise: 0.2
+noise_clip: 0.5
+expl_noise: 0.1       # Gaussian exploration on the normalised action
+
+obs_norm: true
+reward_scale: 1.0
+test_channels: data/test_channels.npz
+train_channels: data/train_channels.npz

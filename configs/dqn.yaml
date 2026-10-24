@@ -1,0 +1,27 @@
+# RIS-DRL 2.0 — codebook DQN configuration (design (a), frozen D0)
+# Owner: Shreyansh. N heads, each choosing one of 2^bits phases.
+# bits is overridden per run by --bits {2,3,4}; run_id becomes dqn_b{bits}.
+agent: dqn
+seed: 0
+device: cpu
+bits: 2
+
+env_steps: 200000
+start_steps: 2000
+eval_every: 2000
+
+buffer: 300000
+batch: 256
+hidden: [256, 256]
+lr: 3.0e-4
+gamma: 1.0            # inert: every transition is terminal (contextual bandit)
+target_update: 1000   # hard target sync every N env steps
+eps_start: 1.0
+eps_end: 0.05
+eps_decay_steps: 100000
+huber_delta: 1.0
+
+obs_norm: true
+reward_scale: 1.0
+test_channels: data/test_channels.npz
+train_channels: data/train_channels.npz

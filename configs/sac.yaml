@@ -1,0 +1,28 @@
+# RIS-DRL 2.0 — SAC configuration
+# Owner: Shreyansh. Frozen after the G2 sign-off; only lr_actor may be tuned.
+agent: sac
+seed: 0
+device: cpu
+
+# Budget (identical for every agent — runbook §1.5)
+env_steps: 200000
+start_steps: 2000
+eval_every: 2000
+
+# Replay / optimisation
+buffer: 300000
+batch: 256
+hidden: [256, 256]
+lr_actor: 3.0e-4      # the ONE tunable: {1e-3, 3e-4, 1e-4}
+lr_critic: 1.0e-3
+lr_alpha: 3.0e-4
+gamma: 1.0            # bandit: every transition is terminal, so this is inert (no discount)
+tau: 0.005
+alpha_auto: true
+init_alpha: 0.2
+
+# Interface / hygiene
+obs_norm: true        # agent-side running standardisation of the frozen obs vector
+reward_scale: 1.0     # rate is already O(1–10) bps/Hz; never rescale silently
+test_channels: data/test_channels.npz
+train_channels: data/train_channels.npz
