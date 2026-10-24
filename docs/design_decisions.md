@@ -60,3 +60,5 @@ DD-010 (D2): G1 thresholds are stated constants in scripts/run\_gate1.py; changi
 
 &#x20;            requires a logged vote here (never change silently).
 
+DD-zero (D1): Power-normalized ZF ⇒ Heff@W = c·I. Interference-free = off-diagonals zero, not identity. Corrected the over-strict test; per-user SNR = |c\_gain(k)|²/σ², and the whole optimization problem is now pure phase alignment.
+
