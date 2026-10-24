@@ -16,7 +16,7 @@ train:
   theta_init: 0.0             # SAME init as ao_riemannian -> fair AO-vs-unfolding comparison
   wrap_theta: true            # project theta into [0, 2pi) each layer (rate is 2pi-periodic)
   optimizer: adam
-  lr: 0.01                    # the ONE tunable
+  lr: 0.003                    # the ONE tunable
   batch_channels: 128
   iters: 3000
   eval_every: 250
@@ -29,3 +29,4 @@ eval:
 out:
   root: results/unfold
   ckpt_stem: unfold           # -> results/unfold/unfold_L6_rate.pt, ..._circular.pt, ..._mse.pt
+
