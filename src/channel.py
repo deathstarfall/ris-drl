@@ -69,4 +69,8 @@ def save_dataset(path, n, seed, zone=None):
 def load_dataset(path):
     d = np.load(_ROOT / path, allow_pickle=True)
     keys = str(d["keys"]).split("|")
-    return [dict(zip(keys, [d[k][i] for k in keys])) for i in range(len(d["sigma2"]))]
+    
+    # FIX: Load arrays into memory FIRST to avoid millions of slow zip decompressions
+    arrays = {k: d[k] for k in keys}
+    
+    return [dict(zip(keys, [arrays[k][i] for k in keys])) for i in range(len(arrays["sigma2"]))]
