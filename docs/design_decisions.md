@@ -119,3 +119,5 @@ DD-024 (D3): (B11) At very high SNR the AO/random ratio compresses toward 1 even
 DD-025 (D3): (B12) No conftest.py / src/__init__.py from my side — tests self-configure
              sys.path, modules use dual-mode imports; PR2 adds zero shared-file conflicts.
 
+DD-026 — batch_slice indexed by batch length, not dataset size
+batch_slice's condition (v.shape[0] == len(idx)) never matched per-datasettensors (theta 1500 vs ref 128), so the rate loss silently ran full-batch,circular/mse crashed on the mismatch, and latency was measured as one500-channel forward pass. Fixed to slice by T["h_r"].shape[0] with av.dim() >= 1 guard; all three loss ablations retrained and the latency tablere-measured (true per-channel) before G3.
