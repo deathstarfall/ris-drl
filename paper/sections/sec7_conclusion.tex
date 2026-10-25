@@ -2,12 +2,12 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-Under a frozen, pre-registered 500-channel evaluation protocol, direct
+Under a frozen 500-channel evaluation protocol, direct
 reinforcement-learning phase policies for a blocked direct-link RIS
 scenario provided no measurable benefit over random phase selection,
 across every investigated architecture (continuous and codebook
 discretization levels) and thirty independent training runs. Deep
-unfolding, by contrast, recovers $95\%$ of the Riemannian-AO bound at
+unfolding, by contrast, recovers $95\%$ of the Riemannian-AO reference at
 $\sim$9.7~ms decision latency, absorbs 2--4-bit quantization losses
 gracefully, and degrades coherently under channel error. The
 asymmetry between the two epistemologies is not sample-limited (the
@@ -16,8 +16,8 @@ asymmetry between the two epistemologies is not sample-limited (the
 
 We offer this not as a verdict against RL writ large, but against an
 evaluation culture in which trained-policy comparisons are reported
-without frozen test sets, pre-registered budgets, or certified
-selection rules. The three-layer protocol---bound reference,
+without frozen test sets, written acceptance rules, or disciplined
+selection rules. The three-layer protocol---AO reference,
 model-driven learner, model-free challenger---used here is portable to
 any emerging-RIS benchmark, and we release the decision log
 (DD-001--DD-033), the raw per-channel artifacts, and the entire
@@ -26,11 +26,11 @@ ordering can, from now on, be checked against committed files rather
 than prose.
 
 \paragraph{Future work.} Three ranked directions follow directly from
-the certified data: (i) reward shaping and state-augmented
+the reported data: (i) reward shaping and state-augmented
 observations that inject gradient-sign structure into the bandit
 observation, giving model-free learners the same structure unfolding
 consumes at design time; (ii) sub-millisecond forward-only inference
-on hardware targets versus the measured $9.7$~ms, certifying latency
+on hardware targets versus the measured $9.7$~ms, quantifying latency
 on real silicon rather than software proxies; and (iii) extension to
-multi-RIS and multi-user scaling, where the AO-bound gap is expected
+multi-RIS and multi-user scaling, where the AO-reference gap is expected
 to widen the way it did for the single-RIS hard case here.

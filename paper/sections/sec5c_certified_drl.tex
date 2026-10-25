@@ -1,9 +1,9 @@
 % sec5c_certified_drl.tex - Certified DRL null-results study (DD-033)
-\subsection{Certified Evaluation of Direct DRL Phase Policies}
+\subsection{Frozen-Set Evaluation of Direct DRL Phase Policies}
 \label{sec:results-drl}
 
 Direct reinforcement-learning phase policies were evaluated under the
-project's pre-registered acceptance protocol: six architectures
+project's acceptance protocol: six architectures
 (continuous-policy SAC, TD3 and DDPG; discrete codebook DQN at 2, 3 and
 4-bit phase resolution), each trained over five random seeds with an
 identical $200\,000$-step budget on the frozen training split
@@ -12,9 +12,9 @@ evaluated on the frozen $500$-channel test set through the shared
 \texttt{evaluate.py} entry point (\S\ref{sec:results-ao}); all rates
 report the same ZF sum-rate convention as every other row.
 
-\paragraph{Certified null result.}
+\paragraph{Null result.}
 No architecture achieves a positive mean gain over the frozen random
-baseline ($43.80$~bps/Hz). The certified test-set deltas range from
+baseline ($43.80$~bps/Hz). The test-set deltas range from
 $-0.07$ (DQN@2bit) to $-0.33$~bps/Hz (SAC), every 95\% bootstrap
 interval covers zero, and every paired Wilcoxon test yields
 $p \geq 0.25$
@@ -29,7 +29,7 @@ toward it.
 
 \begin{table}[t]
 \centering\small
-\caption{Certified frozen-test-set evaluation of all six DRL agents
+\caption{Frozen-test-set evaluation of all six DRL agents
 (validation-best seed per agent; paired statistics vs.\ the frozen
 random baseline over the same 500 channels).}
 \label{tab:certified-drl}
@@ -52,7 +52,7 @@ Exploitable head demonstrably exists in this environment: selecting
 \emph{two hundred random} phase vectors per channel and keeping the best
 yields $51.84$~bps/Hz ($+8.04$, $p=1.7 \times 10^{-83}$), deep
 unfolding reaches $59.88$ ($+16.08$, $p=1.3 \times 10^{-83}$,
-$5.0\%$ short of the Riemannian AO bound $63.04$), while every trained
+$5.0\%$ short of the Riemannian AO reference $63.04$), while every trained
 policy remains statistically indistinguishable from a single random
 draw. The gap between what a 200-draw random search deftly extracts and
 what 30 gradient-informed training runs could not extract is the
@@ -69,5 +69,5 @@ re-weighting was performed after certification. A diagnosis of the
 failure modes (reward decomposition, observation-contract coverage,
 exploration coverage vs.\ the best-of-200 oracle) is the subject of a
 companion technical note deferred out of the results flow; it does not
-alter the certified outcome stated in
+alter the reported outcome stated in
 Table~\ref{tab:certified-drl}.

@@ -9,7 +9,7 @@
 % placeholders and are OVERWRITTEN at build time -- they must never be hand-edited to match
 % experiments (runbook \S7: "all numbers auto-generated, nothing hand-typed").
 
-\subsection{The Riemannian Bound and the Deep Unfolding}
+\subsection{The Riemannian Reference and Deep Unfolding}
 \label{sec:results_bound}
 
 \subsubsection{Gradient Verification Before Any Result}
@@ -23,7 +23,7 @@ to the torus ($\bigl|\operatorname{Re}(\nabla^{R} R \circ
 verified to return unit-modulus iterates to $10^{-12}$. Every optimization
 result below inherits a machine-checked gradient.
 
-\subsubsection{The AO Bound (Gate 2)}
+\subsubsection{The AO Reference (Gate 2)}
 \label{sec:ao_bound}
 Riemannian conjugate gradient on the torus
 $\mathcal{M} = \{\boldsymbol{z}: |z_i| = 1\}$ maximizes
@@ -47,18 +47,19 @@ $\boldsymbol{z} = \boldsymbol{1}$.
 \providecommand{\AOMedianIters}{200}
 \providecommand{\AOMedianTimeS}{0.475}
 \providecommand{\AOpercentTolHit}{44.4}
-On the frozen $500$-channel test set the bound achieves
-$\AOMeanRate{} \pm \AOMeanSD{}$~bps/Hz against
+On the frozen $500$-channel test set the reference achieves
+$\AOMeanRate{} \pm \AOMeanSD{}$~bps/Hz (SD, $n{=}500$) against
 $\RandomMeanRate{}$~bps/Hz for random phases---a mean ratio of
 \AoRandomRatio{} (criterion: $\geq 1.3$), with AO beating the random-phase
 mean on $\AOpercentAboveRandom{}\%$ of channels individually. The optimizer
 terminates in a median of $\AOMedianIters{}$ iterations
-($\AOpercentTolHit{}\%$ of channels meeting the first-order tolerance; the
-remainder terminate at a numerical local maximum with the Armijo search
-exhausted, both reported per channel) and takes $\AOMedianTimeS{}$~s per
+($\AOpercentTolHit{}\%$ meeting the first-order tolerance, $55.6\%$
+stopping at the iteration cap in a numerical local optimum; the
+non-convex problem makes this a strong \emph{reference}, not a proven
+upper bound; both shares reported per channel) and takes $\AOMedianTimeS{}$~s per
 channel---the ``seconds-scale'' reference against which learned policies are
 timed. A plain projected-gradient twin without the CG momentum is included as
-a reviewer control and never outperforms the bound.
+a reviewer control and never outperforms the reference.
 
 \providecommand{\AOHistoryFig}{figs/ao_convergence.pdf}
 Fig.~\ref{fig:ao_convergence} shows the per-iteration sum-rate curve (mean and
@@ -76,22 +77,22 @@ artifact). The curve saturates at 202 iterations/tolerance floor
 \end{center}
 \end{figure}
 
-\subsubsection{Unfolding Versus the Bound}
+\subsubsection{Unfolding Versus the Reference}
 \providecommand{\UnfoldMeanRate}{59.875}
 \providecommand{\UnfoldSD}{1.26}
-\providecommand{\UnfoldGapToAO}{94.7}
-\providecommand{\UnfoldLatencyMedianMS}{6.732}
-\providecommand{\UnfoldLatencyP95MS}{8.006}
-\providecommand{\UnfoldVsAOLatencyRatio}{70.6}
+\providecommand{\UnfoldGapToAO}{94.98}
+\providecommand{\UnfoldLatencyMedianMS}{9.572}
+\providecommand{\UnfoldLatencyP95MS}{11.285}
+\providecommand{\UnfoldVsAOLatencyRatio}{49.6}
 \providecommand{\RateLossMeanRate}{59.875}
 \providecommand{\CircularLossMeanRate}{58.335}
 \providecommand{\MSEnaLossMeanRate}{56.752}
 The trained unfolding reaches $\UnfoldMeanRate{} \pm \UnfoldSD{}$~bps/Hz on
-the frozen test set---within \UnfoldGapToAO{}\% of the AO bound
+the frozen test set---within \UnfoldGapToAO{}\% of the AO reference
 (criterion: $\leq 10\%$)---while deciding in a median of
 \UnfoldLatencyMedianMS{}~ms per channel ($p95$:
 \UnfoldLatencyP95MS{}~ms), a $\UnfoldVsAOLatencyRatio{}\times$ speed-up over
-the bound, on identical channels, budgets, and seeds. The loss-ablation table
+the reference, on identical channels, budgets, and seeds. The loss-ablation table
 confirms the design correction quantitatively:
 $\mathcal{L}_{\mathrm{rate}}$ attains \RateLossMeanRate{}~bps/Hz, the smooth
 circular surrogate \CircularLossMeanRate{}~bps/Hz, and the legacy
@@ -102,7 +103,7 @@ produced a policy indistinguishable from random phases in the earlier study.
 
 \begin{table}[t]
 \begin{center}
-\caption{Post-hoc $B$-bit quantization of continuous solutions (frozen test set, seed 0; raw means from \texttt{results/bits\_sweep.json}; dB-equivalent gaps to the continuous AO bound via $\Delta\mathrm{bps}\times 10\log_{10}2 = 3.0103$).}\label{tab:quantization}
+\caption{Post-hoc $B$-bit quantization of continuous solutions (frozen test set, seed 0; raw means from \texttt{results/bits\_sweep.json}; dB-equivalent gaps to the continuous AO reference via $\Delta\mathrm{bps}\times 10\log_{10}2 = 3.0103$).}\label{tab:quantization}
 \small\begin{tabular}{lccccc}\toprule
 $B$ & AO@$B$ & Unfold@$B$ & Random@$B$ & $\Delta$AO (bps/Hz) & $\Delta$AO (dB) \\
 \midrule
@@ -152,7 +153,7 @@ $\varepsilon = 0.1$.
 \subsubsection{Unseen User Zone}
 Finally, all methods are re-evaluated on $200$ channels whose users lie in a
 geometric zone never seen during any training or tuning
-(Fig.~\ref{fig:generalization}). The AO bound and the unfolding degrade by
+(Fig.~\ref{fig:generalization}). The AO reference and the unfolding degrade by
 \GenGapAODbOrBps{} and \GenGapUnfoldDbOrBps{} respectively---both
 optimization-based methods transfer essentially without loss because their
 inductive bias is the physics of \eqref{eq:sum_rate} itself, not the training

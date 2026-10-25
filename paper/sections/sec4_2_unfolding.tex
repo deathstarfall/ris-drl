@@ -5,7 +5,7 @@
 % ---------------------------------------------------------------
 \subsection{Model-Driven Reference: Riemannian AO and Deep Unfolding}\label{sec:unfolding}
 
-\subsubsection{Riemannian bound}
+\subsubsection{Riemannian reference}
 We treat \eqref{eq:sum_rate} as maximization of $f(\boldsymbol\theta)$ over the
 torus $\mathbb T^N$. Writing $\mathbf z = e^{j\boldsymbol\theta}$ and
 $\mathbf g = \nabla_{\!\boldsymbol\theta} f \in \mathbb R^N$, the Riemannian
@@ -28,7 +28,7 @@ $\mathcal R_{\mathbf z}(\gamma \mathbf d) = (\mathbf z+\gamma\mathbf d)/
 ($c = 10^{-4}$, $\gamma_0 = 1$, halvable to $2^{-20}$, restarts every
 ten accepted steps and whenever ascent pairing degrades). We run at least
 $200$ iterations per channel. This AO serves two roles: the
-\emph{optimization bound} for the study (the $``$AO $\geq 1.3\times$ random''
+\emph{optimization reference} for the study (the $``$AO $\geq 1.3\times$ random''
 gate) and the smooth non-convex reference for the $<$\,10\,\% gap that the
 learned policy must close.
 
@@ -73,4 +73,4 @@ the same frozen test set as every agent.
 At test time the policicy evaluates \eqref{eq:unroll} $L$ times; end-to-end
 decision latency is measured and reported next to the AO wall-clock
 (mean/p95 per-channel), evidencing the sub-millisecond regime against the
-seconds-scale bound (§\ref{sec:results-ao}, latency table).
+seconds-scale reference (\\S\\ref{sec:results-ao}, latency table).
