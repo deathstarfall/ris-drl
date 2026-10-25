@@ -9,7 +9,7 @@
  AO > random per-channel :   100.0 %    [informational]
  iters to terminate       : median 200, max 200 (cap 200)    [criterion <= 200]
  termination quality      : tol-hit  44.4 %  | numerical-stall  55.6 %  | ||rgrad|| at stop: median 3.18e-04, max 3.89e-01
- wall time               : 201.6 s total | median 0.388 s/channel   (AO is the seconds-scale upper bound for the G3 latency table)
+ wall time               : 232.0 s total | median 0.475 s/channel   (AO is the seconds-scale upper bound for the G3 latency table)
 --------------------------------------------------------------
  G2 VERDICT: PASS
 ==============================================================
