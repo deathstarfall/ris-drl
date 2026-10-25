@@ -2,7 +2,7 @@ import os
 import json
 import time
 from typing import Optional
-
+from src.channel import load_dataset
 import numpy as np
 import torch
 
@@ -21,7 +21,8 @@ class BanditWrapper:
         self.seed = seed
         try:
             from src.ris_env import RISEnv
-            self.env = RISEnv(channel_source=train_channels, seed=seed)
+            channels_list = load_dataset(train_channels)
+            self.env = RISEnv(channels=channels_list, seed=seed)
             self.obs_dim = int(np.prod(self.env.observation_space.shape))
             self.act_dim = int(np.prod(self.env.action_space.shape))
             self.N = self.env.N
@@ -44,7 +45,8 @@ def evaluate_on_frozen_test_set(agent, test_channels: str = "data/test_channels.
     # Fallback evaluation if evaluate.py isn't ready yet.
     try:
         from src.ris_env import RISEnv
-        env = RISEnv(channel_source=test_channels, seed=12345)
+        channels_list = load_dataset(test_channels)
+        env = RISEnv(channels=channels_list, seed=12345)
         total = 0.0
         n = N_eval if N_eval is not None else len(env.chs)
         for i in range(n):
@@ -128,11 +130,20 @@ def train_from_cfg(cfg_path: str):
         if t >= start_steps:
             agent.update()
         if t % eval_every == 0:
+            print(f">>> STARTING EVALUATION AT STEP {t} (this may take a minute on CPU) <<<", flush=True)
             ev = evaluate_on_frozen_test_set(agent, test_channels=cfg["test_channels"])
             hist.append(dict(step=t, eval_rate=float(ev), wall=time.time() - t0))
+            
+            # FIX: Save metrics incrementally so we can watch it in real-time!
+            out_dir = os.path.join("results", cfg_name(cfg), f"seed{seed}")
+            os.makedirs(out_dir, exist_ok=True)
+            out_path = os.path.join(out_dir, "metrics.json")
+            write_json(out_path, hist)
+            
             # frozen checkpoint format
             ckpt_path = os.path.join("ckpt", f"{cfg_name(cfg)}_seed{seed}.pt")
             torch.save(agent.state_dict(), ckpt_path)
+            print(f"Saved metrics to {out_path}", flush=True)
         obs = obs2
         if term or trunc:
             obs, _ = bw.env.reset()
