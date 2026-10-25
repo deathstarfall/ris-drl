@@ -23,3 +23,5 @@ paper/main.out
 paper/main.bbl
 paper/main.blg
 paper/main.log
+
+.tmp_cfg.yaml
