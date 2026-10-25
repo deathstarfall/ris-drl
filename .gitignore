@@ -12,3 +12,14 @@ results/**/local_*
 *.log
 
 # Keep in git (do NOT ignore): src/, configs/, scripts/, tests/, docs/, paper/, data/*.npz, results/**/*.json
+paper/main.aux
+paper/main.out
+paper/main.bbl
+paper/main.blg
+paper/main.log
+
+paper/main.aux
+paper/main.out
+paper/main.bbl
+paper/main.blg
+paper/main.log
