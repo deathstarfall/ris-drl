@@ -8,8 +8,11 @@ def describe(x, label):
                 sd=float(np.std(x, ddof=1)), sem=float(np.std(x, ddof=1) / np.sqrt(n)))
 
 def paired_vs_random(rates, random_rates, label=""):
-    """The core test of the whole paper: same 500 frozen channels, paired differences."""
-    diff = np.asarray(rates) - np.asarray(random_rates)
+    diff = np.asarray(rates, float) - np.asarray(random_rates, float)
+    if np.allclose(diff, 0.0, atol=1e-12):          # identical arrays → degenerate test
+        return dict(method=label, n=len(diff), mean_gain=0.0, p_wilcoxon=1.0,
+                    ci95=[0.0, 0.0], frac_channels_positive=0.0,
+                    degenerate=True, note="method output identical to random on all channels")
     stat, p = wilcoxon(diff)
     rng = np.random.default_rng(0)
     boots = [np.mean(diff[rng.integers(0, len(diff), len(diff))]) for _ in range(10000)]
