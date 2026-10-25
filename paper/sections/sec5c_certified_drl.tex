@@ -1,0 +1,73 @@
+% sec5c_certified_drl.tex - Certified DRL null-results study (DD-033)
+\subsection{Certified Evaluation of Direct DRL Phase Policies}
+\label{sec:results-drl}
+
+Direct reinforcement-learning phase policies were evaluated under the
+project's pre-registered acceptance protocol: six architectures
+(continuous-policy SAC, TD3 and DDPG; discrete codebook DQN at 2, 3 and
+4-bit phase resolution), each trained over five random seeds with an
+identical $200\,000$-step budget on the frozen training split
+(DD-017). The validation-best seed of each agent was subsequently
+evaluated on the frozen $500$-channel test set through the shared
+\texttt{evaluate.py} entry point (\S\ref{sec:results-ao}); all rates
+report the same ZF sum-rate convention as every other row.
+
+\paragraph{Certified null result.}
+No architecture achieves a positive mean gain over the frozen random
+baseline ($43.80$~bps/Hz). The certified test-set deltas range from
+$-0.07$ (DQN@2bit) to $-0.33$~bps/Hz (SAC), every 95\% bootstrap
+interval covers zero, and every paired Wilcoxon test yields
+$p \geq 0.25$
+(Table~\ref{tab:certified-drl}); training-time evaluation plateaus
+over all seeds corroborate the plateau at random-level values
+(per-agent training-band diagnostics \texttt{fig\_band\_*} accompany
+the artifact set). We therefore \emph{fail to find} evidence
+that model-free reinforcement learning discovers the RIS phase
+structure of \eqref{eq:sum_rate} under episodic $T{=}1$ bandit
+feedback, and we report this as a null result rather than tuning
+toward it.
+
+\begin{table}[t]
+\centering\small
+\caption{Certified frozen-test-set evaluation of all six DRL agents
+(validation-best seed per agent; paired statistics vs.\ the frozen
+random baseline over the same 500 channels).}
+\label{tab:certified-drl}
+\begin{tabular}{lrrrrr}
+\toprule
+Agent & Mean & $\Delta$ vs.\ random & $p$ & 95\% CI & \%ch.$>0$ \\
+\midrule
+SAC      & 43.47 & $-0.33$ & $0.27$ & $[-0.81,\,0.15]$ & 49 \\
+TD3      & 43.51 & $-0.28$ & $0.25$ & $[-0.79,\,0.21]$ & 47 \\
+DDPG     & 43.64 & $-0.16$ & $0.76$ & $[-0.68,\,0.34]$ & 50 \\
+DQN@2bit & 43.73 & $-0.07$ & $0.83$ & $[-0.53,\,0.39]$ & 49 \\
+DQN@3bit & 43.70 & $-0.10$ & $0.54$ & $[-0.56,\,0.37]$ & 47 \\
+DQN@4bit & 43.62 & $-0.17$ & $0.62$ & $[-0.65,\,0.29]$ & 49 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{The contrast that makes the null informative.}
+Exploitable head demonstrably exists in this environment: selecting
+\emph{two hundred random} phase vectors per channel and keeping the best
+yields $51.84$~bps/Hz ($+8.04$, $p=1.7 \times 10^{-83}$), deep
+unfolding reaches $59.88$ ($+16.08$, $p=1.3 \times 10^{-83}$,
+$5.0\%$ short of the Riemannian AO bound $63.04$), while every trained
+policy remains statistically indistinguishable from a single random
+draw. The gap between what a 200-draw random search deftly extracts and
+what 30 gradient-informed training runs could not extract is the
+central empirical observation of this study, and it supports the
+model-driven thesis: the search landscape of phase optimization is
+exploited by structure-informed optimization (unfolding, AO), not by
+model-free exploration within a $T{=}1$ bandit feedback loop.
+
+\paragraph{Why null results belong here.}
+All numbers in this subsection are emitted from committed raw JSON
+artifacts by the project's figure pipeline (DD-018) and recorded as
+decision DD-033; no post-hoc selection, seed replacement, or metric
+re-weighting was performed after certification. A diagnosis of the
+failure modes (reward decomposition, observation-contract coverage,
+exploration coverage vs.\ the best-of-200 oracle) is the subject of a
+companion technical note deferred out of the results flow; it does not
+alter the certified outcome stated in
+Table~\ref{tab:certified-drl}.

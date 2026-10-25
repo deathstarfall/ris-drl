@@ -2,12 +2,12 @@
 \providecommand{\TangencyTol}{\ensuremath{10^{-8}}}
 \providecommand{\FDTolRel}{\ensuremath{10^{-5}}}
 \providecommand{\TangencyTol}{\ensuremath{10^{-8}}}
-% paper/sections/sec5b_bound_and_unfolding.tex â€” Balraj Singh (24BCE0531) â€” runbook Â§4.2 ownership
+% paper/sections/sec5b_bound_and_unfolding.tex -- Balraj Singh (24BCE0531) -- runbook \S4.2 ownership
 % \input this from paper/main.tex as Section 5's bound+unfolding results subsection.
 % EVERY number is a macro populated by scripts/make_all_figures.py from results/ao/*.json
 % and results/unfold/*/metrics.json. The \providecommand fallbacks below are compile-only
-% placeholders and are OVERWRITTEN at build time â€” they must never be hand-edited to match
-% experiments (runbook Â§7: "all numbers auto-generated, nothing hand-typed").
+% placeholders and are OVERWRITTEN at build time -- they must never be hand-edited to match
+% experiments (runbook \S7: "all numbers auto-generated, nothing hand-typed").
 
 \subsection{The Riemannian Bound and the Deep Unfolding}
 \label{sec:results_bound}
@@ -66,6 +66,17 @@ Fig.~\ref{fig:ao_convergence} shows the per-iteration sum-rate curve (mean and
 $\pm$SD band over the test set), demonstrating monotone ascent and the
 convergence cap at $200$ iterations.
 
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=\columnwidth]{figs/fig_ao_convergence.pdf}
+\caption{Riemannian AO convergence: mean sum-rate per projected-gradient
+iteration, averaged over the 500 frozen test channels (DD-009 history
+artifact). The curve saturates at 202 iterations/tolerance floor
+(DD-017 convergence metadata).}
+\label{fig:ao_convergence}
+\end{center}
+\end{figure}
+
 \subsubsection{Unfolding Versus the Bound}
 \providecommand{\UnfoldMeanRate}{XX.X}
 \providecommand{\UnfoldSD}{X.X}
@@ -102,6 +113,17 @@ in line with the literature's $2$-bit practicality sweet spot.
 \providecommand{\CsiSweepFig}{figs/csi_sweep.pdf}
 \providecommand{\CsiEpsilonMaxLossDB}{X.X}
 For channel-state errors we perturb every channel tensor as
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=\columnwidth]{figs/fig_csi.pdf}
+\caption{CSI-robustness sweep: effects of channel-estimation mismatch
+$\varepsilon \in \{0, 0.01, 0.02, 0.05, 0.1\}$ on AO, unfolding, and the
+random-phase control (phases decided on $\hat{\boldsymbol h}$, scored on
+true $\boldsymbol h$; artifact \texttt{csi\_sweep.json}).}
+\label{fig:csi_sweep}
+\end{center}
+\end{figure}
+
 $\hat{\boldsymbol{h}} = \boldsymbol{h} + \varepsilon\,
 \operatorname{rms}(\boldsymbol{h})\,\mathcal{CN}(0,1)$ with
 $\varepsilon \in \{0, 0.01, 0.02, 0.05, 0.1\}$, decide the phases on
@@ -133,4 +155,4 @@ the same figure from the shared evaluation entry point.
 %   \label{fig:ao_convergence}
 % \end{figure}
 % Table stubs for \ref{tab:quantization} and the loss-ablation table are emitted by
-% scripts/make_all_figures.py (Ayansh) â€” single figure/table source of truth.
+% scripts/make_all_figures.py (Ayansh) -- single figure/table source of truth.

@@ -6,7 +6,7 @@
 \subsection{Model-Driven Reference: Riemannian AO and Deep Unfolding}\label{sec:unfolding}
 
 \subsubsection{Riemannian bound}
-We treat \eqref{eq:rate} as maximization of $f(\boldsymbol\theta)$ over the
+We treat \eqref{eq:sum_rate} as maximization of $f(\boldsymbol\theta)$ over the
 torus $\mathbb T^N$. Writing $\mathbf z = e^{j\boldsymbol\theta}$ and
 $\mathbf g = \nabla_{\!\boldsymbol\theta} f \in \mathbb R^N$, the Riemannian
 gradient is the Riesz representative
@@ -62,9 +62,9 @@ $\mathcal L_{\mathrm{circ}}$ is wrap-invariant; $\mathcal L_{\mathrm{mse}}$ is
 not — it charges a $\sim(2\pi)^2$ penalty to physically identical phases at the
 $0/2\pi$ boundary, exactly the failure mode destroyed our earlier study's
 unfolding, and we keep it only as a labeled ablation
-(§\ref{sec:results}, ablation table).
+(§\ref{sec:results-ao}, ablation table).
 
-Algorithmic honesty preamble (kept short here; full statement in §\ref{sec:protocol}):
+Algorithmic honesty preamble (kept short here; full statement in §\S\ref{sec:repro}):
 each episode observes one channel and commits one phase vector -- a contextual
 bandit, not an MDP. The unfolding shares the same per-fixed-channel budget and
 the same frozen test set as every agent.
@@ -73,4 +73,4 @@ the same frozen test set as every agent.
 At test time the policicy evaluates \eqref{eq:unroll} $L$ times; end-to-end
 decision latency is measured and reported next to the AO wall-clock
 (mean/p95 per-channel), evidencing the sub-millisecond regime against the
-seconds-scale bound (§\ref{sec:results}, latency table).
+seconds-scale bound (§\ref{sec:results-ao}, latency table).
