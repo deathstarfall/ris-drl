@@ -102,10 +102,14 @@ def summary_table():
                         ("baselines/best_of_200/eval_rates.json", "Best-of-200"),
                         ("ao/ao_rates.json", "Riemannian AO"),
                         ("unfold/unfold_rates.json", "Deep unfolding"),
-                        ("sac/best/eval_rates.json", "SAC (best seed)"),
-                        ("td3/best/eval_rates.json", "TD3 (best seed)"),
-                        ("ddpg/best/eval_rates.json", "DDPG (best seed)")]:
+                        ("sac/seed0/eval_rates.json", "SAC (certified)"),
+                        ("td3/seed0/eval_rates.json", "TD3 (certified)"),
+                        ("ddpg/seed0/eval_rates.json", "DDPG (certified)"),
+                        ("dqn_b2/seed0/eval_rates.json", "DQN@2bit (certified)"),
+                        ("dqn_b3/seed0/eval_rates.json", "DQN@3bit (certified)"),
+                        ("dqn_b4/seed0/eval_rates.json", "DQN@4bit (certified)")]:
         d = J(path)
+        if isinstance(d, list): d = {"rates": d}   # tolerate bare-list layouts (legacy artifacts)
         if not d or "rates" not in d: continue
         row = describe(d["rates"], label)
         if rnd: row.update(paired_vs_random(d["rates"], rnd["rates"], label))
