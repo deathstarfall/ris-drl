@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-scripts/make_balraj_macros.py — Balraj Singh (24BCE0531)
+scripts/make_balraj_macros.py -- Balraj Singh (24BCE0531)
 =========================================================
 
 Fills paper/sections/balraj_macros.tex from FROZEN ARTIFACTS ONLY.
 Honesty rule: a number that cannot be parsed from an artifact stays
-__TBD__ — nothing is ever invented here.
+TBD -- nothing is ever invented here. (Internally the marker is
+__TBD__, but the tex emits bold TBD: bare underscores are illegal in
+LaTeX text mode and would break compilation.)
 
 Sources (read-only; produced by gated runs):
   * results/ao/gate2_verdict.txt        -> Ao* macros + GateTwoVerdict
-    (written by scripts/run_gate2.py; the report JSON is NOT required —
+    (written by scripts/run_gate2.py; the report JSON is NOT required --
      this fixes the "__TBD__ after a successful rerun" bug, because the
      verdict txt is what the gate actually writes)
   * results/unfold/*/metrics.json       -> UnfoldGapToAo
@@ -17,12 +19,27 @@ Sources (read-only; produced by gated runs):
      group is the 5-seed protocol set, so lr-grid dirs (lr 0.03 / 0.003)
      and the circular/mse ablations are excluded automatically)
   * results/unfold/latency_float32.json -> UnfoldLatencyMs, UnfoldSpeedup
-    (float64 per-channel MEDIAN latency from the frozen latency-lever run —
-     median, because the AO side (gate2 verdict) is also a median, so the
-     ratio is like-for-like; mean/p95 are disclosed in DD-029 instead.
+    (float64 per-channel MEDIAN latency, like-for-like with the AO median;
      UnfoldSpeedup = AoWallMeanMs / UnfoldLatencyMs, e.g. 475/6.732 -> 70.6.
-     The parser is SCHEMA-AGNOSTIC: it walks the whole JSON and picks the
-     float64 median-ms leaf, so the exact key layout does not matter)
+     Parser is SCHEMA-AGNOSTIC: walks the whole JSON and picks the float64
+     median-ms leaf)
+  * results/bits_sweep.json             -> QaoQuantGapBthree
+    (AO-vs-AO-quantized mean-rate gap at B=3, reported as dB-equivalent
+     via the standard high-SNR convention 1 bps/Hz == 10*log10(2) ==
+     3.0103 dB, i.e. doubling the SNR buys exactly 1 bps/Hz)
+  * results/unfold/csi_sweep.json       -> CsiAoZero, CsiAoPone,
+    CsiRandomZero, CsiRandomPone
+    (eps=0 vs eps=0.1 rows; protocol: decide on h_hat, score on true h)
+  * results/ao/generalization.json      -> GenAo, GenPg, GenUnfold, GenRandom
+    (unseen-zone means; PG stays TBD until a PG generalization pass
+     actually runs -- it never has)
+  * results/ao/pg_test_channels.json    -> PgRandomRatio
+    (PG test mean / random test mean, the test-set twin of AoRandomRatio;
+     guarded: the pg file's ao_mean must match the canonical AO test mean
+     within 0.01 or the ratio is not like-for-like and stays TBD)
+  * results/ao/gate2_report.json        -> AoWallPNinetyFiveMs (best
+     effort; the report has never been produced, so this stays TBD
+     until an instrumented AO re-run -- lead item)
   * any pre-existing macros not in the known set are preserved verbatim
 
 Usage:
@@ -30,20 +47,32 @@ Usage:
 
 Exit code 0 iff every known macro is filled; 1 otherwise (CI-safe).
 Parser is encoding-robust: it matches ASCII labels and digits only, so
-cp1252/utf-8 mangling of ± or em-dashes in the verdict cannot break it.
+cp1252/utf-8 mangling of +/- or em-dashes in the verdict cannot break it.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from pathlib import Path
 
 KNOWN = ["AoRandomRatio", "AoRateMean", "AoSD", "AoIterMean",
          "AoWallMeanMs", "GateTwoVerdict", "UnfoldLatencyMs",
-         "UnfoldGapToAo", "UnfoldSpeedup"]
+         "UnfoldGapToAo", "UnfoldSpeedup",
+         "AoWallPNinetyFiveMs", "QaoQuantGapBthree",
+         "CsiAoZero", "CsiAoPone", "CsiRandomZero", "CsiRandomPone",
+         "GenAo", "GenPg", "GenUnfold", "GenRandom", "PgRandomRatio"]
+
+# why a macro can still be TBD today (printed with the outstanding list)
+TBD_HINTS = {
+    "AoWallPNinetyFiveMs": "needs results/ao/gate2_report.json "
+                           "(instrumented AO re-run; sec5_2 already cites it)",
+    "GenPg": "PG on the unseen gen_channels split has never been produced "
+             "(lead call: add a pg pass to run_generalization.py)",
+}
 
 FLOAT_RE = re.compile(r"[0-9]*\.?[0-9]+")
 NEWCMD_RE = re.compile(r"^\s*\\newcommand\{\\(\w+)\}\{(.*)\}\s*$")
@@ -94,7 +123,7 @@ def parse_verdict(path: Path) -> dict:
     if m:
         out["GateTwoVerdict"] = m.group(1).upper()
 
-    # internal consistency check (warn only — never silently trust)
+    # internal consistency check (warn only -- never silently trust)
     f = _line_floats(txt, "random mean rate")
     if ("AoRandomRatio" in out and "AoRateMean" in out and f):
         recomputed = float(out["AoRateMean"]) / float(f[0])
@@ -179,7 +208,7 @@ def parse_latency(path: Path):
     Return the float64 per-channel MEDIAN latency in MILLISECONDS from
     results/unfold/latency_float32.json (falls back to mean when no median
     key exists), tolerant to the exact schema.
-    Returns None when nothing plausible is found (honesty rule -> __TBD__).
+    Returns None when nothing plausible is found (honesty rule -> TBD).
     """
     try:
         d = json.loads(path.read_text(encoding="utf-8"))
@@ -208,6 +237,151 @@ def parse_latency(path: Path):
               f"'{leaf['path']}' -- ignoring (honesty rule)")
         return None
     print(f"[macros] latency source key '{leaf['path']}' -> {ms:.3f} ms (float64)")
+    return ms
+
+
+# ----------------------------------------------------------------------
+# bits sweep: AO-vs-AO-quantized gap at B=3, in dB-equivalent
+# ----------------------------------------------------------------------
+
+def parse_bits_sweep(path: Path):
+    """AO (infinite precision) minus AO @ 3-bit codebook, as dB-equivalent.
+    Convention: 1 bps/Hz == 10*log10(2) == 3.0103 dB (high-SNR regime:
+    doubling the SNR buys exactly 1 bps/Hz). Returns None when the
+    artifact lacks the expected fields (honesty rule -> TBD)."""
+    try:
+        d = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[macros] WARNING unreadable {path}: {e}")
+        return None
+    ao = ((d.get("detail") or {}).get("methods") or {}).get("ao") or {}
+    inf_mean = (ao.get("inf") or {}).get("mean")
+    per = ao.get("per_bits") or {}
+    b3 = per.get("3") or per.get(3) or {}
+    b3_mean = b3.get("mean")
+    if inf_mean is None or b3_mean is None:
+        print("[macros] WARNING bits_sweep.json lacks detail.methods.ao.inf / per_bits['3']")
+        return None
+    gap = float(inf_mean) - float(b3_mean)
+    if gap < 0:
+        print("[macros] WARNING negative quantization gap -- ignoring (honesty rule)")
+        return None
+    db = gap * (10.0 * math.log10(2.0))
+    print(f"[macros] quant gap B=3: {inf_mean:.4f} - {b3_mean:.4f} = {gap:.4f} "
+          f"bps/Hz == {db:.3f} dB-equivalent")
+    return db
+
+
+# ----------------------------------------------------------------------
+# CSI robustness sweep: eps 0 vs 0.1
+# ----------------------------------------------------------------------
+
+def parse_csi_sweep(path: Path):
+    try:
+        d = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[macros] WARNING unreadable {path}: {e}")
+        return None
+    mrm = d.get("mean_rate_by_method") or {}
+    eps = d.get("eps") or []
+    ao, ra = mrm.get("ao"), mrm.get("random")
+    if not ao or not ra or len(ao) != len(eps) or len(ra) != len(eps):
+        print("[macros] WARNING csi_sweep.json missing expected fields")
+        return None
+
+    def idx(target):
+        for i, e in enumerate(eps):
+            if abs(float(e) - target) < 1e-9:
+                return i
+        return None
+
+    i0, i1 = idx(0.0), idx(0.1)
+    if i0 is None or i1 is None:
+        print("[macros] WARNING csi_sweep.json lacks eps=0 / eps=0.1 rows")
+        return None
+    print(f"[macros] csi sweep: ao {ao[i0]:.3f} -> {ao[i1]:.3f}, "
+          f"random {ra[i0]:.3f} -> {ra[i1]:.3f} (eps 0 -> 0.1)")
+    return {"CsiAoZero": f"{ao[i0]:.3f}", "CsiAoPone": f"{ao[i1]:.3f}",
+            "CsiRandomZero": f"{ra[i0]:.3f}", "CsiRandomPone": f"{ra[i1]:.3f}"}
+
+
+# ----------------------------------------------------------------------
+# generalization: unseen-zone means (+ PG/random test ratio)
+# ----------------------------------------------------------------------
+
+def parse_generalization(path: Path):
+    try:
+        d = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[macros] WARNING unreadable {path}: {e}")
+        return None
+    m = d.get("methods") or {}
+    out = {}
+    for name, key in (("GenAo", "ao"), ("GenPg", "pg"),
+                      ("GenUnfold", "unfolding"), ("GenRandom", "random")):
+        try:
+            out[name] = f"{float(m[key]['unseen']['mean']):.3f}"
+        except (KeyError, TypeError):
+            pass                        # e.g. PG unseen never produced
+    print(f"[macros] generalization unseen means: {out}")
+    return out
+
+
+def parse_pg_ratio(gen_path: Path, pg_path: Path):
+    """PG test mean / random test mean -- the test-set twin of AoRandomRatio.
+    Guard: pg file's ao_mean must match the canonical AO test mean (from
+    generalization.json) within 0.01, else the channels differ and the
+    ratio is not like-for-like -> TBD."""
+    try:
+        g = json.loads(gen_path.read_text(encoding="utf-8"))
+        p = json.loads(pg_path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[macros] WARNING cannot read gen/pg artifacts: {e}")
+        return None
+    try:
+        ao_ref = float(g["methods"]["ao"]["test"]["mean"])
+        rnd = float(g["methods"]["random"]["test"]["mean"])
+    except (KeyError, TypeError):
+        print("[macros] WARNING generalization.json lacks ao/random test means")
+        return None
+    ao_pg = p.get("ao_mean")
+    if ao_pg is None or abs(float(ao_pg) - ao_ref) > 0.01:
+        print(f"[macros] WARNING pg file ao_mean {ao_pg} != test AO {ao_ref:.3f} "
+              f"-- different channel vintage; PgRandomRatio -> TBD")
+        return None
+    ratio = float(p["pg_mean"]) / rnd
+    print(f"[macros] PgRandomRatio: {float(p['pg_mean']):.3f} / {rnd:.3f} = {ratio:.3f}")
+    return ratio
+
+
+# ----------------------------------------------------------------------
+# gate2 report: AO wall-time p95 (artifact not produced yet -> TBD)
+# ----------------------------------------------------------------------
+
+def parse_gate2_report(path: Path):
+    """Best-effort p95 wall time (ms) from results/ao/gate2_report.json.
+    The file has never been produced, so the exact schema is unknown; we
+    walk for ms/second-valued leaves tagged p95 and sanity-check magnitude.
+    Returns None (-> TBD) on any doubt."""
+    try:
+        d = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[macros] WARNING unreadable {path}: {e}")
+        return None
+    leaves = []
+    _walk_ms(d, [], [], leaves)
+    cands = [l for l in leaves if "p95" in l["key"] or "p95" in l["path"]]
+    wall = [l for l in cands if "wall" in l["path"]] or cands
+    if not wall:
+        print(f"[macros] WARNING no p95 wall-time leaf found in {path}")
+        return None
+    leaf = wall[0]
+    ms = leaf["val"] * (1000.0 if leaf["sec"] else 1.0)
+    if not 0.1 <= ms <= 600000.0:
+        print(f"[macros] WARNING implausible p95 {ms} ms from "
+              f"'{leaf['path']}' -- ignoring (honesty rule)")
+        return None
+    print(f"[macros] AO wall p95 source key '{leaf['path']}' -> {ms:.1f} ms")
     return ms
 
 
@@ -268,6 +442,50 @@ def main() -> int:
     if values["UnfoldLatencyMs"] != "__TBD__" and values["AoWallMeanMs"] != "__TBD__":
         values["UnfoldSpeedup"] = f"{float(values['AoWallMeanMs']) / float(values['UnfoldLatencyMs']):.1f}"
 
+    # ---- B=3 quantization gap (dB-equivalent) ------------------------------
+    bpath = root / "results" / "bits_sweep.json"
+    if bpath.exists():
+        db = parse_bits_sweep(bpath)
+        if db is not None:
+            values["QaoQuantGapBthree"] = f"{db:.3f}"
+    else:
+        print(f"[macros] WARNING missing {bpath}")
+
+    # ---- CSI robustness (eps 0 vs 0.1) --------------------------------------
+    cpath = root / "results" / "unfold" / "csi_sweep.json"
+    if cpath.exists():
+        csi = parse_csi_sweep(cpath)
+        if csi:
+            values.update(csi)
+    else:
+        print(f"[macros] WARNING missing {cpath}")
+
+    # ---- generalization means + PG/random ratio -----------------------------
+    gpath = root / "results" / "ao" / "generalization.json"
+    ppath = root / "results" / "ao" / "pg_test_channels.json"
+    if gpath.exists():
+        gen = parse_generalization(gpath)
+        if gen:
+            values.update(gen)
+        if ppath.exists():
+            ratio = parse_pg_ratio(gpath, ppath)
+            if ratio is not None:
+                values["PgRandomRatio"] = f"{ratio:.3f}"
+        else:
+            print(f"[macros] WARNING missing {ppath}")
+    else:
+        print(f"[macros] WARNING missing {gpath}")
+
+    # ---- AO wall-time p95 (best effort; artifact not produced yet) ----------
+    rpath = root / "results" / "ao" / "gate2_report.json"
+    if rpath.exists():
+        ms95 = parse_gate2_report(rpath)
+        if ms95 is not None:
+            values["AoWallPNinetyFiveMs"] = f"{ms95:.1f}"
+    else:
+        print(f"[macros] NOTE {rpath} does not exist yet -> "
+              f"AoWallPNinetyFiveMs stays TBD")
+
     extras = load_extra_macros(out_path)
     if extras:
         print(f"[macros] preserving {len(extras)} non-standard macro(s) from the existing tex")
@@ -277,23 +495,32 @@ def main() -> int:
         "% Sources: results/ao/gate2_verdict.txt + results/unfold/*/metrics.json",
         "%          + results/unfold/latency_float32.json (f64 MEDIAN, matching",
         "%            the AO median in gate2_verdict.txt), schema-agnostic",
+        "%          + results/bits_sweep.json (B=3 gap, dB-equivalent:",
+        "%            1 bps/Hz == 10*log10(2) == 3.0103 dB, high-SNR convention)",
+        "%          + results/unfold/csi_sweep.json (eps 0 vs 0.1)",
+        "%          + results/ao/generalization.json + pg_test_channels.json",
         "% Balraj Singh (24BCE0531); consumed by paper/sections/sec5_2_*.tex.",
     ]
-    lines += [f"\\newcommand{{\\{k}}}{{\\textbf{{{values[k]}}}}}" for k in KNOWN]
+    # LaTeX-safe emission: unfilled macros print bold TBD (never __TBD__ --
+    # bare underscores are illegal in text mode and break compilation).
+    lines += [f"\\newcommand{{\\{k}}}{{\\textbf{{{values[k] if values[k] != '__TBD__' else 'TBD'}}}}}"
+              for k in KNOWN]
     lines += extras
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     print("-" * 56)
     for k in KNOWN:
-        print(f"  {k:16s} = {values[k]}")
+        print(f"  {k:20s} = {values[k]}")
     print("-" * 56)
 
     outstanding = [k for k in KNOWN if values[k] == "__TBD__"]
     if outstanding:
-        print("WARNING - __TBD__ macros outstanding (honesty rule: no invented numbers):")
+        print("WARNING - TBD macros outstanding (honesty rule: no invented numbers):")
         for k in outstanding:
             print(f"  - {k}")
+            if k in TBD_HINTS:
+                print(f"      ({TBD_HINTS[k]})")
         print(f"[macros] wrote {out_path} (incomplete)")
         return 1
     print(f"[macros] wrote {out_path} -- all {len(KNOWN)} macros filled")
