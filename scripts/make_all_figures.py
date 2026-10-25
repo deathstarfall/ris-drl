@@ -53,11 +53,27 @@ def fig_reward_band(agent):
 
 def fig_ao_convergence():
     d = J("ao/ao_rates.json")
-    if not d or "convergence" not in d: return
+    traj = None
+    if d and isinstance(d.get("convergence"), list) and d["convergence"] and isinstance(d["convergence"][0], (int, float)):
+        traj = d["convergence"]                                  # single mean trajectory (not per-channel)
+    else:                                                        # per-channel trajectories (Balraj layout):
+        try:                                                     # mean over channels from the DD-005 history npz
+            import numpy as np
+            z = np.load(ROOT / "results" / "ao" / "ao_test_channels_history.npz")
+            hist = z["history"].astype(float)
+            traj = np.nanmean(np.where(np.isfinite(hist), hist, np.nan), axis=0)  # nan-mean over 500 channels
+            traj = traj[np.isfinite(traj)]
+        except (FileNotFoundError, KeyError, ValueError):
+            pass
+    if traj is None or len(traj) < 2:
+        print("[skip] fig_ao_convergence: no convergence trajectory in artifacts")
+        return
     plt.figure(figsize=(5.5, 3.5))
-    plt.plot(d["convergence"]); plt.xlabel("CG iteration"); plt.ylabel("mean sum rate")
-    plt.title("Riemannian AO convergence (≥200 iters, tol 1e-4)")
-    plt.tight_layout(); plt.savefig(FIGS / "fig_ao_convergence.pdf"); plt.close()
+    plt.plot(traj)
+    plt.xlabel("CG iteration"); plt.ylabel("mean sum rate (bps/Hz)")
+    plt.title("Riemannian AO convergence (mean over 500 test channels)")
+    plt.tight_layout(); plt.savefig(FIGS / "fig_ao_convergence.pdf"); plt.savefig(FIGS / "fig_ao_convergence.png"); plt.close()
+    print(f"[figs] fig_ao_convergence written ({len(traj)} iterations)")
 
 def fig_bits_and_csi():
     b = J("bits_sweep.json")
@@ -109,5 +125,5 @@ if __name__ == "__main__":
           ["random","zero","no_ris","best_of_200"]}
     bl = {k: v for k, v in bl.items() if v}
     if bl: fig_baseline_bars(bl)
-    for a in ["sac", "td3", "ddpg"]: fig_reward_band(a)
+    for a in ["sac", "td3", "ddpg", "dqn_b2", "dqn_b3", "dqn_b4"]: fig_reward_band(a)
     fig_ao_convergence(); fig_bits_and_csi(); summary_table()

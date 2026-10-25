@@ -27,6 +27,11 @@ def seed_band(metrics_list):
     by_step = {}
     for m in metrics_list:
         for pt in m:
-            by_step.setdefault(pt["step"], []).append(pt["eval_rate"])
+            if not isinstance(pt, dict) or "step" not in pt or "eval_rate" not in pt:
+                continue  # skip trailing summary/meta rows (metrics.json contracting, DD-005)
+            try:
+                by_step.setdefault(float(pt["step"]), []).append(float(pt["eval_rate"]))
+            except (TypeError, ValueError):
+                continue
     return {s: {"mean": float(np.mean(v)), "sd": float(np.std(v, ddof=1)),
                 "n_seeds": len(v)} for s, v in sorted(by_step.items())}
