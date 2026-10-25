@@ -1,0 +1,78 @@
+% sec1_intro.tex - Introduction and related work
+\section{Introduction}
+\label{sec:intro}
+
+Reconfigurable intelligent surfaces reshape the wireless propagation
+environment by reflecting incident waves under a programmable phase
+profile~\cite{huang2019reconfigurable,wu2019towards}, turning the
+passive radio scene into an optimizable multiplier. Achieving that
+potential, however, requires solving a non-convex phase
+optimization problem per coherence block under real deployments that
+must obey latency budgets, quantization limits, and imperfect channel
+state information~\cite{wu2020intelligent}.
+
+Two solution philosophies currently dominate the literature. The
+\emph{model-driven} family embeds the sum-rate objective and its
+gradients explicitly into the solver: alternating-optimize (AO)
+procedures descend a Riemannian manifold structure, while
+\emph{deep unfolding} \cite{shlezinger2023model} converts iterations of
+a projected-gradient method into layers of a fixed-depth neural
+network, regaining learned step sizes while keeping the physics
+visible. The \emph{model-free} family treats phase selection as a
+decision problem and trains reinforcement-learning
+agents~\cite{mnih2015human,lillicrap2015continuous,fujimoto2018addressing,haarnoja2018soft}
+end-to-end from reward, letting exploration rather than analysis
+discover the solution.
+
+\subsection{Contributions}
+\label{sec:contrib}
+
+This paper contributes a protocol-governed empirical comparison of
+these philosophies, built around a frozen test protocol rather than
+best-effort best-run reporting:
+
+\begin{enumerate}
+\item \textbf{Certifiably frozen evaluation protocol.} A
+pre-registered channel-generation seed split (train/test/generalize)
+fixes all 500 evaluation channels before any policy interacts with
+them; every method---bound, unfolding, and all six RL agents---is
+evaluated through one shared scorekeeper on identical hardware and
+identical ZF sum-rate convention (DD-017).
+\item \textbf{A Riemannian AO reference bound.} A manifold-constrained
+alternating optimizer reaches $63.04$~bps/Hz mean sum rate
+($1.439 \times$ the random baseline) on the full frozen test set,
+establishing the certified headroom available for any learned method
+(\S\ref{sec:results-ao}).
+\item \textbf{Deep unfolding within $5.0\%$ of the bound.} An
+$L{=}6$ unfolded projected-gradient network reaches $59.88$~bps/Hz
+($p=1.3\times10^{-83}$ over random), with trained-side inference
+latency of $9.7$~ms per decision and absorbed quantization sweep at
+2/3/4-bit phase codebooks (\S\ref{sec:results-ao}).
+\item \textbf{A certified null for direct DRL policies.} Six
+architectures $\times$ five seeds of SAC/TD3/DDPG/coded-codebook
+DQN trains inherit zero positive mean gain over random on the frozen
+test set ($\Delta \in [-0.33,-0.07]$ bps/Hz, all $p \geq 0.25$,
+\S\ref{sec:results-drl}); the study reports this outcome rather than
+selecting training-run endpoints, and contrasts it against the
+$+8.04$~bps/Hz obtainable from a simple 200-draw random oracle,
+isolating \emph{learned structure}---not sample count---as the
+difference-maker.
+\end{enumerate}
+
+\subsection{Reproducibility and the role of a decision log}
+\label{sec:repro}
+
+Every numeric claim in this paper is emitted from committed JSON
+artifacts by a figure pipeline that accepts no hand-typed values
+(protocol DD-018), and every experimental-convention change en route
+is recorded as a numbered decision (DD-001--DD-033) with date and
+owner. In particular, changes that materially weakened the original
+claim set---replacement of an interference-limited channel model
+(DD-011b), opening of the direct link to $-25$~dB blockage so that
+RIS contribution dominates (G1 sensitivity check
+$3.75$~bps/Hz/flip), and re-casting the RL formulation as a $T{=}1$
+contextual bandit (DD-007)---are logged \emph{as corrections}, not as
+silent tuning. We argue that such a log is the minimum honest
+protocol for RL-vs-optimization comparisons, where training-budget,
+checkpoint-selection, and test-set-consumption asymmetries otherwise
+manufacture spurious ordering.
