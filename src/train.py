@@ -20,7 +20,7 @@ def main():
         cfg_path = os.path.join("configs", f"{args.agent}.yaml")
     else:
         cfg_path = args.config
-    with open(cfg_path, "r") as f:
+    with open(cfg_path, "r",encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
     cfg = copy.deepcopy(cfg)
     cfg["agent"] = args.agent
@@ -32,7 +32,7 @@ def main():
             cfg["bits"] = 2
     # write a transient merged config if needed (keep original)
     out_cfg = os.path.join(".tmp_cfg.yaml")
-    with open(out_cfg, "w") as f:
+    with open(out_cfg, "w",encoding="utf-8") as f:
         yaml.safe_dump(cfg, f)
     train_from_cfg(out_cfg)
 

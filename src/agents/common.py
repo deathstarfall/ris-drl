@@ -109,11 +109,11 @@ def to_tensor(x, device):
 def write_json(path, obj):
     import json
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-    with open(path, "w") as f:
+    with open(path, "w",encoding="utf-8") as f:
         json.dump(obj, f, indent=2)
 
 
 def load_yaml(path):
     import yaml
-    with open(path, "r") as f:
+    with open(path, "r",encoding="utf-8") as f:
         return yaml.safe_load(f)
