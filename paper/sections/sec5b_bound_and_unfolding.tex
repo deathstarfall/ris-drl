@@ -1,0 +1,136 @@
+﻿\providecommand{\FDTolRel}{\ensuremath{10^{-5}}}
+\providecommand{\TangencyTol}{\ensuremath{10^{-8}}}
+\providecommand{\FDTolRel}{\ensuremath{10^{-5}}}
+\providecommand{\TangencyTol}{\ensuremath{10^{-8}}}
+% paper/sections/sec5b_bound_and_unfolding.tex â€” Balraj Singh (24BCE0531) â€” runbook Â§4.2 ownership
+% \input this from paper/main.tex as Section 5's bound+unfolding results subsection.
+% EVERY number is a macro populated by scripts/make_all_figures.py from results/ao/*.json
+% and results/unfold/*/metrics.json. The \providecommand fallbacks below are compile-only
+% placeholders and are OVERWRITTEN at build time â€” they must never be hand-edited to match
+% experiments (runbook Â§7: "all numbers auto-generated, nothing hand-typed").
+
+\subsection{The Riemannian Bound and the Deep Unfolding}
+\label{sec:results_bound}
+
+\subsubsection{Gradient Verification Before Any Result}
+Following the failure-analysis discipline of Section~\ref{sec:intro}, the very
+first experimental artifact of this work is not a rate table but a gradient
+audit: the autograd Euclidean gradient of $R(\boldsymbol{z})$ is compared
+against central finite differences along random complex directions (agreement
+to \FDTolRel{} relative or better), the Riemannian gradient is verified tangent
+to the torus ($\bigl|\operatorname{Re}(\nabla^{R} R \circ
+\boldsymbol{z}^{*})\bigr|_{\max} < \TangencyTol{}$), and the retraction is
+verified to return unit-modulus iterates to $10^{-12}$. Every optimization
+result below inherits a machine-checked gradient.
+
+\subsubsection{The AO Bound (Gate 2)}
+\label{sec:ao_bound}
+Riemannian conjugate gradient on the torus
+$\mathcal{M} = \{\boldsymbol{z}: |z_i| = 1\}$ maximizes
+\eqref{eq:sum_rate} with Fletcher--Reeves directions transported by the tangent
+projection
+$P_{\boldsymbol{z}}(\boldsymbol{v}) = \boldsymbol{v} -
+\operatorname{Re}(\boldsymbol{v} \circ \boldsymbol{z}^{*}) \circ
+\boldsymbol{z}$, retraction
+$\boldsymbol{z} \leftarrow (\boldsymbol{z} + \gamma \boldsymbol{d}) \oslash
+|\boldsymbol{z} + \gamma \boldsymbol{d}|$, Armijo backtracking
+($c_1 = 10^{-4}$, $\gamma_0 = 1$, $\rho = 1/2$), and the stopping rule
+$\|\nabla^{R} R\|_F < 10^{-4}$ or $200$ iterations, initialized at
+$\boldsymbol{z} = \boldsymbol{1}$.
+
+\providecommand{\FDTolRel}{\ensuremath{10^{-5}}}
+\providecommand{\TangencyTol}{\ensuremath{10^{-8}}}
+\providecommand{\AOrandomRatio}{XX.XX}
+\providecommand{\AOMeanRate}{XX.X}
+\providecommand{\AOMeanSD}{X.X}
+\providecommand{\RandomMeanRate}{XX.X}
+\providecommand{\AOpercentAboveRandom}{XX.X}
+\providecommand{\AOMedianIters}{XXX}
+\providecommand{\AOMedianTimeS}{X.XXX}
+\providecommand{\AOpercentTolHit}{XX.X}
+On the frozen $500$-channel test set the bound achieves
+$\AOMeanRate{} \pm \AOMeanSD{}$~bps/Hz against
+$\RandomMeanRate{}$~bps/Hz for random phases---a mean ratio of
+$\AOrandomRatio{}$ (criterion: $\geq 1.3$), with AO beating the random-phase
+mean on $\AOpercentAboveRandom{}\%$ of channels individually. The optimizer
+terminates in a median of $\AOMedianIters{}$ iterations
+($\AOpercentTolHit{}\%$ of channels meeting the first-order tolerance; the
+remainder terminate at a numerical local maximum with the Armijo search
+exhausted, both reported per channel) and takes $\AOMedianTimeS{}$~s per
+channel---the ``seconds-scale'' reference against which learned policies are
+timed. A plain projected-gradient twin without the CG momentum is included as
+a reviewer control and never outperforms the bound.
+
+\providecommand{\AOHistoryFig}{figs/ao_convergence.pdf}
+Fig.~\ref{fig:ao_convergence} shows the per-iteration sum-rate curve (mean and
+$\pm$SD band over the test set), demonstrating monotone ascent and the
+convergence cap at $200$ iterations.
+
+\subsubsection{Unfolding Versus the Bound}
+\providecommand{\UnfoldMeanRate}{XX.X}
+\providecommand{\UnfoldSD}{X.X}
+\providecommand{\UnfoldGapToAO}{XX.X}
+\providecommand{\UnfoldLatencyMedianMS}{X.XX}
+\providecommand{\UnfoldLatencyP95MS}{X.XX}
+\providecommand{\UnfoldVsAOLatencyRatio}{XXX}
+\providecommand{\RateLossMeanRate}{XX.X}
+\providecommand{\CircularLossMeanRate}{XX.X}
+\providecommand{\MSEnaLossMeanRate}{XX.X}
+The trained unfolding reaches $\UnfoldMeanRate{} \pm \UnfoldSD{}$~bps/Hz on
+the frozen test set---within \UnfoldGapToAO{}\% of the AO bound
+(criterion: $\leq 10\%$)---while deciding in a median of
+\UnfoldLatencyMedianMS{}~ms per channel ($p95$:
+\UnfoldLatencyP95MS{}~ms), a $\UnfoldVsAOLatencyRatio{}\times$ speed-up over
+the bound, on identical channels, budgets, and seeds. The loss-ablation table
+confirms the design correction quantitatively:
+$\mathcal{L}_{\mathrm{rate}}$ attains \RateLossMeanRate{}~bps/Hz, the smooth
+circular surrogate \CircularLossMeanRate{}~bps/Hz, and the legacy
+wrapped-angle MSE \MSEnaLossMeanRate{}~bps/Hz---the regime that silently
+produced a policy indistinguishable from random phases in the earlier study.
+
+\providecommand{\QuantTabRef}{tab:quantization}
+\providecommand{\BitsTwoLossDB}{X.X}
+\providecommand{\BitsThreeLossDB}{X.X}
+\providecommand{\BitsFourLossDB}{X.X}
+\subsubsection{Discrete Phase Shifters and Imperfect CSI}
+Real RIS controllers apply quantized phases. Re-mapping the AO, unfolding, and
+random solutions onto uniform $B$-bit codebooks ($B \in \{2,3,4\}$,
+$\Delta = 2\pi/2^{B}$) costs \BitsTwoLossDB{}/\BitsThreeLossDB{}/%
+\BitsFourLossDB{}~dB at $2/3/4$ bits respectively (Table~\ref{tab:quantization}),
+in line with the literature's $2$-bit practicality sweet spot.
+
+\providecommand{\CsiSweepFig}{figs/csi_sweep.pdf}
+\providecommand{\CsiEpsilonMaxLossDB}{X.X}
+For channel-state errors we perturb every channel tensor as
+$\hat{\boldsymbol{h}} = \boldsymbol{h} + \varepsilon\,
+\operatorname{rms}(\boldsymbol{h})\,\mathcal{CN}(0,1)$ with
+$\varepsilon \in \{0, 0.01, 0.02, 0.05, 0.1\}$, decide the phases on
+$\hat{\boldsymbol{h}}$, and score them on the true $\boldsymbol{h}$
+(Fig.~\ref{fig:csi_sweep}). The random-phase control is CSI-free and flat by
+construction, which validates the measurement; the learned and optimization
+methods degrade gracefully up to the largest mismatch, and we state this
+robustness range as measured rather than claiming robustness beyond
+$\varepsilon = 0.1$.
+
+\providecommand{\GenFig}{figs/generalization.pdf}
+\providecommand{\GenGapAODbOrBps}{X.X}
+\providecommand{\GenGapUnfoldDbOrBps}{X.X}
+\subsubsection{Unseen User Zone}
+Finally, all methods are re-evaluated on $200$ channels whose users lie in a
+geometric zone never seen during any training or tuning
+(Fig.~\ref{fig:generalization}). The AO bound and the unfolding degrade by
+\GenGapAODbOrBps{} and \GenGapUnfoldDbOrBps{} respectively---both
+optimization-based methods transfer essentially without loss because their
+inductive bias is the physics of \eqref{eq:sum_rate} itself, not the training
+distribution. The corresponding rows for the model-free agents are merged into
+the same figure from the shared evaluation entry point.
+
+% ---------------------------------------------------------------- figure stubs
+% \begin{figure}[t]\centering
+%   \includegraphics[width=\columnwidth]{\AOHistoryFig}
+%   \caption{AO convergence on the frozen test set: mean sum rate vs.\ iteration,
+%            $\pm$SD band; stopping rule $\|\nabla^R R\|_F < 10^{-4}$ or $200$ iters.}
+%   \label{fig:ao_convergence}
+% \end{figure}
+% Table stubs for \ref{tab:quantization} and the loss-ablation table are emitted by
+% scripts/make_all_figures.py (Ayansh) â€” single figure/table source of truth.

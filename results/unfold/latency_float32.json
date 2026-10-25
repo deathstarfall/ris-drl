@@ -1,0 +1,23 @@
+{
+  "ckpt": "results\\unfold\\unfold_L6_rate.pt",
+  "n_channels": 500,
+  "n_trials": 200,
+  "float64": {
+    "test_rate": 59.87531459122388,
+    "median_ms": 6.732450005074497,
+    "p95_ms": 8.00649999291636,
+    "mean_ms": 6.791416999840294,
+    "dtype": "torch.complex128",
+    "n_trials": 200
+  },
+  "float32": {
+    "test_rate": 59.87469482421875,
+    "median_ms": 6.802550007705577,
+    "p95_ms": 8.116699988022447,
+    "mean_ms": 6.789610499981791,
+    "dtype": "torch.complex64",
+    "n_trials": 200
+  },
+  "rate_drift_bps_hz": 0.0006197670051264481,
+  "latency_gain_float32": 0.9896950404551714
+}

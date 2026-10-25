@@ -68,3 +68,78 @@ DD-013 (D1): PR1 was committed to main directly by mistake (b86d366). Accepted a
 
 &#x20;            Rule reminder: branch FIRST (`git switch -c feat/...`), commit second, PR third.
 
+DD-014 (D3): (B1) sum_rate torch+numpy twins live in src/ao_riemannian.py (frozen §6.2
+             formula), pinned to 1e-10 vs numpy in tests/test_ao_grad.py. No import of
+             precoder.py so PR2 never blocked on PR1. At integration: move into
+             precoder.py (≈30 lines) or keep both with the twin test as drift tripwire.
+
+DD-015 (D3): (B2) §6.2 skeleton's gain pairing np.sum(Heff*W.conj(), axis=1) is wrong for
+             K≠M: pairs user k with ROW k of W, but user k's ZF beam is COLUMN k (Heff@W=I);
+             also a (K,M)*(M,K) shape error. Correct pairing: einsum('km,mk->k', Heff, W.conj()).
+
+DD-016 (D3): (B3) §6.1 channel dict carried no "P" while §6.2 reads ch["P"]. My code uses
+             ch.get("P", 1.0) (1 W ≡ 30 dBm). Superseded by DD-005: npz carries P (n,),
+             loader passes it through per channel.
+
+DD-017 (D3): (B4) float64/complex128 everywhere in AO + unfolding + scripts. FD gradient
+             tests need ~1e-6 relative agreement, unreachable in float32 at rate O(10-50)
+             bps/Hz. float32 only for inference-latency experiments, labeled as such.
+
+DD-018 (D3): (B5) CG sign: we MAXIMIZE rate, so ascent direction = +rgrad; §4.2's
+             minimization form (d ← -rgrad + β·P_T(d)) stalled Armijo exactly as §8's
+             "AO ≈ random" ghost. Caught by day-1 FD tests; equivalence in ao_math.md §A6.
+
+DD-019 (D3): (B6) FR-CG restarts every N iters, on non-ascent direction, and on Armijo
+             failure (one steepest-ascent retry before declaring numerical stall).
+             run_gate2.py reports tol-hit % AND stall % + rgrad norm at stop; the G2
+             verdict uses only the frozen criteria so it cannot be gamed.
+
+DD-020 (D3): (B7) AO and unfolding share init θ=0 (z=1): AO-vs-unfolding gap is purely
+             algorithmic. random-phase covers "random init"; best-of-200 the practical bar.
+
+DD-021 (D3): (B8) Unfolding losses: main = -mean sum rate end-to-end (second-order autograd
+             through the L internal rate gradients); circular = 1-cos(Δθ), branch-cut-free;
+             MSE-on-wrapped-angles = old bug #5, kept ONLY to quantify its deficit.
+
+DD-022 (D3): (B9) CSI-error protocol: ĥ = h + ε·rms(h)·CN(0,1) per tensor,
+             ε ∈ {0,.01,.02,.05,.1}, seeded so all methods see identical realizations;
+             decide on ĥ, score on true h. Quantization: uniform per-element codebook
+             Δ = 2π/2^B, nearest codeword, B ∈ {2,3,4}, on the frozen test set.
+
+DD-023 (D3): (B10) Extra entry points beyond the frozen scripts/ layout: run_ao_reference.py,
+             train_unfolding.py, run_quantization.py, run_csi_sweep.py, run_generalization.py.
+             Scope guard: my scripts emit JSON/npy only; make_all_figures.py stays the single
+             figure source; nothing writes into data/.
+
+DD-024 (D3): (B11) At very high SNR the AO/random ratio compresses toward 1 even for a
+             perfect optimizer (coherent gain ≈ log2 N absolute; ratio → 1 as SNR → ∞), so a
+             failing ratio with green FD tests indicts the link budget/geometry, not the
+             optimizer. The −25 dB directly-blocked geometry makes this less of a risk here.
+
+DD-025 (D3): (B12) No conftest.py / src/__init__.py from my side — tests self-configure
+             sys.path, modules use dual-mode imports; PR2 adds zero shared-file conflicts.
+
+DD-026 — batch_slice indexed by batch length, not dataset size
+<<<<<<< HEAD
+batch_slice's condition (v.shape[0] == len(idx)) never matched per-datasettensors (theta 1500 vs ref 128), so the rate loss silently ran full-batch,circular/mse crashed on the mismatch, and latency was measured as one500-channel forward pass. Fixed to slice by T["h_r"].shape[0] with av.dim() >= 1 guard; all three loss ablations retrained and the latency tablere-measured (true per-channel) before G3.
+=======
+batch_slice's condition (v.shape[0] == len(idx)) never matched per-datasettensors (theta 1500 vs ref 128), so the rate loss silently ran full-batch,circular/mse crashed on the mismatch, and latency was measured as one500-channel forward pass. Fixed to slice by T["h_r"].shape[0] with av.dim() >= 1 guard; all three loss ablations retrained and the latency tablere-measured (true per-channel) before G3.
+
+DD-017 (ratified D2/D3): GATE G2 PASSED — AO/random = 1.445 over the FULL frozen
+500-channel test set (100% per-channel wins; PG twin within 1%). Campaigns authorized
+in all methods. (Logged initially by Balraj on feat/opt-bound — ratified here.)
+
+DD-018 (already logged — keep): figure/table consume RAW eval JSONs; stats derived in-code.
+
+DD-019 (Balraj B1–B12, renumbered): <one-line mapping table: B1→DD-019 ... B12→DD-030>.
+
+DD-031 (D3 — LATENCY CRITERION VOTE): measured unfolding inference = 6.8 ms vs AO 0.388 s
+=> 57.6x speedup (Balraj DD-029). Original acceptance text said "<1 ms". TEAM VOTE:
+(a) implement forward-only inference path (no autograd at eval) as a fix task, OR
+(b) revise acceptance to "<7 ms, >=57x vs AO; sub-ms as future work". DECISION: ____.
+
+DD-032 (transiently — resolving): results/unfold/unfold_rates.json (DD-009) absent;
+per-channel unfold rates must land there (rates[500] + latency_ms[500] + channel_seed
+2000) before run_gate3 can produce its unfold row. Owner: Balraj.
+>>>>>>> fbde7a1b7defa9ac4177a9952806c43cfb139815
+

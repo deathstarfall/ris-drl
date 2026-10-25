@@ -1,0 +1,76 @@
+% ---------------------------------------------------------------
+% paper/sections/sec4_2_unfolding.tex
+% Owner: Balraj Singh (24BCE0531) — runbook s7 D12-D14 (Balraj = §4.2).
+% Math source of truth: docs/ao_math.md s7; implementation: src/unfolding.py.
+% ---------------------------------------------------------------
+\subsection{Model-Driven Reference: Riemannian AO and Deep Unfolding}\label{sec:unfolding}
+
+\subsubsection{Riemannian bound}
+We treat \eqref{eq:rate} as maximization of $f(\boldsymbol\theta)$ over the
+torus $\mathbb T^N$. Writing $\mathbf z = e^{j\boldsymbol\theta}$ and
+$\mathbf g = \nabla_{\!\boldsymbol\theta} f \in \mathbb R^N$, the Riemannian
+gradient is the Riesz representative
+\begin{equation}\label{eq:rgrad}
+\mathbf r(\mathbf z) \;=\; j\, \mathbf z \odot \mathbf g,
+\qquad
+\langle \mathbf r, \mathbf t\rangle = df(\mathbf t)
+\ \ \forall\, \mathbf t = j\,\mathbf z\odot \mathbf w,\ \mathbf w\in\mathbb R^N,
+\end{equation}
+with $\|\mathbf r\|_2 = \|\mathbf g\|_2$ identically, hence the stopping rule
+$\|\mathbf r\|_2 < 10^{-4}$ has a parameterization-free meaning. Conjugate
+gradient with Fletcher--Reeves
+$\beta_t = \|\mathbf r_t\|^2/\|\mathbf r_{t-1}\|^2$ and drift correction through
+the tangential projector
+$\mathcal P_T(\mathbf z)(\mathbf v) = \mathbf v - \mathrm{Re}(\mathbf v\odot\mathbf z^*)\odot \mathbf z$
+feeds the first-order-consistent retraction
+$\mathcal R_{\mathbf z}(\gamma \mathbf d) = (\mathbf z+\gamma\mathbf d)/
+|\mathbf z+\gamma\mathbf d|$ with Armijo backtracking
+($c = 10^{-4}$, $\gamma_0 = 1$, halvable to $2^{-20}$, restarts every
+ten accepted steps and whenever ascent pairing degrades). We run at least
+$200$ iterations per channel. This AO serves two roles: the
+\emph{optimization bound} for the study (the $``$AO $\geq 1.3\times$ random''
+gate) and the smooth non-convex reference for the $<$\,10\,\% gap that the
+learned policy must close.
+
+\subsubsection{Deep unfolding on the sum rate itself}
+The model-driven learned method unrolls $L=6$ projected-gradient steps:
+\begin{equation}\label{eq:unroll}
+\boldsymbol\theta_{\ell+1} = \mathrm{wrap}\!\Big(
+\boldsymbol\theta_\ell + e^{\alpha_\ell}\,
+\nabla_{\!\boldsymbol\theta_\ell} R\Big),
+\qquad \ell = 0,\dots, L-1,
+\end{equation}
+with $\mathrm{wrap}$ the mod-$2\pi$ torus map and $\{\alpha_\ell\}$ the only
+trained parameters -- six positive-valued layer-dependent step sizes
+(log-parameterized, so $e^{\alpha_\ell}>0$ structurally).
+Because the channel gradients inside \eqref{eq:unroll} are computed by
+autodiff through the batched channel model with a retained graph
+(\texttt{create\_graph=True}), the whole chain differentiates end to end, and
+we train with the TRUE objective
+\begin{equation}\label{eq:lossrate}
+\mathcal L_{\mathrm{rate}} \;=\; -\,\mathbb E_{\mathrm{ch}}\!\left[R\!\big(\boldsymbol\theta_L\big)\right],
+\end{equation}
+never an angle-space surrogate. Two supervised ablations
+\begin{equation}\label{eq:ablation}
+\mathcal L_{\mathrm{circ}} = \mathbb E\big[1-\cos(\boldsymbol\theta_L - \boldsymbol\theta^{\mathrm{AO}})\big],
+\qquad
+\mathcal L_{\mathrm{mse}} = \mathbb E\big[\|\mathrm{wrap}(\boldsymbol\theta_L)-
+\mathrm{wrap}(\boldsymbol\theta^{\mathrm{AO}})\|_2^2\big],
+\end{equation}
+regress onto our own AO (teacher computed once on the training split).
+$\mathcal L_{\mathrm{circ}}$ is wrap-invariant; $\mathcal L_{\mathrm{mse}}$ is
+not — it charges a $\sim(2\pi)^2$ penalty to physically identical phases at the
+$0/2\pi$ boundary, exactly the failure mode destroyed our earlier study's
+unfolding, and we keep it only as a labeled ablation
+(§\ref{sec:results}, ablation table).
+
+Algorithmic honesty preamble (kept short here; full statement in §\ref{sec:protocol}):
+each episode observes one channel and commits one phase vector -- a contextual
+bandit, not an MDP. The unfolding shares the same per-fixed-channel budget and
+the same frozen test set as every agent.
+
+\subsubsection{Inference-time behavior}
+At test time the policicy evaluates \eqref{eq:unroll} $L$ times; end-to-end
+decision latency is measured and reported next to the AO wall-clock
+(mean/p95 per-channel), evidencing the sub-millisecond regime against the
+seconds-scale bound (§\ref{sec:results}, latency table).
