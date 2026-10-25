@@ -1,0 +1,31 @@
+# configs/unfolding.yaml — Balraj Singh (24BCE0531)
+# Frozen at D0 like every other config (runbook §1.1 / §3); the ONE tunable is
+# `lr` (grid {0.03, 0.01, 0.003}) — same one-hyperparameter rule as Shreyansh's SAC.
+
+method: unrolled_pg
+L: 6                          # unrolled projected-gradient steps (frozen §6.7)
+
+data:
+  train_channels: data/train_channels.npz     # 1500 chs, seed 1000 (Ayansh, D1 handoff)
+  test_channels:  data/test_channels.npz      # 500 chs,  seed 2000, NEVER regenerated
+  ao_train_refs:  results/ao/train/ao_thetas.npy   # AO targets for circular/MSE ablations
+                                                   # (produced by scripts/run_ao_reference.py)
+
+train:
+  loss: rate                  # rate | circular | mse   (mse = the old bug, ablation ONLY)
+  theta_init: 0.0             # SAME init as ao_riemannian -> fair AO-vs-unfolding comparison
+  wrap_theta: true            # project theta into [0, 2pi) each layer (rate is 2pi-periodic)
+  optimizer: adam
+  lr: 0.01                    # the ONE tunable
+  batch_channels: 128
+  iters: 3000
+  eval_every: 250
+  seed: 0                     # one of seeds {0..4} for the 5-seed protocol
+
+eval:
+  latency_trials: 200         # per-decision wall-clock for the G3 <1 ms table
+  chunk: 128                  # eval batch size (memory bound)
+
+out:
+  root: results/unfold
+  ckpt_stem: unfold           # -> results/unfold/unfold_L6_rate.pt, ..._circular.pt, ..._mse.pt

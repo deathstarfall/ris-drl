@@ -1,0 +1,104 @@
+% paper/sections/sec3_system_model.tex — Balraj Singh (24BCE0531) — runbook §4.2 paper ownership
+% \input this from paper/main.tex as Section 3 (System Model and Problem Formulation).
+% ALL result numbers in these sections are macros populated by scripts/make_all_figures.py
+% (Ayansh) from results/ao/*.json — nothing is hand-typed (runbook §7 paper-week rule).
+% The \providecommand fallbacks below exist ONLY so the file compiles before integration.
+
+\section{System Model and Problem Formulation}
+\label{sec:system_model}
+
+\subsection{Signal Model}
+We consider the uplink-analogous downlink of a single cell in which an
+$M$-antenna base station (BS) serves $K$ single-antenna users through a
+reconfigurable intelligent surface (RIS) of $N$ passive reflecting elements.
+The discrete-time baseband observation at user $k$ is
+\begin{equation}
+y_k \;=\; \tilde{h}_k(\boldsymbol{\theta})^{H} w_k \;+\; n_k,
+\qquad k = 1,\dots,K,
+\label{eq:signal_model}
+\end{equation}
+where $w_k \in \mathbb{C}^{M}$ is the BS precoder vector for user $k$,
+$n_k \sim \mathcal{CN}(0,\sigma^2)$ is additive white Gaussian noise, and
+$\tilde{h}_k(\boldsymbol{\theta}) \in \mathbb{C}^{M}$ is the \emph{effective}
+BS--user~$k$ channel, which concatenates the direct link $h_{d,k} \in
+\mathbb{C}^{M}$ with the cascaded BS--RIS--user link through the RIS phase
+profile $\boldsymbol{\Phi} = \operatorname{diag}(e^{j\theta_1}, \dots,
+e^{j\theta_n}, \dots, e^{j\theta_N})$:
+\begin{equation}
+\tilde{h}_k(\boldsymbol{\theta}) \;=\; h_{d,k} \;+\; G^{H} \boldsymbol{\Phi}^{H} h_{r,k}.
+\label{eq:effective_channel}
+\end{equation}
+Here $G \in \mathbb{C}^{M \times N}$ is the BS--RIS channel, $h_{r,k} \in
+\mathbb{C}^{N}$ is the RIS--user channel, and
+$\boldsymbol{\theta} \in [0, 2\pi)^N$ collects the $N$ reflection phases---%
+\emph{the only optimization variable in this work}. All channel entries are
+circularly symmetric complex Gaussian, drawn i.i.d.\ and scaled by 3GPP
+urban-micro path-loss models: NLoS for the direct link
+($128.1 + 37.6\log_{10} d_{\mathrm{km}}$~dB) and LoS for both RIS hops
+($61.4 + 35.8\log_{10} d_{\mathrm{km}}$~dB each). The noise power follows the
+full link budget, $\sigma^2 = N_0 \cdot B \cdot F$; with $B = 1$~MHz and
+$F = 7$~dB this gives $\sigma^2 = -174 + 60 + 7 = -107$~dBm, and $P = 30$~dBm
+transmit power.
+
+\subsection{Zero-Forcing Precoding and the Sum-Rate Objective}
+For any fixed phase vector we apply zero-forcing (ZF) precoding. Stacking the
+effective channels into $\tilde{H}(\boldsymbol{\theta}) \in \mathbb{C}^{K
+\times M}$,
+\begin{equation}
+W \;=\; \tilde{H}^{H}\bigl(\tilde{H}\tilde{H}^{H}\bigr)^{-1},
+\qquad
+W \leftarrow W \,\frac{\sqrt{P}}{\|W\|_F},
+\label{eq:zf}
+\end{equation}
+where the power normalization enforces $\sum_k \|w_k\|^2 = P$. ZF annihilates
+inter-user interference exactly, so the signal-to-interference-plus-noise
+ratio collapses to a pure SNR,
+\begin{equation}
+\mathrm{SNR}_k(\boldsymbol{\theta}) \;=\;
+\frac{\bigl|\tilde{h}_k(\boldsymbol{\theta})^{H} w_k\bigr|^2}{\sigma^2},
+\qquad
+R(\boldsymbol{\theta}) \;=\; \sum_{k=1}^{K} \log_2\!\bigl(1 + \mathrm{SNR}_k(\boldsymbol{\theta})\bigr).
+\label{eq:sum_rate}
+\end{equation}
+
+This design is deliberately \emph{noise-limited} (cf.\ Section~\ref{sec:intro}):
+because ZF removes interference, $\mathrm{SNR}_k$ depends directly on the
+phase-alignment quality of the cascaded term $h_{r,k}^{H}\boldsymbol{\Phi} G$,
+and a misaligned phase profile costs decibels. Coherent alignment across the
+$N$ elements grows the cascade amplitude proportional to $N$, whereas a random
+profile leaves it proportional to $\sqrt{N}$; the resulting $\sim\!N$-fold
+power ratio ($\approx 18$~dB for $N = 64$) is exactly the headroom an
+optimizer can capture and a random draw cannot. Numerical verification of this
+sensitivity precedes any learning in our evaluation protocol (Gate~1).
+
+\subsection{Phase Optimization on the Torus}
+Because the sum rate depends on the phases only through the unit-modulus
+vector $\boldsymbol{z} = e^{j\boldsymbol{\theta}} \in \mathbb{C}^N$, we state
+the optimization on the $N$-torus
+\begin{equation}
+\boldsymbol{z}^{\star} \;=\; \arg\max_{\boldsymbol{z} \in \mathcal{M}} \;
+R\bigl(\boldsymbol{z}\bigr),
+\qquad
+\mathcal{M} = \bigl\{\, \boldsymbol{z} \in \mathbb{C}^{N} : |z_i| = 1 \ \forall i \,\bigr\},
+\label{eq:torus_problem}
+\end{equation}
+a compact smooth manifold without inequality constraints or branch cuts. The
+Euclidean gradient of $R$ with respect to the complex vector
+$\boldsymbol{z}$ is obtained by reverse-mode automatic differentiation through
+\eqref{eq:zf}--\eqref{eq:sum_rate}, and is verified against central finite
+differences to a relative accuracy better than $10^{-5}$ before any optimization
+run (Section~\ref{sec:results_bound}). All methods studied in this paper---%
+model-free deep reinforcement learning, deep unfolding, and the
+Riemannian bound---share this single implementation of
+\eqref{eq:sum_rate} and are evaluated on one frozen dataset of $500$ channels
+that is generated once and never regenerated, so every comparison is exactly
+paired.
+
+% ---- auto-populated result macros (make_all_figures.py) ----------------------
+\providecommand{\NrisElements}{64}
+\providecommand{\NumAntennasBS}{8}
+\providecommand{\NumUsers}{4}
+The default geometry used throughout is
+$M = \NumAntennasBS$, $N = \NrisElements$, $K = \NumUsers$; the $M=4$
+ablation and the $N=36$ debug configuration are reported once in
+Section~\ref{sec:results}.
