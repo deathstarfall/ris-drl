@@ -5,8 +5,10 @@
 % remain artifact-informational; published ratios = 63.040/43.797 = 1.439
 % and 62.550/43.797 = 1.428.
 % Sources: results/ao/gate2_verdict.txt + results/unfold/*/metrics.json
-%          + results/unfold/latency_float32.json (f64 MEDIAN, matching
-%            the AO median in gate2_verdict.txt), schema-agnostic
+%          + results/unfold/latency_float32.json (v1.0.x bench, retired from the
+%            paper in DD-037; latency now = deployed-protocol per-channel
+%            metrics.json latency_ms: median 9.572 / mean 9.719 / p95 11.285,
+%            n=200 trials, complex128), schema-agnostic
 %          + results/bits_sweep.json (B=3 gap, dB-equivalent:
 %            1 bps/Hz == 10*log10(2) == 3.0103 dB, high-SNR convention)
 %          + results/unfold/csi_sweep.json (eps 0 vs 0.1)
@@ -18,9 +20,9 @@
 \newcommand{\AoIterMean}{\textbf{200}}
 \newcommand{\AoWallMeanMs}{\textbf{475}}
 \newcommand{\GateTwoVerdict}{\textbf{PASS}}
-\newcommand{\UnfoldLatencyMs}{\textbf{6.732}}
-\newcommand{\UnfoldGapToAo}{\textbf{94.7}}
-\newcommand{\UnfoldSpeedup}{\textbf{70.6}}
+\newcommand{\UnfoldLatencyMs}{\textbf{9.572}}
+\newcommand{\UnfoldGapToAo}{\textbf{94.98}}
+\newcommand{\UnfoldSpeedup}{\textbf{49.6}}
 % \AoWallPNinetyFiveMs removed: no per-channel AO wall artifact exists
 % (gate2_verdict records total+median only); p95 sourcing moves to v1.1.
 \newcommand{\QaoQuantGapBthree}{\textbf{1.402}}

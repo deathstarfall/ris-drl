@@ -22,7 +22,7 @@ R\bigl(\boldsymbol{\theta}^{(l)}\bigr)\Bigr),
 \label{eq:unrolled_pg}
 \end{equation}
 with $L = 6$ layers, initialization
-$\boldsymbol{\theta}^{(0)} = \boldsymbol{0}$ (identical to the AO bound of
+$\boldsymbol{\theta}^{(0)} = \boldsymbol{0}$ (identical to the AO reference of
 Section~\ref{sec:ao_bound}, so the two are never separated by initialization
 luck), and $\operatorname{wrap}(\boldsymbol{\theta}) =
 \boldsymbol{\theta} - 2\pi\lfloor \boldsymbol{\theta}/2\pi \rfloor$, the
@@ -63,11 +63,11 @@ At inference the unfolded optimizer performs exactly $L = 6$ fixed
 gradient evaluations---no line search, no iterative-until-convergence
 loop---on a single frozen test channel, and its latency
 is therefore a deterministic constant independent of channel difficulty. The
-Riemannian AO bound of Section~\ref{sec:ao_bound}, by contrast, iterates with
+Riemannian AO reference of Section~\ref{sec:ao_bound}, by contrast, iterates with
 Armijo line searches until a first-order tolerance is met. The measured
 per-decision latencies and the resulting quality--latency trade are reported
 in Section~\ref{sec:results_bound}; the claim we defend is the \emph{relative}
-one (unfolding is orders of magnitude faster than the bound it approximates),
+one (unfolding is orders of magnitude faster than the reference it approximates),
 with the absolute milliseconds table reported as measured on the training
 dtype.
 

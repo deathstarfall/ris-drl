@@ -14,14 +14,18 @@ state information~\cite{wu2020intelligent}.
 Two solution philosophies currently dominate the literature. The
 \emph{model-driven} family embeds the sum-rate objective and its
 gradients explicitly into the solver: alternating-optimize (AO)
-procedures descend a Riemannian manifold structure, while
+procedures descend a Riemannian manifold
+structure~\cite{absil2008optimization,zhang2021manifold}, while
 \emph{deep unfolding} \cite{shlezinger2023model} converts iterations of
 a projected-gradient method into layers of a fixed-depth neural
 network, regaining learned step sizes while keeping the physics
 visible. The \emph{model-free} family treats phase selection as a
 decision problem and trains reinforcement-learning
 agents~\cite{mnih2015human,lillicrap2015continuous,fujimoto2018addressing,haarnoja2018soft}
-end-to-end from reward, letting exploration rather than analysis
+end-to-end from reward; DRL-based phase configuration for RIS has been
+studied recently~\cite{huang2020risdrl}, and sum-rate objectives with
+discrete phases are commonly attacked by alternating or manifold
+methods~\cite{guo2020weighted,zhang2021manifold}, letting exploration rather than analysis
 discover the solution.
 
 \subsection{Contributions}
@@ -32,23 +36,25 @@ these philosophies, built around a frozen test protocol rather than
 best-effort best-run reporting:
 
 \begin{enumerate}
-\item \textbf{Certifiably frozen evaluation protocol.} A
-pre-registered channel-generation seed split (train/test/generalize)
+\item \textbf{Frozen evaluation protocol.} A fixed channel-generation
+seed split (train/test/generalize)
 fixes all 500 evaluation channels before any policy interacts with
-them; every method---bound, unfolding, and all six RL agents---is
+them; every method---AO reference, unfolding, and all six RL agents---is
 evaluated through one shared scorekeeper on identical hardware and
 identical ZF sum-rate convention (DD-017).
-\item \textbf{A Riemannian AO reference bound.} A manifold-constrained
+\item \textbf{A Riemannian AO reference.} A manifold-constrained
 alternating optimizer reaches $63.04$~bps/Hz mean sum rate
 ($1.439 \times$ the random baseline) on the full frozen test set,
-establishing the certified headroom available for any learned method
+establishing the headroom available to a learned method (the problem
+is non-convex, so this is a strong reference solution reached under a
+fixed 200-iteration stopping rule, not a provable upper bound)
 (\S\ref{sec:results-ao}).
-\item \textbf{Deep unfolding within $5.0\%$ of the bound.} An
+\item \textbf{Deep unfolding within $5.0\%$ of the reference.} An
 $L{=}6$ unfolded projected-gradient network reaches $59.88$~bps/Hz
 ($p=1.3\times10^{-83}$ over random), with trained-side inference
 latency of $9.7$~ms per decision and absorbed quantization sweep at
 2/3/4-bit phase codebooks (\S\ref{sec:results-ao}).
-\item \textbf{A certified null for direct DRL policies.} Six
+\item \textbf{A null result for direct DRL policies.} Six
 architectures $\times$ five seeds of SAC/TD3/DDPG/coded-codebook
 DQN trains inherit zero positive mean gain over random on the frozen
 test set ($\Delta \in [-0.33,-0.07]$ bps/Hz, all $p \geq 0.25$,

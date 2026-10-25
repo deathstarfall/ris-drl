@@ -5,33 +5,44 @@
 \begin{document}
 
 \title{Model-Driven Optimization for Reconfigurable Intelligent
-Surfaces: Deep Unfolding versus a Certified Null for Direct
+Surfaces: Deep Unfolding versus a Null Result for Direct
 Reinforcement Learning}
-\author{A.~Agarwal, S.~Verma, and B.~Singh\\
-RIS-DRL 2.0 Team}
+\author{A.~Agarwal, S.~Verma, and B.~Singh%
+\thanks{The authors are with the School of Electronics Engineering,
+Vellore Institute of Technology, Vellore 632014, India.
+Corresponding author: A.~Agarwal. The evaluation artifacts and the
+project decision log (DD-001--037) are open-source at
+\texttt{github.com/deathstarfall/ris-drl}.}}
+\markboth{IEEE Open Journal of the Communications Society}{Agarwal
+\MakeLowercase{et al.}: Model-Driven Optimization for RIS}
 
 \maketitle
 
+\begin{IEEEkeywords}
+Reconfigurable intelligent surface, deep unfolding, reinforcement
+learning, sum-rate maximization, Riemannian optimization, phase
+quantization, null result.
+\end{IEEEkeywords}
+
 \begin{abstract}
-We study phase-configuration optimization for a
-reconfigurable intelligent surface (RIS) under a zero-forcing sum-rate
-objective with direct-link blockage, using a three-layer experimental
-protocol: a Riemannian alternating-optimize (AO) upper reference, deep
-unfolding of projected-gradient ascent, and six direct
-reinforcement-learning (RL) policies certified on a frozen,
-pre-registered 500-channel test set. Deep unfolding reaches
-$59.88$~bps/Hz mean sum rate, $5.0\%$ short of the Riemannian AO bound
-($63.04$) and $16.08$~bps/Hz above the random baseline ($43.80$;
-$p=1.3\times10^{-83}$), while deciding in $\sim$9.7~ms per channel.
-In contrast, a certified evaluation of SAC, TD3, DDPG, and
-codebook-DQN policies at 2--4 bit phase resolution---the contract that
-protects this study from cherry-picking---finds \emph{no} architecture
-exceeding the random baseline (deltas $-0.07$ to $-0.33$~bps/Hz, all
-$p \geq 0.25$). Since a two-hundred-draw random search attains
-$+8.04$~bps/Hz over random, the null is informative: phase
-optimization in this regime is exploited by structure-informed
-optimization, not by model-free exploration. All figures and tables
-derive verbatim from committed artifacts (DD-018).
+We compare three solver families for phase-configuration
+optimization of a reconfigurable intelligent surface (RIS) under a
+zero-forcing sum-rate objective with direct-link blockage, on one
+frozen 500-channel test set fixed before evaluation: a Riemannian
+alternating-optimize (AO) reference, a deep unfolding of
+projected-gradient ascent, and six direct reinforcement-learning (RL)
+policies spanning SAC, TD3, DDPG, and codebook-DQN at 2--4-bit phase
+resolution. Deep unfolding reaches $59.88$~bps/Hz mean sum rate
+(SD $1.26$), $5.0\%$ short of the Riemannian AO reference
+($63.04\pm0.64$, SD) and $16.08$~bps/Hz above the random baseline
+($43.80$; $p=1.3\times10^{-83}$), while deciding in about $9.7$~ms per
+channel (median $9.57$, $p95$ $11.3$). No RL policy exceeds random
+(deltas $-0.07$ to $-0.33$~bps/Hz, all $p \geq 0.25$), whereas a
+200-draw random search attains $51.84\pm1.08$ (SD) over the same
+channels. The null is therefore informative: this regime is exploited
+by structure-informed optimization, and model-free exploration at the
+same budget does not find it. Every value in the paper is emitted from
+committed machine-readable artifacts.
 \end{abstract}
 
 \input{sections/sec1_intro}

@@ -5,11 +5,16 @@
 \citation{huang2019reconfigurable}
 \citation{wu2019towards}
 \citation{wu2020intelligent}
+\citation{absil2008optimization}
+\citation{zhang2021manifold}
 \citation{shlezinger2023model}
 \citation{mnih2015human}
 \citation{lillicrap2015continuous}
 \citation{fujimoto2018addressing}
 \citation{haarnoja2018soft}
+\citation{huang2020risdrl}
+\citation{guo2020weighted}
+\citation{zhang2021manifold}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}\protected@file@percent }
 \newlabel{sec:intro}{{I}{1}{Introduction}{section.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-A}}Contributions}{1}{subsection.1.1}\protected@file@percent }
@@ -34,57 +39,61 @@
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-D}3}Protocol}{3}{subsubsection.2.4.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-E}}Model-Driven Reference: Riemannian AO and Deep Unfolding}{3}{subsection.2.5}\protected@file@percent }
 \newlabel{sec:unfolding}{{\mbox  {II-E}}{3}{Model-Driven Reference: Riemannian AO and Deep Unfolding}{subsection.2.5}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-E}1}Riemannian bound}{3}{subsubsection.2.5.1}\protected@file@percent }
-\newlabel{eq:rgrad}{{8}{3}{Riemannian bound}{equation.8}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-E}1}Riemannian reference}{3}{subsubsection.2.5.1}\protected@file@percent }
+\newlabel{eq:rgrad}{{8}{3}{Riemannian reference}{equation.8}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-E}2}Deep unfolding on the sum rate itself}{3}{subsubsection.2.5.2}\protected@file@percent }
 \newlabel{eq:unroll}{{9}{3}{Deep unfolding on the sum rate itself}{equation.9}{}}
 \newlabel{eq:lossrate}{{10}{3}{Deep unfolding on the sum rate itself}{equation.10}{}}
 \newlabel{eq:ablation}{{11}{3}{Deep unfolding on the sum rate itself}{equation.11}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-E}3}Inference-time behavior}{3}{subsubsection.2.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-F}}The Riemannian Bound and the Deep Unfolding}{3}{subsection.2.6}\protected@file@percent }
-\newlabel{sec:results_bound}{{\mbox  {II-F}}{3}{The Riemannian Bound and the Deep Unfolding}{subsection.2.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-F}}The Riemannian Reference and Deep Unfolding}{3}{subsection.2.6}\protected@file@percent }
+\newlabel{sec:results_bound}{{\mbox  {II-F}}{3}{The Riemannian Reference and Deep Unfolding}{subsection.2.6}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-F}1}Gradient Verification Before Any Result}{3}{subsubsection.2.6.1}\protected@file@percent }
-\newlabel{sec:ao_bound}{{\mbox  {II-F}2}{3}{The AO Bound (Gate 2)}{subsubsection.2.6.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-F}2}The AO Bound (Gate 2)}{3}{subsubsection.2.6.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-F}3}Unfolding Versus the Bound}{3}{subsubsection.2.6.3}\protected@file@percent }
+\newlabel{sec:ao_bound}{{\mbox  {II-F}2}{3}{The AO Reference (Gate 2)}{subsubsection.2.6.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-F}2}The AO Reference (Gate 2)}{3}{subsubsection.2.6.2}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Riemannian AO convergence: mean sum-rate per projected-gradient iteration, averaged over the 500 frozen test channels (DD-009 history artifact). The curve saturates at 202 iterations/tolerance floor (DD-017 convergence metadata).}}{4}{figure.1}\protected@file@percent }
 \newlabel{fig:ao_convergence}{{1}{4}{Riemannian AO convergence: mean sum-rate per projected-gradient iteration, averaged over the 500 frozen test channels (DD-009 history artifact). The curve saturates at 202 iterations/tolerance floor (DD-017 convergence metadata)}{figure.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Post-hoc $B$-bit quantization of continuous solutions (frozen test set, seed 0; raw means from \texttt  {results/bits\_sweep.json}; dB-equivalent gaps to the continuous AO bound via $\Delta \mathrm  {bps}\times 10\log _{10}2 = 3.0103$).}}{4}{table.1}\protected@file@percent }
-\newlabel{tab:quantization}{{I}{4}{Post-hoc $B$-bit quantization of continuous solutions (frozen test set, seed 0; raw means from \texttt {results/bits\_sweep.json}; dB-equivalent gaps to the continuous AO bound via $\Delta \mathrm {bps}\times 10\log _{10}2 = 3.0103$)}{table.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Post-hoc $B$-bit quantization of continuous solutions (frozen test set, seed 0; raw means from \texttt  {results/bits\_sweep.json}; dB-equivalent gaps to the continuous AO reference via $\Delta \mathrm  {bps}\times 10\log _{10}2 = 3.0103$).}}{4}{table.1}\protected@file@percent }
+\newlabel{tab:quantization}{{I}{4}{Post-hoc $B$-bit quantization of continuous solutions (frozen test set, seed 0; raw means from \texttt {results/bits\_sweep.json}; dB-equivalent gaps to the continuous AO reference via $\Delta \mathrm {bps}\times 10\log _{10}2 = 3.0103$)}{table.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-F}3}Unfolding Versus the Reference}{4}{subsubsection.2.6.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-F}4}Discrete Phase Shifters and Imperfect CSI}{4}{subsubsection.2.6.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-F}5}Unseen User Zone}{4}{subsubsection.2.6.5}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces CSI-robustness sweep: effects of channel-estimation mismatch $\varepsilon \in \{0, 0.01, 0.02, 0.05, 0.1\}$ on AO, unfolding, and the random-phase control (phases decided on $\hat  {\bm  {h}}$, scored on true $\bm  {h}$; artifact \texttt  {csi\_sweep.json}).}}{4}{figure.2}\protected@file@percent }
 \newlabel{fig:csi_sweep}{{2}{4}{CSI-robustness sweep: effects of channel-estimation mismatch $\varepsilon \in \{0, 0.01, 0.02, 0.05, 0.1\}$ on AO, unfolding, and the random-phase control (phases decided on $\hat {\boldsymbol h}$, scored on true $\boldsymbol h$; artifact \texttt {csi\_sweep.json})}{figure.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Generalization to the unseen-user zone (200 gen split channels): test vs unseen mean sum-rate for AO, unfolding, and random (artifact \texttt  {results/ao/generalization.json}).}}{4}{figure.3}\protected@file@percent }
 \newlabel{fig:generalization}{{3}{4}{Generalization to the unseen-user zone (200 gen split channels): test vs unseen mean sum-rate for AO, unfolding, and random (artifact \texttt {results/ao/generalization.json})}{figure.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-G}}Optimization Bound and the Model-Driven Layer}{4}{subsection.2.7}\protected@file@percent }
-\newlabel{sec:results-ao}{{\mbox  {II-G}}{4}{Optimization Bound and the Model-Driven Layer}{subsection.2.7}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-G}1}The AO bound is real}{4}{subsubsection.2.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-F}5}Unseen User Zone}{4}{subsubsection.2.6.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-G}}Optimization Reference and the Model-Driven Layer}{4}{subsection.2.7}\protected@file@percent }
+\newlabel{sec:results-ao}{{\mbox  {II-G}}{4}{Optimization Reference and the Model-Driven Layer}{subsection.2.7}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-G}1}The AO reference is strong}{4}{subsubsection.2.7.1}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Conjugate-search contribution: per-channel sum-rate histograms of the plain projected-gradient (PG) twin versus the full Riemannian AO on the frozen 500-channel test set (means marked; artifact \texttt  {pg\_test\_channels.json}, rate \texttt  {ao\_test\_channels.json}).}}{5}{figure.4}\protected@file@percent }
 \newlabel{fig:ao-pg-gap}{{4}{5}{Conjugate-search contribution: per-channel sum-rate histograms of the plain projected-gradient (PG) twin versus the full Riemannian AO on the frozen 500-channel test set (means marked; artifact \texttt {pg\_test\_channels.json}, rate \texttt {ao\_test\_channels.json})}{figure.4}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Unfolding loss ablation: trained-test rate (zero-phase, frozen 500-channel test set, $L{=}6$, lr $10^{-2}$, seed 0). Values are raw \texttt  {metrics.json} means.}}{5}{table.2}\protected@file@percent }
 \newlabel{tab:ablation}{{II}{5}{Unfolding loss ablation: trained-test rate (zero-phase, frozen 500-channel test set, $L{=}6$, lr $10^{-2}$, seed 0). Values are raw \texttt {metrics.json} means}{table.2}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-G}2}Unfolding closes the gap cheaply}{5}{subsubsection.2.7.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-G}3}Discretized and imperfect world}{5}{subsubsection.2.7.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-G}4}Generalization}{5}{subsubsection.2.7.4}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Loss-ablation bars (same three trained models; raw values from the \texttt  {metrics.json} artifacts of \texttt  {unfold\_L6\_rate}, \texttt  {unfold\_L6\_circular}, and \texttt  {unfold\_L6\_mse}).}}{5}{figure.5}\protected@file@percent }
 \newlabel{fig:loss-ablation}{{5}{5}{Loss-ablation bars (same three trained models; raw values from the \texttt {metrics.json} artifacts of \texttt {unfold\_L6\_rate}, \texttt {unfold\_L6\_circular}, and \texttt {unfold\_L6\_mse})}{figure.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-H}}Certified Evaluation of Direct DRL Phase Policies}{5}{subsection.2.8}\protected@file@percent }
-\newlabel{sec:results-drl}{{\mbox  {II-H}}{5}{Certified Evaluation of Direct DRL Phase Policies}{subsection.2.8}{}}
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {II-H}0a}Certified null result.}{5}{paragraph.2.8.0.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {II-H}0b}The contrast that makes the null informative.}{5}{paragraph.2.8.0.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-G}4}Generalization}{5}{subsubsection.2.7.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-H}}Frozen-Set Evaluation of Direct DRL Phase Policies}{5}{subsection.2.8}\protected@file@percent }
+\newlabel{sec:results-drl}{{\mbox  {II-H}}{5}{Frozen-Set Evaluation of Direct DRL Phase Policies}{subsection.2.8}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {II-H}0a}Null result.}{5}{paragraph.2.8.0.1}\protected@file@percent }
 \bibstyle{IEEEtran}
 \bibdata{refs}
 \bibcite{huang2019reconfigurable}{1}
 \bibcite{wu2019towards}{2}
 \bibcite{wu2020intelligent}{3}
-\bibcite{shlezinger2023model}{4}
-\bibcite{mnih2015human}{5}
-\bibcite{lillicrap2015continuous}{6}
-\bibcite{fujimoto2018addressing}{7}
-\bibcite{haarnoja2018soft}{8}
-\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Certified frozen-test-set evaluation of all six DRL agents (validation-best seed per agent; paired statistics vs.\ the frozen random baseline over the same 500 channels).}}{6}{table.3}\protected@file@percent }
-\newlabel{tab:certified-drl}{{III}{6}{Certified frozen-test-set evaluation of all six DRL agents (validation-best seed per agent; paired statistics vs.\ the frozen random baseline over the same 500 channels)}{table.3}{}}
+\bibcite{absil2008optimization}{4}
+\bibcite{zhang2021manifold}{5}
+\bibcite{shlezinger2023model}{6}
+\bibcite{mnih2015human}{7}
+\bibcite{lillicrap2015continuous}{8}
+\bibcite{fujimoto2018addressing}{9}
+\bibcite{haarnoja2018soft}{10}
+\bibcite{huang2020risdrl}{11}
+\bibcite{guo2020weighted}{12}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Frozen-test-set evaluation of all six DRL agents (validation-best seed per agent; paired statistics vs.\ the frozen random baseline over the same 500 channels).}}{6}{table.3}\protected@file@percent }
+\newlabel{tab:certified-drl}{{III}{6}{Frozen-test-set evaluation of all six DRL agents (validation-best seed per agent; paired statistics vs.\ the frozen random baseline over the same 500 channels)}{table.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {II-H}0b}The contrast that makes the null informative.}{6}{paragraph.2.8.0.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {II-H}0c}Why null results belong here.}{6}{paragraph.2.8.0.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {III}Conclusion}{6}{section.3}\protected@file@percent }
 \newlabel{sec:conclusion}{{III}{6}{Conclusion}{section.3}{}}
