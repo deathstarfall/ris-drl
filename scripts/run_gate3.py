@@ -16,7 +16,7 @@ def main():
     assert rnd and ao, "prereqs missing: baselines/random + ao"
     rep = ["# GATE G3 report (frozen 500-ch test set, seed 2000)", ""]
     best_g = None
-    for agent in ["sac", "td3", "ddpg"]:
+    for agent in ["sac", "td3", "ddpg", "dqn_b2", "dqn_b3", "dqn_b4"]:
         best = None
         for s in range(5):
             d = J(f"{agent}/seed{s}/eval_rates.json")
