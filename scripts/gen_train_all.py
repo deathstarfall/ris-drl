@@ -6,7 +6,7 @@ from pathlib import Path
 def _read_cfg(name):
     import yaml
     p = Path("configs") / f"{name}.yaml"
-    with open(p) as f:
+    with open(p,encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
@@ -30,7 +30,7 @@ def generate():
     lines.append("")
     lines.append("echo 'campaign complete'")
     os.makedirs("scripts", exist_ok=True)
-    with open("scripts/train_all.sh", "w") as f:
+    with open("scripts/train_all.sh", "w",encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
     os.chmod("scripts/train_all.sh", 0o755)
     print("wrote scripts/train_all.sh")

@@ -19,7 +19,7 @@ def extract_metrics_summary(results_root="results"):
             mpath = seed_dir / "metrics.json"
             if mpath.exists():
                 try:
-                    with open(mpath) as f:
+                    with open(mpath , encoding="utf-8") as f:
                         hist = json.load(f)
                     if hist:
                         # last eval and best

@@ -120,4 +120,26 @@ DD-025 (D3): (B12) No conftest.py / src/__init__.py from my side — tests self-
              sys.path, modules use dual-mode imports; PR2 adds zero shared-file conflicts.
 
 DD-026 — batch_slice indexed by batch length, not dataset size
+<<<<<<< HEAD
 batch_slice's condition (v.shape[0] == len(idx)) never matched per-datasettensors (theta 1500 vs ref 128), so the rate loss silently ran full-batch,circular/mse crashed on the mismatch, and latency was measured as one500-channel forward pass. Fixed to slice by T["h_r"].shape[0] with av.dim() >= 1 guard; all three loss ablations retrained and the latency tablere-measured (true per-channel) before G3.
+=======
+batch_slice's condition (v.shape[0] == len(idx)) never matched per-datasettensors (theta 1500 vs ref 128), so the rate loss silently ran full-batch,circular/mse crashed on the mismatch, and latency was measured as one500-channel forward pass. Fixed to slice by T["h_r"].shape[0] with av.dim() >= 1 guard; all three loss ablations retrained and the latency tablere-measured (true per-channel) before G3.
+
+DD-017 (ratified D2/D3): GATE G2 PASSED — AO/random = 1.445 over the FULL frozen
+500-channel test set (100% per-channel wins; PG twin within 1%). Campaigns authorized
+in all methods. (Logged initially by Balraj on feat/opt-bound — ratified here.)
+
+DD-018 (already logged — keep): figure/table consume RAW eval JSONs; stats derived in-code.
+
+DD-019 (Balraj B1–B12, renumbered): <one-line mapping table: B1→DD-019 ... B12→DD-030>.
+
+DD-031 (D3 — LATENCY CRITERION VOTE): measured unfolding inference = 6.8 ms vs AO 0.388 s
+=> 57.6x speedup (Balraj DD-029). Original acceptance text said "<1 ms". TEAM VOTE:
+(a) implement forward-only inference path (no autograd at eval) as a fix task, OR
+(b) revise acceptance to "<7 ms, >=57x vs AO; sub-ms as future work". DECISION: ____.
+
+DD-032 (transiently — resolving): results/unfold/unfold_rates.json (DD-009) absent;
+per-channel unfold rates must land there (rates[500] + latency_ms[500] + channel_seed
+2000) before run_gate3 can produce its unfold row. Owner: Balraj.
+>>>>>>> fbde7a1b7defa9ac4177a9952806c43cfb139815
+

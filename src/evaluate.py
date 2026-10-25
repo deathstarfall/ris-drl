@@ -15,7 +15,8 @@ def store(name, rates, extra=None):
     if extra: d.update(extra)
     out = ROOT / "results" / name
     out.mkdir(parents=True, exist_ok=True)
-    (out / "eval_rates.json").with_suffix(".json").write_text(json.dumps(d, indent=2))
+    (out / "eval_rates.json").with_suffix(".json").write_text(json.dumps(d, indent=2), encoding="utf-8")
+
     print(f"[store] results/{name}/eval_rates.json  mean={np.mean(rates):.3f}")
 
 def eval_rl(agent, seed, N):
@@ -49,6 +50,6 @@ if __name__ == "__main__":
     elif args.method == "ao":
         # AO rates come from Balraj's own runner; this only re-validates provenance (DD-006)
         f = ROOT / "results" / "ao" / "ao_rates.json"
-        d = json.loads(f.read_text())
+        d = json.loads(f.read_text(encoding="utf-8"))
         assert d["channel_seed"] == 2000 and len(d["rates"]) == len(chs), "AO provenance FAIL"
         print("[ao] provenance OK vs frozen test set:", float(np.mean(d["rates"])))

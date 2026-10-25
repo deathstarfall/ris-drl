@@ -109,11 +109,62 @@ def to_tensor(x, device):
 def write_json(path, obj):
     import json
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-    with open(path, "w") as f:
+    with open(path, "w",encoding="utf-8") as f:
         json.dump(obj, f, indent=2)
 
 
 def load_yaml(path):
     import yaml
-    with open(path, "r") as f:
+    with open(path, "r",encoding="utf-8") as f:
         return yaml.safe_load(f)
+
+
+def build_policy_fn(agent_name, seed, N):
+    """Reconstructs the agent policy from a checkpoint for evaluation (DD-008)."""
+    import torch
+    import numpy as np
+    
+    ckpt_path = f"ckpt/{agent_name}_seed{seed}.pt"
+    
+    # Load checkpoint
+    sd = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+    cfg = sd.get("cfg", {})
+    
+    # Infer obs_dim from the saved RunningNorm state dict, or fallback to a safe estimate
+    obs_dim = sd.get("norm", {}).get("dim", N * 4)
+    
+    # Dynamically import and instantiate the correct agent
+    if agent_name == "sac":
+        from src.agents.sac import SAC
+        agent = SAC(cfg, obs_dim, N, N, env=None, device="cpu")
+    elif agent_name == "td3":
+        from src.agents.td3 import TD3
+        agent = TD3(cfg, obs_dim, N, N, env=None, device="cpu")
+    elif agent_name == "ddpg":
+        from src.agents.ddpg import DDPG
+        agent = DDPG(cfg, obs_dim, N, N, env=None, device="cpu")
+    else: # covers dqn, dqn_codebook, etc.
+        from src.agents.dqn_codebook import DQNCodebook
+        agent = DQNCodebook(cfg, obs_dim, N, N, env=None, device="cpu")
+        
+    # Load the trained weights
+    agent.load_state_dict(sd)
+    
+    def policy_fn(ch):
+        # Reconstruct the observation exactly as DD-004 specifies:
+        # obs = concat(|h_r|, ∠h_r, |G|, |h_d|) flat float32
+        h_r = ch["h_r"]
+        G = ch["G"]
+        h_d = ch["h_d"]
+        
+        obs = np.concatenate([
+            np.abs(h_r).flatten(),
+            np.angle(h_r).flatten(),
+            np.abs(G).flatten(),
+            np.abs(h_d).flatten()
+        ]).astype(np.float32)
+        
+        # agent.act returns the action in radians [0, 2π], which sum_rate expects
+        return agent.act(obs)
+        
+    return policy_fn

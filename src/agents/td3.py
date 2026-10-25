@@ -27,7 +27,7 @@ class TD3:
         self.opt_c2 = torch.optim.Adam(self.critic2.parameters(), lr=cfg["lr_critic"])
         self.gamma = float(cfg.get("gamma", 1.0))
         self.tau = float(cfg.get("tau", 0.005))
-        self.expl_noise = float(cfg.get("expl_noise", 0.1"))
+        self.expl_noise = float(cfg.get("expl_noise", 0.1))
         self.policy_delay = int(cfg.get("policy_delay", 2))
         self.target_noise = float(cfg.get("target_noise", 0.2))
         self.noise_clip = float(cfg.get("noise_clip", 0.5))
