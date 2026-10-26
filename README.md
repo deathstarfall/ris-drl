@@ -1,29 +1,32 @@
 # RIS-DRL 2.0 - RIS Sum-Rate Study (frozen-protocol)
 
-**One-line summary:** deep unfolding closes **94.78 %** of the Riemannian AO
-sum-rate reference at **58.0x lower wall-time** (DD-041 audited train/validation protocol), while a multi-seed DRL
+**One-line summary:** deep unfolding closes **97.41 %** of the Riemannian AO
+sum-rate reference at **1044x lower wall-time** (DD-041 audited train/validation
+protocol, re-certified under the DD-043 corrected ZF pairing), while a
+multi-seed DRL
 campaign establishes a **null result** (DRL ~ random) -- shipped as paper tag
 `v1.0.1-paper` (quality pass DD-037, v1.0.2).
 
 - Paper: `paper/` (journal-style, 6 pages, compiles with pdflatex)
 - Frozen test set: fixed before any evaluation; one frozen 500-channel
   tensor `data/test_channels.npz` covers every solver family.
-- Decision log: `docs/design_decisions.md` (**DD-001 - DD-037**; every
+- Decision log: `docs/design_decisions.md` (**DD-001 - DD-043**; every
   experimental convention recorded)
 
 ## Results snapshot (all from committed artifacts; +/- = SD)
 
 | Method | Test rate (bps/Hz) | Notes |
 |---|---|---|
-| Riemannian AO (reference) | **63.040 +/- 0.644 (SD, n=500)** | median 0.475 s/channel; strong local solution, not an upper bound (55.6 % of channels reach the 200-iter cap) |
-| Deep unfolding (L=6) | **59.749 +/- 1.86 (SD)** | 94.78 % of AO reference; 8.196 ms median (mean 8.357, p95 10.280, per-channel DD-009; DD-041 protocol); **58.0x speed-up** |
-| Deep unfolding, 5-seed protocol breadth | 59.783 +/- 0.041 | protocol-breadth number, not the headline |
-| Best-of-200 random | 51.835 +/- 1.083 (SD) | exploitable headroom exists |
-| Random phase | **43.797** (frozen baseline, n=500) | |
-| DRL (6 archs x 5 seeds x 200k steps) | ~ 43.80 | **NULL**: deltas -0.07...-0.33, all p >= 0.25 |
+| Riemannian AO (reference) | **64.193 +/- 0.582 (SD, n=500)** | median 1.352 s/channel; strong local solution, not an upper bound (45.8 % of channels stop at the 200-iter cap) |
+| Deep unfolding (L=6, lr 0.03) | **62.532 +/- 0.853 (SD)** | 97.41 % of AO reference; 1.295 ms median (mean 1.298, p95 1.312, per-channel DD-009; DD-041 protocol); **1044x speed-up** |
+| Deep unfolding, 5-seed protocol breadth | 62.526 +/- 0.041 | protocol-breadth number, not the headline |
+| Best-of-200 random | 57.145 +/- 0.764 (SD) | exploitable headroom exists |
+| Random phase | **53.178** (frozen baseline, n=500) | |
+| DRL (6 archs x 5 seeds x 200k steps) | ~ 53.18 | **NULL**: deltas -0.10...+0.04, all p >= 0.37 |
 
-Headline ratios: AO/random = **1.439**, PG/random = **1.428** (frozen-baseline
-protocol, DD-036; gate2's seed-0 internal ratios 1.445/1.433 remain
+Headline ratios: AO/random = **1.207**, PG/random = **1.200** (frozen-baseline
+protocol, DD-036; gate2's internal draw random 53.172 and G2's re-baselined
+ratio criterion >= 1.15 are disclosed; gate2's seed-0 internal ratios remain
 artifact-informational, never published).
 
 ## Repo layout
@@ -71,18 +74,21 @@ python crossref_check.py    # ALL ENTRIES VERIFIED (12/12)
 5. Every number traceable to a `results/**` artifact (DD-018 rule)
 
 ## Tags & releases
-- **`v1.0.1-paper`** - submission candidate: zero TBD/stubs, zero undefined
-  refs; DD-036 (close-out) + DD-037 (quality pass) recorded
+- **`v1.0.1-paper`** - submission candidate (moving pointer, retags disclosed):
+  zero TBD/stubs, zero undefined refs; DD-036 (close-out) + DD-037 (quality
+  pass) recorded. Re-pointed again on the DD-044/043 re-certification round
+  (corrected ZF pairing; corrected AO/unfolding/DRL artifacts + G2 re-baseline;
+  sec5c disclosure). Last pre-fix paper commit: `fe1813c` (superseded).
 - `v1.0-paper` - pre-release, superseded
 
 ## Artifacts <-> paper map
 - `results/ao/gate2_verdict.txt` -> AO block + G3 latency row (DD-037: AO
-  475 ms vs unfolding 8.196 ms median = 58.0x, DD-009 per-channel)
+  1352 ms vs unfolding 1.295 ms median = 1044x, DD-009 per-channel)
 - `results/ao/ao_test_channels.(json|npz)` -> AO mean/sd, per-channel (AO wins
   100.0 % of channels vs frozen random)
 - `results/ao/ao_test_channels_history.npz` -> AO convergence figure
 - `results/unfold/unfold_L6_rate/metrics.json` -> deployed-protocol unfolding
-  test rate + per-channel latency (8.196 median / 8.357 mean / 10.280 p95)
+  test rate + per-channel latency (1.295 median / 1.298 mean / 1.312 p95)
 - `results/unfold/*/metrics.json` (seed1-4, lr-grid, circular/mse) -> 5-seed
   aggregate, lr grid, loss-ablation table/figure
 - `results/unfold/latency_float32.json` -> isolated f64/f32 inference bench

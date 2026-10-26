@@ -54,13 +54,14 @@ chapters phases across the $0/2\pi$ boundary
 
 \begin{table}[t]
 \begin{center}
-\caption{Unfolding loss ablation: test-once rate (zero-phase, frozen 500-channel test set, $L{=}6$, LR $10^{-3}$, audited train/validation protocol, seed 0). Values are raw \texttt{metrics.json} means; the rate-vs-circular difference is within test noise (per-channel SD $\approx 1.9$).}\label{tab:ablation}
+\caption{Unfolding loss ablation: test-once rate (zero-phase, frozen 500-channel test set, $L{=}6$, LR $3\times10^{-2}$ (validation winner under the corrected pairing), audited train/validation protocol, seed 0). Values are raw \texttt{metrics.json} means; the rate-vs-circular difference is within test noise (per-channel SD $\approx 2$).}
+\label{tab:ablation}
 \small\begin{tabular}{lcc}\toprule
 Loss objective & test rate (bps/Hz) & $\Delta$ vs rate loss \\
 \midrule
-Sum-rate $\mathcal{L}_{\mathrm{rate}}$ & 59.749 & --- \\
-Circular surrogate & 59.840 & $+0.091$ \\
-Wrapped-angle MSE & 58.501 & $-1.248$ \\
+Sum-rate $\mathcal{L}_{\mathrm{rate}}$ & 62.532 & --- \\
+Circular surrogate & 61.860 & $-0.672$ \\
+Wrapped-angle MSE & 59.327 & $-3.205$ \\
 \bottomrule
 \end{tabular}
 \end{center}

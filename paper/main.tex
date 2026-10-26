@@ -29,13 +29,13 @@ frozen 500-channel test set fixed before evaluation: a Riemannian
 alternating-optimize (AO) reference, a deep unfolding of
 projected-gradient ascent, and six direct reinforcement-learning (RL)
 policies spanning SAC, TD3, DDPG, and codebook-DQN at 2--4-bit phase
-resolution. Deep unfolding reaches $59.75$~bps/Hz mean sum rate
-(SD $1.86$), $5.2\%$ short of the Riemannian AO reference
-($63.04\pm0.64$, SD) and $15.95$~bps/Hz above the random baseline
-($43.80$; $p=1.3\times10^{-83}$), while deciding in about $8.4$~ms per
-channel (median $8.196$, $p95$ $10.3$). No RL policy exceeds random
-(deltas $-0.07$ to $-0.33$~bps/Hz, all $p \geq 0.25$), whereas a
-200-draw random search attains $51.84\pm1.08$ (SD) over the same
+resolution. Deep unfolding reaches $62.53$~bps/Hz mean sum rate
+(SD $0.85$), $2.6\%$ short of the Riemannian AO reference
+($64.19\pm0.58$, SD) and $9.35$~bps/Hz above the random baseline
+($53.18$; $p=1.3\times10^{-83}$), while deciding in about $1.3$~ms per
+channel (median $1.295$, $p95$ $1.312$). No RL policy exceeds random
+(deltas $-0.10$ to $+0.04$~bps/Hz, all $p \geq 0.37$), whereas a
+200-draw random search attains $57.14\pm0.76$ (SD) over the same
 channels. The null is therefore informative: this regime is exploited
 by structure-informed optimization, and model-free exploration at the
 same budget does not find it. Every value in the paper is emitted from

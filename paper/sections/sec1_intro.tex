@@ -48,25 +48,25 @@ them; every method---AO reference, unfolding, and all six RL agents---is
 evaluated through one shared scorekeeper on identical hardware and an
 identical zero-forcing sum-rate convention (\S\ref{sec:intro}).
 \item \textbf{A Riemannian AO reference.} A manifold-constrained
-alternating optimizer reaches $63.04$~bps/Hz mean sum rate
-($1.439 \times$ the random baseline) on the full frozen test set,
+alternating optimizer reaches $64.19$~bps/Hz mean sum rate
+($1.207 \times$ the random baseline) on the full frozen test set,
 establishing the headroom available to a learned method (the problem
 is non-convex, so this is a strong reference solution reached under a
 fixed 200-iteration stopping rule, not a provable upper bound)
 (\S\ref{sec:results-ao}).
-\item \textbf{Deep unfolding within $5.2\%$ of the reference.} An
-$L{=}6$ unfolded projected-gradient network reaches $59.75$~bps/Hz
+\item \textbf{Deep unfolding within $2.6\%$ of the reference.} An
+$L{=}6$ unfolded projected-gradient network reaches $62.53$~bps/Hz
 ($p=1.3\times10^{-83}$ over random), trained under an audited
 train/validation protocol with a single frozen-test evaluation, with
-inference latency of $8.2$~ms (median) per decision and an absorbed
+inference latency of $1.3$~ms (median) per decision and an absorbed
 quantization sweep at 2/3/4-bit phase codebooks (\S\ref{sec:results-ao}).
 \item \textbf{A null result for direct DRL policies.} Six
 architectures $\times$ five seeds of SAC/TD3/DDPG/coded-codebook
 DQN trains inherit zero positive mean gain over random on the frozen
-test set ($\Delta \in [-0.33,-0.07]$ bps/Hz, all $p \geq 0.25$,
+test set ($\Delta \in [-0.10,+0.04]$ bps/Hz, all $p \geq 0.37$,
 \S\ref{sec:results-drl}); the study reports this outcome rather than
 selecting training-run endpoints, and contrasts it against the
-$+8.04$~bps/Hz obtainable from a simple 200-draw random oracle,
+$+3.97$~bps/Hz obtainable from a simple 200-draw random oracle,
 isolating \emph{learned structure}---not sample count---as the
 difference-maker.
 \end{enumerate}

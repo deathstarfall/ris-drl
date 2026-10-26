@@ -14,10 +14,10 @@ report the same ZF sum-rate convention as every other row.
 
 \paragraph{Null result.}
 No architecture achieves a positive mean gain over the frozen random
-baseline ($43.80$~bps/Hz). The test-set deltas range from
-$-0.07$ (DQN@2bit) to $-0.33$~bps/Hz (SAC), every 95\% bootstrap
+baseline ($53.18$~bps/Hz). The test-set deltas range from
+$-0.10$ (TD3, DQN@2bit) to $+0.04$~bps/Hz (SAC), every 95\% bootstrap
 interval covers zero, and every paired Wilcoxon test yields
-$p \geq 0.25$
+$p \geq 0.37$
 (Table~\ref{tab:certified-drl}); training-time evaluation plateaus
 over all seeds corroborate the plateau at random-level values
 (per-agent training-band diagnostics \texttt{fig\_band\_*} accompany
@@ -40,9 +40,22 @@ trained policies never consumed it for optimization, and the unfolding
 model (whose deployment numbers headline this work) was retrained
 under an audited train/validation protocol with the test set evaluated
 exactly once (supplementary decision log).
-(iii)~Committed per-channel evaluation artifacts cover the
-validation-best seed of each architecture; full per-seed artifacts for
-all thirty runs are a released follow-up item.
+(iii)~Committed per-channel evaluation artifacts cover all thirty runs
+(six architectures $\times$ five seeds), as required by the acceptance
+protocol.
+(iv)~Disclosure: during external review of the first submission
+version, an erroneous complex conjugation in the ZF pairing of the
+shared rate function was identified (the SINR was evaluated as
+$|\langle h, w^{*}\rangle|^{2}$ rather than
+$|\langle h, w\rangle|^{2}$, a global phase rotation that had no effect
+on the optimizer set but shifted every absolute rate). All baselines,
+the AO reference, the unfolding retrain family, the DRL re-scoring, and
+every derived table in this paper were regenerated under the corrected
+pairing; in addition, the DRL evaluation wrapper was hardened to the
+deterministic-action mode required by the fixed-order evaluation
+contract. The reported null is a re-certification, not the original
+pre-fix numbers, which are retained in the archive with a
+\texttt{\_zfbuggy} suffix.
 
 \begin{table}[t]
 \centering\small
@@ -54,12 +67,12 @@ random baseline over the same 500 channels).}
 \toprule
 Agent & Mean & $\Delta$ vs.\ random & $p$ & 95\% CI & \%ch.$>0$ \\
 \midrule
-SAC      & 43.47 & $-0.33$ & $0.27$ & $[-0.81,\,0.15]$ & 49 \\
-TD3      & 43.51 & $-0.28$ & $0.25$ & $[-0.79,\,0.21]$ & 47 \\
-DDPG     & 43.64 & $-0.16$ & $0.76$ & $[-0.68,\,0.34]$ & 50 \\
-DQN@2bit & 43.73 & $-0.07$ & $0.83$ & $[-0.53,\,0.39]$ & 49 \\
-DQN@3bit & 43.70 & $-0.10$ & $0.54$ & $[-0.56,\,0.37]$ & 47 \\
-DQN@4bit & 43.62 & $-0.17$ & $0.62$ & $[-0.65,\,0.29]$ & 49 \\
+SAC      & 53.22 & $+0.04$ & $0.72$ & $[-0.20,\,+0.27]$ & 51 \\
+TD3      & 53.08 & $-0.10$ & $0.49$ & $[-0.34,\,+0.13]$ & 51 \\
+DDPG     & 53.08 & $-0.09$ & $0.52$ & $[-0.33,\,+0.14]$ & 50 \\
+DQN@2bit & 53.08 & $-0.10$ & $0.37$ & $[-0.33,\,+0.13]$ & 48 \\
+DQN@3bit & 53.12 & $-0.06$ & $0.55$ & $[-0.28,\,+0.17]$ & 48 \\
+DQN@4bit & 53.19 & $+0.02$ & $0.83$ & $[-0.20,\,+0.23]$ & 48 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -67,9 +80,9 @@ DQN@4bit & 43.62 & $-0.17$ & $0.62$ & $[-0.65,\,0.29]$ & 49 \\
 \paragraph{The contrast that makes the null informative.}
 Exploitable head demonstrably exists in this environment: selecting
 \emph{two hundred random} phase vectors per channel and keeping the best
-yields $51.84$~bps/Hz ($+8.04$, $p=1.7 \times 10^{-83}$), deep
-unfolding reaches $59.75$ ($+15.95$, $p=1.3 \times 10^{-83}$,
-$5.2\%$ short of the Riemannian AO reference $63.04$), while every trained
+yields $57.14$~bps/Hz ($+3.97$, $p=1.7 \times 10^{-83}$), deep
+unfolding reaches $62.53$ ($+9.35$, $p=1.3 \times 10^{-83}$,
+$2.6\%$ short of the Riemannian AO reference $64.19$), while every trained
 policy remains statistically indistinguishable from a single random
 draw. The gap between what a 200-draw random search deftly extracts and
 what 30 gradient-informed training runs could not extract is the
