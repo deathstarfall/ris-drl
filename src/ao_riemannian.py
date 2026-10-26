@@ -120,13 +120,15 @@ def sum_rate_phi(phi, ch_t: Dict):
       * phi (N,)   with a SINGLE-channel dict (h_d (K,M), G (M,N), h_r (K,N)) -> scalar
       * phi (B,N)  with a BATCHED dict ((B,K,M), (B,M,N), (B,K,N))            -> (B,)
 
-    Formula (frozen §6.2, conjugations absorbed exactly as implemented there):
+    Formula (DD-043 corrected pairing; the rate is the column pairing of ZF):
         Heff = h_d + (h_r * phi) @ G^H                     (K,M)
         W    = Heff^H (Heff Heff^H)^{-1},  ||W||_F^2 = P   (ZF; SINR == SNR)
-        R    = sum_k log2(1 + |h~_k^H w_k|^2 / sigma2)
-    The §6.2 skeleton's final pairing line `np.sum(Heff * W.conj(), axis=1)` is
-    shape-broken for K != M; the correct pairing (Heff @ W = I  =>  user k owns
-    column k of W) is the einsum below.  Logged as design decision B2.
+        R    = sum_k log2(1 + |Heff[k,:] @ W[:,k]|^2 / sigma2)
+    i.e. the UNCONJUGATED inner product y_k = Heff[k,:] @ W[:,k].  (History: an
+    erroneous `.conj()` sat on Heff/W in every twin between the v1.0.x
+    submissions and DD-043; the error was a global phase rotation with no
+    effect on the optimizer set but shifted every absolute rate -- see
+    docs/design_decisions.md DD-043.  Logged first as design decision B2.)
     """
     h_d, G, h_r = ch_t["h_d"], ch_t["G"], ch_t["h_r"]
     sigma2, P = ch_t["sigma2"], ch_t["P"]
