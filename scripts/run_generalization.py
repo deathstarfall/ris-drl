@@ -31,6 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from ao_riemannian import (  # noqa: E402
     TWO_PI, load_channel_npz, random_rates, run_ao_dataset, sum_rate_numpy,
+    pg_sanity,
 )
 from unfolding import UnrolledPG, channels_to_tensors  # noqa: E402
 
@@ -47,10 +48,8 @@ def unfold_thetas(model, chs):
     return np.concatenate(out, axis=0)
 
 
-def evaluate_zone(chs, iters, tol, n_random, seed, ckpt):
-    """AO + unfolding + random on one channel zone.  The DRL policies join here
-    at integration: Ayansh's evaluate.py runs each agent ckpt on the SAME npz —
-    we deliberately do not touch Shreyansh's agent code (repo discipline §3)."""
+def evaluate_zone(chs, iters, tol, n_random, seed, ckpt, with_pg=False):
+    """AO + unfolding + random (+ optional PG twin, DD-037 leftover) on one zone."""
     res = run_ao_dataset(chs, iters=iters, tol=tol, workers=1)
     ao = np.array([r["rate"] for r in res])
     rng = np.random.default_rng(seed)
@@ -62,7 +61,10 @@ def evaluate_zone(chs, iters, tol, n_random, seed, ckpt):
         model.eval()
         th = unfold_thetas(model, chs)
         unf = np.array([sum_rate_numpy(th[i], chs[i]) for i in range(len(chs))])
-    return ao, unf, rand
+    pg = None
+    if with_pg:
+        pg = np.array([pg_sanity(ch, iters=iters, tol=tol)["rate"] for ch in chs])
+    return ao, unf, rand, pg
 
 
 def main() -> int:
@@ -76,6 +78,9 @@ def main() -> int:
     ap.add_argument("--n-random", type=int, default=200)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--max-channels", type=int, default=0)
+    ap.add_argument("--with-pg", action="store_true",
+                    help="also run the 200-iteration plain-PG twin on both zones"
+                         " (DD-037 leftover: names the pg generalization column)")
     args = ap.parse_args()
 
     for p in (args.gen, args.test):
@@ -95,14 +100,16 @@ def main() -> int:
     print(header); print("-" * len(header))
 
     t0 = time.perf_counter()
-    ao_t, unf_t, rand_t = evaluate_zone(test, args.iters, args.tol, args.n_random,
-                                        args.seed, args.ckpt)
-    ao_g, unf_g, rand_g = evaluate_zone(gen, args.iters, args.tol, args.n_random,
-                                        args.seed, args.ckpt)
+    ao_t, unf_t, rand_t, pg_t = evaluate_zone(test, args.iters, args.tol, args.n_random,
+                                              args.seed, args.ckpt, with_pg=args.with_pg)
+    ao_g, unf_g, rand_g, pg_g = evaluate_zone(gen, args.iters, args.tol, args.n_random,
+                                              args.seed, args.ckpt, with_pg=args.with_pg)
 
     rows = [("ao", ao_t, ao_g)]
     if unf_t is not None and unf_g is not None:
         rows.append(("unfolding", unf_t, unf_g))
+    if pg_t is not None and pg_g is not None:
+        rows.append(("pg", pg_t, pg_g))
     rows.append(("random", rand_t, rand_g))
 
     for name, r_t, r_g in rows:

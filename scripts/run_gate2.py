@@ -158,7 +158,8 @@ def main() -> int:
                  f"numerical-stall {100 * (1 - tol_hits.mean()):5.1f} %  | "
                  f"||rgrad|| at stop: median {np.median(ao_rgrad):.2e}, max {ao_rgrad.max():.2e}")
     lines.append(f" wall time               : {wall:.1f} s total | median {np.median(ao_times):.3f} s/channel"
-                 f"   (AO is the seconds-scale upper bound for the G3 latency table)")
+                 f" | p95 {np.percentile(ao_times, 95):.3f} s/channel"
+                 f"   (AO is the seconds-scale upper bound for the G3 latency table; DD-036 leftover closed)")
     lines.append("-" * 62)
     lines.append(f" G2 VERDICT: {'PASS' if pass_gate else 'FAIL'}")
     if not pass_gate:
@@ -194,6 +195,8 @@ def main() -> int:
                "rgrad_norm_median": float(np.median(ao_rgrad)),
                "rgrad_norm_max": float(ao_rgrad.max()),
                "median_time_s": float(np.median(ao_times)),
+               "mean_time_s": float(ao_times.mean()),
+               "p95_time_s": float(np.percentile(ao_times, 95)),   # DD-036 leftover: AO wall p95
                "per_channel": ao_rates.tolist()},
         "random": {"mean": float(rand_means.mean()), "sd": float(rand_means.std(ddof=1)),
                    "pooled_sd": float(rand_all.std(ddof=1)), "n_draws": args.n_random},
