@@ -18,7 +18,17 @@ mean \AoIterMean\ accepted iterations per channel
 \texttt{results/ao/gate2\_report.json}). The plain projected-gradient twin--
 identical machinery without conjugacy--lands at
 \PgRandomRatio$\!\times$, isolating the contribution of conjugate search
-(Fig.~\ref{fig:ao-pg-gap}).
+(Fig.~\ref{fig:ao-pg-gap}). Two further references anchor the scale of these
+numbers on the same channels: with the surface phases randomized the mean rate
+is $\RandomMeanRate$~bps/Hz ($\sigma = \RandomSD{}$ over $500$ channels),
+while removing the
+RIS entirely (no-RIS baseline, same protocol) reduces it to
+\NoRisMeanRate~\(\pm\)\NoRisSD~bps/Hz -- so the surface alone already
+contributes $+10.7$~bps/Hz at random phases and $+29.9$~bps/Hz under the
+optimized reference. These headrooms establish that phase choice, and the
+RIS itself, carry information an informed method can only gain from the
+channel; the certified null in \S\ref{sec:results-drl} is measured against
+exactly this floor.
 
 \begin{figure}[t]
 \begin{center}

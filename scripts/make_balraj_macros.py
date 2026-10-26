@@ -66,6 +66,7 @@ KNOWN = ["AoRandomRatio", "AoRateMean", "AoSD", "AoIterMean",
          "UnfoldLatencyMeanMs", "UnfoldLatencyP95Ms",
          "QaoQuantGapBthree",
          "CsiAoZero", "CsiAoPone", "CsiRandomZero", "CsiRandomPone",
+         "NoRisMeanRate", "NoRisSD",
          "GenAo", "GenUnfold", "GenRandom", "PgRandomRatio"]
 
 # why a macro can still be TBD today (printed with the outstanding list)
@@ -501,6 +502,17 @@ def main() -> int:
         values.update(ratios)
 
     # bench latency_float32 is RETIRED from the paper (DD-037): keep on disk only
+
+    # ---- no-RIS baseline (DD-log round-3 reviewer request; committed artifact) -
+    npath = root / "results" / "baselines" / "no_ris" / "eval_rates.json"
+    if npath.exists():
+        import numpy as np
+        nr = np.asarray(json.loads(npath.read_text(encoding="utf-8"))["rates"], dtype=float)
+        values["NoRisMeanRate"] = f"{nr.mean():.3f}"
+        values["NoRisSD"] = f"{nr.std(ddof=1):.3f}"
+        print(f"[macros] no-RIS baseline: {nr.mean():.3f} +/- {nr.std(ddof=1):.3f} (SD, n={len(nr)})")
+    else:
+        print(f"[macros] WARNING missing {npath}")
 
     if values["UnfoldLatencyMs"] != "__TBD__" and values["AoWallMeanMs"] != "__TBD__":
         values["UnfoldSpeedup"] = f"{float(values['AoWallMeanMs']) / float(values['UnfoldLatencyMs']):.1f}"
