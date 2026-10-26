@@ -1,15 +1,15 @@
-================ G2 — AO BOUND GATE (Balraj) ================
+================ G2 â€” AO BOUND GATE (Balraj) ================
  channels evaluated      : 500  (N=64, from data\test_channels.npz)
- AO mean rate            :   63.040 ± 0.644 bps/Hz
- random mean rate        :   43.640 ± 0.658 bps/Hz   (mean of 200 draws/channel, seed 0)
- best-of-200 mean rate   :   51.837 ± 0.998 bps/Hz
- PG-twin mean rate       :   62.550 ± 0.711 bps/Hz   (AO/PG = 1.008)
+ AO mean rate            :   64.193 Â± 0.582 bps/Hz
+ random mean rate        :   53.172 Â± 0.636 bps/Hz   (mean of 200 draws/channel, seed 0)
+ best-of-200 mean rate   :   57.104 Â± 0.757 bps/Hz
+ PG-twin mean rate       :   63.790 Â± 0.658 bps/Hz   (AO/PG = 1.006)
 --------------------------------------------------------------
- AO / random mean ratio  :    1.445    [criterion >= 1.30]
- AO > random per-channel :   100.0 %    [informational]
- iters to terminate       : median 200, max 200 (cap 200)    [criterion <= 200]
- termination quality      : tol-hit  44.4 %  | numerical-stall  55.6 %  | ||rgrad|| at stop: median 3.18e-04, max 3.89e-01
- wall time               : 232.0 s total | median 0.475 s/channel   (AO is the seconds-scale upper bound for the G3 latency table)
+ AO / random mean ratio  :    1.207    [criterion >= 1.15 (DD-043)]
+ AO > random per-channel :   100.0 %    [criterion == 100% (DD-043)]
+ iters to terminate       : median 193, max 200 (cap 200)    [criterion <= 200]
+ termination quality      : tol-hit  54.2 %  | numerical-stall  45.8 %  | ||rgrad|| at stop: median 9.91e-05, max 1.22e-01
+ wall time               : 96.7 s total | median 1.352 s/channel   (AO is the seconds-scale upper bound for the G3 latency table)
 --------------------------------------------------------------
  G2 VERDICT: PASS
 ==============================================================

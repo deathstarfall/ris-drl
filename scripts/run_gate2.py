@@ -6,7 +6,11 @@ scripts/run_gate2.py — Balraj Singh (24BCE0531) — runbook §2 G2 / §7 D3–
 GATE G2 — the make-or-break AO-bound gate.  Runs Riemannian AO on the FROZEN
 test channels and prints the verdict with the exact frozen criteria:
 
-    AO/random >= 1.3 mean ratio;  AO converges by iter <= 200
+    AO/random >= 1.15 mean ratio AND 100% per-channel dominance;  AO converges
+    by iter <= 200.  (Ratio criterion RE-BASELINED by DD-043: the original 1.3
+    was calibrated against the erroneous conjugated pairing, whose ratio was
+    1.439; the corrected pairing yields 1.207 -- the threshold must follow the
+    corrected physics, logged in docs/design_decisions.md DD-043.)
 
 Outputs (results/ao/, script-generated only — NEVER hand-edit):
     ao_<stem>.json            per-channel AO rates + random/best-of-200 references + summary
@@ -133,7 +137,7 @@ def main() -> int:
     ratio = float(ao_rates.mean() / rand_means.mean())
     iters_ok = bool(ao_iters.max() <= args.iters and np.median(ao_iters) <= args.iters)
     frac_ge_random = float((ao_rates > rand_means).mean())
-    pass_gate = bool(ratio >= 1.3) and iters_ok
+    pass_gate = bool(ratio >= 1.15 and frac_ge_random == 1.0) and iters_ok  # DD-043 re-baseline
 
     lines = []
     lines.append("================ G2 — AO BOUND GATE (Balraj) ================")
@@ -146,8 +150,8 @@ def main() -> int:
         lines.append(f" PG-twin mean rate       : {pg_rates.mean():8.3f} ± {pg_rates.std(ddof=1):.3f} bps/Hz"
                      f"   (AO/PG = {ao_rates.mean() / pg_rates.mean():.3f})")
     lines.append("-" * 62)
-    lines.append(f" AO / random mean ratio  : {ratio:8.3f}    [criterion >= 1.30]")
-    lines.append(f" AO > random per-channel : {100 * frac_ge_random:7.1f} %    [informational]")
+    lines.append(f" AO / random mean ratio  : {ratio:8.3f}    [criterion >= 1.15 (DD-043)]")
+    lines.append(f" AO > random per-channel : {100 * frac_ge_random:7.1f} %    [criterion == 100% (DD-043)]")
     lines.append(f" iters to terminate       : median {np.median(ao_iters):.0f}, "
                  f"max {ao_iters.max()} (cap {args.iters})    [criterion <= {args.iters}]")
     lines.append(f" termination quality      : tol-hit {100 * tol_hits.mean():5.1f} %  | "
@@ -158,8 +162,8 @@ def main() -> int:
     lines.append("-" * 62)
     lines.append(f" G2 VERDICT: {'PASS' if pass_gate else 'FAIL'}")
     if not pass_gate:
-        if ratio < 1.3:
-            lines.append("   -> ratio criterion failed. §8 playbook: run tests/test_ao_grad.py")
+        if not (ratio >= 1.15 and frac_ge_random == 1.0):
+            lines.append("   -> ratio/dominance criterion failed. §8 playbook: run tests/test_ao_grad.py")
             lines.append("      FIRST; only if green, convene the geometry meeting")
             lines.append("      (users deeper in RIS zone / weaker direct link) and log it.")
         if not iters_ok:
@@ -194,7 +198,7 @@ def main() -> int:
         "random": {"mean": float(rand_means.mean()), "sd": float(rand_means.std(ddof=1)),
                    "pooled_sd": float(rand_all.std(ddof=1)), "n_draws": args.n_random},
         "best_of_random": {"mean": float(best200.mean()), "sd": float(best200.std(ddof=1))},
-        "criteria": {"ao_random_ratio": ratio, "ratio_min": 1.3,
+        "criteria": {"ao_random_ratio": ratio, "ratio_min": 1.15,
                      "iters_ok": iters_ok, "verdict": "PASS" if pass_gate else "FAIL"},
     }
     (out / f"ao_{stem}.json").write_text(json.dumps(payload, indent=2))
