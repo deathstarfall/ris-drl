@@ -62,17 +62,17 @@ from pathlib import Path
 KNOWN = ["AoRandomRatio", "AoRateMean", "AoSD", "AoIterMean",
          "AoWallMeanMs", "GateTwoVerdict", "UnfoldLatencyMs",
          "UnfoldGapToAo", "UnfoldSpeedup",
-         "AoWallPNinetyFiveMs", "QaoQuantGapBthree",
+         "UnfoldRateMean", "UnfoldRateSD",
+         "UnfoldLatencyMeanMs", "UnfoldLatencyP95Ms",
+         "QaoQuantGapBthree",
          "CsiAoZero", "CsiAoPone", "CsiRandomZero", "CsiRandomPone",
-         "GenAo", "GenPg", "GenUnfold", "GenRandom", "PgRandomRatio"]
+         "GenAo", "GenUnfold", "GenRandom", "PgRandomRatio"]
 
 # why a macro can still be TBD today (printed with the outstanding list)
-TBD_HINTS = {
-    "AoWallPNinetyFiveMs": "needs results/ao/gate2_report.json "
-                           "(instrumented AO re-run; sec5_2 already cites it)",
-    "GenPg": "PG on the unseen gen_channels split has never been produced "
-             "(lead call: add a pg pass to run_generalization.py)",
-}
+# NOTE (DD-036): AoWallPNinetyFiveMs and GenPg are NOT emitted at all - removed
+# macros whose artifacts do not exist; the paper text hands off those claims
+# to v1.1 instead of printing a TBD.
+TBD_HINTS = {}
 
 FLOAT_RE = re.compile(r"[0-9]*\.?[0-9]+")
 NEWCMD_RE = re.compile(r"^\s*\\newcommand\{\\(\w+)\}\{(.*)\}\s*$")
@@ -93,6 +93,54 @@ def _line_floats(text: str, label: str):
         if label in raw:
             return FLOAT_RE.findall(raw)
     return None
+
+
+def parse_unfold_rates(path: Path):
+    """DD-041 canonical unfold stats + latency from results/unfold/unfold_rates.json
+    (DD-009: per-channel rates + per-channel latency on the frozen test set, produced
+    by scripts/eval_unfolding.py from the committed checkpoint)."""
+    try:
+        d = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[macros] WARNING unreadable {path}: {e}")
+        return None
+    import numpy as np
+    r = np.asarray(d["rates"], dtype=float)
+    l = np.asarray(d["latency_ms"], dtype=float)
+    out = {
+        "UnfoldRateMean": f"{r.mean():.3f}",
+        "UnfoldRateSD": f"{r.std(ddof=1):.3f}",
+        "UnfoldLatencyMs": f"{np.median(l):.3f}",
+        "UnfoldLatencyMeanMs": f"{l.mean():.3f}",
+        "UnfoldLatencyP95Ms": f"{np.percentile(l, 95):.3f}",
+    }
+    print(f"[macros] DD-009 unfold: mean {r.mean():.3f} +/- {r.std(ddof=1):.3f}, "
+          f"latency median {np.median(l):.3f} / mean {l.mean():.3f} / p95 "
+          f"{np.percentile(l, 95):.3f} ms (n={len(r)}, dtype {d['detail'].get('dtype')})")
+    return out
+
+
+def parse_ratios_frozen(ao_path: Path, rnd_path: Path, pg_path: Path):
+    """DD-006 frozen-baseline policy: published ratios use results/baselines/random
+    (43.797, n=500), never gate2_verdict's internal 200-draw random (43.640)."""
+    import numpy as np
+    try:
+        import numpy as np
+        ao = np.asarray(json.loads(ao_path.read_text())["rates"], dtype=float)
+        rnd = np.asarray(json.loads(rnd_path.read_text())["rates"], dtype=float)
+        out = {"AoRandomRatio": f"{ao.mean() / rnd.mean():.3f}"}
+        print(f"[macros] AO/random (frozen baseline): {ao.mean():.3f}/{rnd.mean():.3f} "
+              f"= {out['AoRandomRatio']}")
+        if pg_path.exists():
+            pg = np.asarray(json.loads(pg_path.read_text())["pg_mean"]) \
+                if "pg_mean" in json.loads(pg_path.read_text()) else None
+            if pg is not None:
+                out["PgRandomRatio"] = f"{float(pg) / rnd.mean():.3f}"
+                print(f"[macros] PG/random (frozen baseline): {out['PgRandomRatio']}")
+        return out
+    except Exception as e:
+        print(f"[macros] WARNING frozen ratio parse failed: {e}")
+        return None
 
 
 def parse_verdict(path: Path) -> dict:
@@ -329,9 +377,11 @@ def parse_generalization(path: Path):
 
 def parse_pg_ratio(gen_path: Path, pg_path: Path):
     """PG test mean / random test mean -- the test-set twin of AoRandomRatio.
-    Guard: pg file's ao_mean must match the canonical AO test mean (from
-    generalization.json) within 0.01, else the channels differ and the
-    ratio is not like-for-like -> TBD."""
+    DD-006/036 policy: published ratios use the FROZEN random baseline
+    (results/baselines/random/eval_rates.json, 43.797 n=500), never an
+    internal random draw. Guard: pg file's ao_mean must match the canonical
+    AO test mean (from generalization.json) within 0.01, else the channels
+    differ and the ratio is not like-for-like -> None."""
     try:
         g = json.loads(gen_path.read_text(encoding="utf-8"))
         p = json.loads(pg_path.read_text(encoding="utf-8"))
@@ -340,17 +390,23 @@ def parse_pg_ratio(gen_path: Path, pg_path: Path):
         return None
     try:
         ao_ref = float(g["methods"]["ao"]["test"]["mean"])
-        rnd = float(g["methods"]["random"]["test"]["mean"])
     except (KeyError, TypeError):
-        print("[macros] WARNING generalization.json lacks ao/random test means")
+        print("[macros] WARNING generalization.json lacks the AO test mean")
+        return None
+    rnd_path = gen_path.parents[1] / "baselines" / "random" / "eval_rates.json"
+    try:
+        rnd = float(np.mean(json.loads(rnd_path.read_text(encoding="utf-8"))["rates"]))
+    except Exception as e:
+        print(f"[macros] WARNING frozen random baseline unreadable ({rnd_path}): {e}")
         return None
     ao_pg = p.get("ao_mean")
     if ao_pg is None or abs(float(ao_pg) - ao_ref) > 0.01:
         print(f"[macros] WARNING pg file ao_mean {ao_pg} != test AO {ao_ref:.3f} "
-              f"-- different channel vintage; PgRandomRatio -> TBD")
+              f"-- different channel vintage; no PG ratio emitted")
         return None
     ratio = float(p["pg_mean"]) / rnd
-    print(f"[macros] PgRandomRatio: {float(p['pg_mean']):.3f} / {rnd:.3f} = {ratio:.3f}")
+    print(f"[macros] PgRandomRatio (frozen baseline): "
+          f"{float(p['pg_mean']):.3f} / {rnd:.3f} = {ratio:.3f}")
     return ratio
 
 
@@ -391,10 +447,11 @@ def parse_gate2_report(path: Path):
 
 def load_extra_macros(path: Path):
     extra = []
+    REMOVED = {"AoWallPNinetyFiveMs", "GenPg"}  # DD-036: no artifact -> macro deleted, never TBD
     if path.exists():
         for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
             m = NEWCMD_RE.match(line)
-            if m and m.group(1) not in KNOWN:
+            if m and m.group(1) not in KNOWN and m.group(1) not in REMOVED:
                 extra.append(line.rstrip())
     return extra
 
@@ -428,16 +485,22 @@ def main() -> int:
     else:
         print("[macros] WARNING no rate-loss unfold metrics found")
 
-    if proto and values["AoRateMean"] != "__TBD__":
-        values["UnfoldGapToAo"] = f"{100.0 * proto['mean'] / float(values['AoRateMean']):.1f}"
+    # canonical unfold stats/latency: the DD-009 per-channel artifact (DD-041 protocol)
+    dd009 = parse_unfold_rates(root / "results" / "unfold" / "unfold_rates.json")
+    if dd009:
+        values.update(dd009)
 
-    lpath = root / "results" / "unfold" / "latency_float32.json"
-    if lpath.exists():
-        ms = parse_latency(lpath)
-        if ms is not None:
-            values["UnfoldLatencyMs"] = f"{ms:.3f}"
-    else:
-        print(f"[macros] WARNING missing {lpath}")
+    if values["UnfoldRateMean"] != "__TBD__" and values["AoRateMean"] != "__TBD__":
+        values["UnfoldGapToAo"] = f"{100.0 * float(values['UnfoldRateMean']) / float(values['AoRateMean']):.2f}"
+
+    # frozen-baseline ratios (DD-006 policy; overrides gate2's internal random)
+    ratios = parse_ratios_frozen(root / "results" / "ao" / "ao_rates.json",
+                                 root / "results" / "baselines" / "random" / "eval_rates.json",
+                                 root / "results" / "ao" / "pg_test_channels.json")
+    if ratios:
+        values.update(ratios)
+
+    # bench latency_float32 is RETIRED from the paper (DD-037): keep on disk only
 
     if values["UnfoldLatencyMs"] != "__TBD__" and values["AoWallMeanMs"] != "__TBD__":
         values["UnfoldSpeedup"] = f"{float(values['AoWallMeanMs']) / float(values['UnfoldLatencyMs']):.1f}"
@@ -476,15 +539,8 @@ def main() -> int:
     else:
         print(f"[macros] WARNING missing {gpath}")
 
-    # ---- AO wall-time p95 (best effort; artifact not produced yet) ----------
-    rpath = root / "results" / "ao" / "gate2_report.json"
-    if rpath.exists():
-        ms95 = parse_gate2_report(rpath)
-        if ms95 is not None:
-            values["AoWallPNinetyFiveMs"] = f"{ms95:.1f}"
-    else:
-        print(f"[macros] NOTE {rpath} does not exist yet -> "
-              f"AoWallPNinetyFiveMs stays TBD")
+    # ---- AO wall-time p95: artifact has never been produced; the macro is
+    # REMOVED from the paper (DD-036). No block here (v1.1 lead).
 
     extras = load_extra_macros(out_path)
     if extras:
@@ -492,14 +548,17 @@ def main() -> int:
 
     lines = [
         "% Auto-generated by scripts/make_balraj_macros.py -- DO NOT hand-edit.",
-        "% Sources: results/ao/gate2_verdict.txt + results/unfold/*/metrics.json",
-        "%          + results/unfold/latency_float32.json (f64 MEDIAN, matching",
-        "%            the AO median in gate2_verdict.txt), schema-agnostic",
-        "%          + results/bits_sweep.json (B=3 gap, dB-equivalent:",
-        "%            1 bps/Hz == 10*log10(2) == 3.0103 dB, high-SNR convention)",
-        "%          + results/unfold/csi_sweep.json (eps 0 vs 0.1)",
+        "% DD-036/037/041 policy: published ratios use the FROZEN random baseline",
+        "% (results/baselines/random, 43.797 n=500; gate2's internal 200-draw random",
+        "% 43.640 stays artifact-informational). Unfold stats/latency come from the",
+        "% DD-009 per-channel artifact results/unfold/unfold_rates.json (DD-041",
+        "% val-protocol checkpoint; latency measured per-channel, complex128).",
+        "% latency_float32.json is retired from the paper (bench context only).",
+        "% Sources: results/ao/gate2_verdict.txt (AO side)",
+        "%          + results/unfold/unfold_rates.json (DD-009 canonical)",
+        "%          + results/bits_sweep.json + csi_sweep.json",
         "%          + results/ao/generalization.json + pg_test_channels.json",
-        "% Balraj Singh (24BCE0531); consumed by paper/sections/sec5_2_*.tex.",
+        "% Ayansh, Balraj Singh (24BCE0531); consumed by paper/sections/sec5_2_*.tex.",
     ]
     # LaTeX-safe emission: unfilled macros print bold TBD (never __TBD__ --
     # bare underscores are illegal in text mode and break compilation).

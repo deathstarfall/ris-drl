@@ -1,4 +1,4 @@
-# Python
+﻿# Python
 .venv/
 venv/
 __pycache__/
@@ -8,6 +8,8 @@ __pycache__/
 # Experiments
 ckpt/
 *.pt
+!results/unfold/*.pt
+!results/unfold/**/*.pt
 results/**/local_*
 *.log
 

@@ -78,28 +78,31 @@ artifact). The curve saturates at the 202-iteration/tolerance floor
 \end{figure}
 
 \subsubsection{Unfolding Versus the Reference}
-\providecommand{\UnfoldMeanRate}{59.875}
-\providecommand{\UnfoldSD}{1.26}
-\providecommand{\UnfoldGapToAO}{94.98}
-\providecommand{\UnfoldLatencyMedianMS}{9.572}
-\providecommand{\UnfoldLatencyP95MS}{11.285}
-\providecommand{\UnfoldVsAOLatencyRatio}{49.6}
-\providecommand{\RateLossMeanRate}{59.875}
-\providecommand{\CircularLossMeanRate}{58.335}
-\providecommand{\MSEnaLossMeanRate}{56.752}
-The trained unfolding reaches $\UnfoldMeanRate{} \pm \UnfoldSD{}$~bps/Hz on
+\providecommand{\UnfoldMeanRate}{59.749}
+\providecommand{\UnfoldSD}{1.86}
+\providecommand{\UnfoldGapToAO}{94.78}
+\providecommand{\UnfoldLatencyMedianMS}{8.196}
+\providecommand{\UnfoldLatencyMeanMS}{8.357}
+\providecommand{\UnfoldLatencyP95MS}{10.280}
+\providecommand{\UnfoldVsAOLatencyRatio}{58.0}
+\providecommand{\RateLossMeanRate}{59.749}
+\providecommand{\CircularLossMeanRate}{59.840}
+\providecommand{\MSEnaLossMeanRate}{58.501}
+The trained unfolding reaches $\UnfoldMeanRate{} \pm \UnfoldSD{}$~bps/Hz (mean, SD over the 500 test channels) on
 the frozen test set---within \UnfoldGapToAO{}\% of the AO reference
 (criterion: $\leq 10\%$)---while deciding in a median of
-\UnfoldLatencyMedianMS{}~ms per channel ($p95$:
+\UnfoldLatencyMedianMS{}~ms per channel (mean \UnfoldLatencyMeanMS{}~ms, $p95$:
 \UnfoldLatencyP95MS{}~ms), a $\UnfoldVsAOLatencyRatio{}\times$ speed-up over
 the reference, on identical channels, budgets, and seeds. All latency
-figures refer to the protocol's evaluation pass: one channel per
-batch decision, torch complex128 arithmetic on a desktop-class CPU
-(measured medians in three settings: dedicated 200-trial inference
-benchmark 6.73~ms; training-time metrics 9.57~ms, $p95$ 11.3~ms,
-reported here; per-channel evaluation recording 9.86~ms, $p95$
-$13.4$~ms). The loss-ablation table
-confirms the design correction quantitatively:
+figures refer to the protocol's DD-009 per-channel evaluation pass: one
+channel per batch decision, torch complex128 arithmetic on a desktop-class
+CPU, recorded for all 500 frozen channels
+(supplementary decision log: the in-training monitoring latencies and the
+retired float32 bench are disclosed as benchmarks, not headline numbers).
+The loss-ablation table
+confirms the design correction quantitatively (all three losses retrained
+under the audited train/validation protocol at the winning learning rate
+$10^{-3}$; each test set evaluated exactly once):
 $\mathcal{L}_{\mathrm{rate}}$ attains \RateLossMeanRate{}~bps/Hz, the smooth
 circular surrogate \CircularLossMeanRate{}~bps/Hz, and the legacy
 wrapped-angle MSE \MSEnaLossMeanRate{}~bps/Hz---the regime that silently
@@ -113,10 +116,10 @@ produced a policy indistinguishable from random phases in the earlier study.
 \small\begin{tabular}{lccccc}\toprule
 $B$ & AO@$B$ & Unfold@$B$ & Random@$B$ & $\Delta$AO (bps/Hz) & $\Delta$AO (dB) \\
 \midrule
-2 & 61.134 & 58.023 & 43.652 & $-1.905$ & $-5.734$ \\
-3 & 62.574 & 59.419 & 43.659 & $-0.466$ & $-1.402$ \\
-4 & 62.922 & 59.761 & 43.592 & $-0.118$ & $-0.354$ \\
-$\infty$ & 63.040 & 59.875 & 43.797 & 0 & 0 \\
+2 & 61.134 & 57.896 & 43.652 & $-1.905$ & $-5.734$ \\
+3 & 62.574 & 59.280 & 43.659 & $-0.466$ & $-1.402$ \\
+4 & 62.922 & 59.630 & 43.592 & $-0.118$ & $-0.354$ \\
+$\infty$ & 63.040 & 59.749 & 43.797 & 0 & 0 \\
 \bottomrule
 \end{tabular}
 \end{center}

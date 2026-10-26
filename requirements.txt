@@ -1,1 +1,10 @@
+# Core runtime (CPU torch is fine for every artifact in this repo)
+torch>=2.0
+numpy>=1.24
+scipy>=1.10
+gymnasium>=0.29
+pyyaml>=6.0
+matplotlib>=3.7
 requests>=2.31
+# dev
+pytest>=7.0

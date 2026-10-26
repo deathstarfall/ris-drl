@@ -9,6 +9,29 @@ from src.precoder import sum_rate
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
+def evaluate_policy(agent, test_channels="data/test_channels.npz", N_eval=None):
+    """DD-041: fixed-order deterministic evaluation on the frozen test set.
+    No environment RNG: channels are visited in stored order, actions deterministic."""
+    from src.ris_env import RISEnv
+    chs = load_dataset(test_channels)
+    env = RISEnv(channels=chs, seed=0)
+    idxs = range(len(chs)) if N_eval is None else range(N_eval)
+    rates = []
+    for i in idxs:
+        ch = chs[i]
+        env.ch = ch
+        env.ch["N"] = env.N
+        obs = env._obs(env.ch)
+        if hasattr(agent, "act_deterministic"):
+            a = agent.act_deterministic(obs)
+        elif hasattr(agent, "act"):
+            a = agent.act(obs, deterministic=True)
+        else:
+            a = env.action_space.sample()
+        rates.append(float(env.step(a)[4]["rate"]))
+    import numpy as _np
+    return float(_np.mean(rates))
+
 def store(name, rates, extra=None):
     d = {"method": name, "rates": [float(x) for x in rates],
          "n": len(rates), "channel_seed": 2000}

@@ -27,6 +27,23 @@ structure of \eqref{eq:sum_rate} under episodic $T{=}1$ bandit
 feedback, and we report this as a null result rather than tuning
 toward it.
 
+\paragraph{Protocol qualifications.} This null is certified for the
+stated protocol, and stated as such: (i)~the agents observe a
+partial-CSI stack---$|h_{r}|$, $\angle h_{r}$, $|G|$, $|h_{d}|$---in
+which $\angle G$ and $\angle h_{d}$ are absent, so the null applies to
+policies under this observation design; a full-CSI observation mode is
+implemented and released for follow-up campaigns
+(supplementary decision log).
+(ii)~In-training monitoring used the frozen evaluation set for
+visualization; the loss and the selection rule that produced the
+trained policies never consumed it for optimization, and the unfolding
+model (whose deployment numbers headline this work) was retrained
+under an audited train/validation protocol with the test set evaluated
+exactly once (supplementary decision log).
+(iii)~Committed per-channel evaluation artifacts cover the
+validation-best seed of each architecture; full per-seed artifacts for
+all thirty runs are a released follow-up item.
+
 \begin{table}[t]
 \centering\small
 \caption{Frozen-test-set evaluation of all six DRL agents
@@ -51,8 +68,8 @@ DQN@4bit & 43.62 & $-0.17$ & $0.62$ & $[-0.65,\,0.29]$ & 49 \\
 Exploitable head demonstrably exists in this environment: selecting
 \emph{two hundred random} phase vectors per channel and keeping the best
 yields $51.84$~bps/Hz ($+8.04$, $p=1.7 \times 10^{-83}$), deep
-unfolding reaches $59.88$ ($+16.08$, $p=1.3 \times 10^{-83}$,
-$5.0\%$ short of the Riemannian AO reference $63.04$), while every trained
+unfolding reaches $59.75$ ($+15.95$, $p=1.3 \times 10^{-83}$,
+$5.2\%$ short of the Riemannian AO reference $63.04$), while every trained
 policy remains statistically indistinguishable from a single random
 draw. The gap between what a 200-draw random search deftly extracts and
 what 30 gradient-informed training runs could not extract is the

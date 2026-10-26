@@ -255,7 +255,12 @@ def measure_decision_latency(model: UnrolledPG, T: Dict, n_trials: int = 200,
 def train_from_config(cfg: Dict, loss_override: Optional[str] = None,
                       max_iters_override: Optional[int] = None,
                       out_suffix: str = "") -> Dict:
-    """Train UnrolledPG from a parsed configs/unfolding.yaml.
+    """Train UnrolledPG from a parsed configs/unfolding.yaml (DD-041 protocol).
+
+    Protocol (audit-revised): the 1,500 training channels are split deterministically
+    into TRAIN (first 80%) and VALIDATION (last 20%).  Mid-training monitoring and any
+    selection happens on VALIDATION only; the frozen 500-channel test set is evaluated
+    exactly ONCE, on the validation-best checkpoint, after training completes.
 
     loss = rate      : end-to-end sum-rate loss (main method, fix #5)
     loss = circular  : needs AO reference thetas (results/ao/train/ao_thetas.npy)
@@ -276,7 +281,12 @@ def train_from_config(cfg: Dict, loss_override: Optional[str] = None,
 
     train_chs = load_channel_npz(cfg["data"]["train_channels"])
     test_chs = load_channel_npz(cfg["data"]["test_channels"])
+    # DD-041 protocol: deterministic train/val split (last val_frac slice = validation)
+    val_frac = float(cfg["train"].get("val_frac", 0.2))
+    n_val = max(1, int(round(val_frac * len(train_chs))))
+    train_chs, val_chs = train_chs[:-n_val], train_chs[-n_val:]
     T_train = channels_to_tensors(train_chs)
+    T_val = channels_to_tensors(val_chs)
     T_test = channels_to_tensors(test_chs)
     N = T_train["h_r"].shape[2]
 
@@ -289,7 +299,9 @@ def train_from_config(cfg: Dict, loss_override: Optional[str] = None,
                 f"  python scripts/run_ao_reference.py --channels {cfg['data']['train_channels']}"
                 f" --out results/ao/train")
         theta_ref_all = torch.as_tensor(np.load(ref_path), dtype=REAL)
-        assert theta_ref_all.shape[0] == len(train_chs), "AO refs misaligned with train npz"
+        # refs align with the ORIGINAL train npz; slice to the split's train part
+        assert len(theta_ref_all) >= len(train_chs), "AO refs misaligned with train npz"
+        theta_ref_all = theta_ref_all[:len(train_chs)]
 
     model = UnrolledPG(L=L, theta_init=float(cfg["train"]["theta_init"]),
                        wrap=bool(cfg["train"]["wrap_theta"]))
@@ -301,8 +313,9 @@ def train_from_config(cfg: Dict, loss_override: Optional[str] = None,
 
     base_rate = float(sum_rate_safe(torch.zeros(len(test_chs), N, dtype=REAL),
                                     T_test).mean())     # all-zero phases reference (float64 defaults — bit-identical to sum_rate_torch)
-    init_model_rate = evaluate_on_channels(model, T_test)  # model before any training
+    init_model_rate = evaluate_on_channels(model, T_val)  # model before any training (validated on VAL per DD-041)
     hist = []
+    best = {"val_rate": -float("inf"), "iter": -1, "state": None}
     t_start = time.perf_counter()
 
     for it in range(iters + 1):
@@ -321,25 +334,37 @@ def train_from_config(cfg: Dict, loss_override: Optional[str] = None,
         opt.step()
 
         if it % eval_every == 0 or it == iters:
-            test_rate = evaluate_on_channels(model, T_test)
+            val_rate = evaluate_on_channels(model, T_val)
+            if val_rate > best["val_rate"]:                      # selection on VAL only (DD-041)
+                best = {"val_rate": val_rate, "iter": it,
+                        "state": {k: v.detach().clone() for k, v in model.state_dict().items()}}
             rec = {"iter": it, "train_loss": float(loss.detach()),
-                   "test_mean_rate": test_rate,
-                   "gain_vs_zero_init": test_rate - base_rate,
+                   "val_mean_rate": val_rate,
+                   "gain_vs_zero_init": val_rate - base_rate,
                    "alphas": [float(a) for a in torch.exp(model.alphas).detach()],
                    "wall_s": time.perf_counter() - t_start}
             hist.append(rec)
             print(f"  [unfolding:{loss_name}] iter {it:5d}  loss {rec['train_loss']: .4f}"
-                  f"  test rate {test_rate: .4f}  alphas"
-                  f" {np.round(rec['alphas'], 3).tolist()}", flush=True)
+                  f"  val rate {val_rate: .4f} (best {best['val_rate']: .4f} @ {best['iter']})"
+                  f"  alphas {np.round(rec['alphas'], 3).tolist()}", flush=True)
+
+    # restore the VALIDATION-BEST weights, then evaluate the frozen test set once (DD-041)
+    if best["state"] is not None:
+        model.load_state_dict(best["state"])
+    test_rate = evaluate_on_channels(model, T_test)
 
     latency = measure_decision_latency(model, T_test, n_trials=int(cfg["eval"]["latency_trials"]))
     metrics = {
         "tag": tag, "L": L, "loss": loss_name, "seed": seed,
         "iters": iters, "batch_channels": B, "lr": float(cfg["train"]["lr"]),
-        "N": int(N), "n_train": len(train_chs), "n_test": len(test_chs),
+        "N": int(N), "n_train": len(train_chs), "n_val": len(val_chs),
+        "n_test": len(test_chs), "val_frac": val_frac,
+        "protocol": "DD-041: train/val split, val-selected best, single final test eval",
         "zero_phase_test_rate": base_rate,
-        "init_model_test_rate": init_model_rate,
-        "final_test_rate": hist[-1]["test_mean_rate"],
+        "init_model_val_rate": init_model_rate,
+        "best_iter": best["iter"],
+        "best_val_rate": best["val_rate"],
+        "final_test_rate": test_rate,                      # test eval of the val-best checkpoint
         "latency_ms": latency,
         "history": hist,
     }

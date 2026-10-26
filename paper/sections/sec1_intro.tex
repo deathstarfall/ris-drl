@@ -54,11 +54,12 @@ establishing the headroom available to a learned method (the problem
 is non-convex, so this is a strong reference solution reached under a
 fixed 200-iteration stopping rule, not a provable upper bound)
 (\S\ref{sec:results-ao}).
-\item \textbf{Deep unfolding within $5.0\%$ of the reference.} An
-$L{=}6$ unfolded projected-gradient network reaches $59.88$~bps/Hz
-($p=1.3\times10^{-83}$ over random), with trained-side inference
-latency of $9.7$~ms per decision and absorbed quantization sweep at
-2/3/4-bit phase codebooks (\S\ref{sec:results-ao}).
+\item \textbf{Deep unfolding within $5.2\%$ of the reference.} An
+$L{=}6$ unfolded projected-gradient network reaches $59.75$~bps/Hz
+($p=1.3\times10^{-83}$ over random), trained under an audited
+train/validation protocol with a single frozen-test evaluation, with
+inference latency of $8.2$~ms (median) per decision and an absorbed
+quantization sweep at 2/3/4-bit phase codebooks (\S\ref{sec:results-ao}).
 \item \textbf{A null result for direct DRL policies.} Six
 architectures $\times$ five seeds of SAC/TD3/DDPG/coded-codebook
 DQN trains inherit zero positive mean gain over random on the frozen

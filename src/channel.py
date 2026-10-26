@@ -33,6 +33,14 @@ def gen_channel(rng, cfg, zone=None):
     g_direct = 10 ** (-(pl_direct_db(d_bu) + blockage_db) / 10)
 
     # ---- cascade link: two-hop Wu-Zhang path loss ----
+    # DD-042 channel-model disclosure: the two hops share ONE product attenuation.
+    # pl_cascade_db() already covers the WORSE of the two hops' distances (Wu-Zhang
+    # form for the larger of d_bt/d_tu), so a separate per-hop scaling of G would
+    # double-count the shared loss. G consequently carries unit magnitude (i.i.d.
+    # CN(0,1)) and the full cascade attenuation profiles the RIS -> user hop h_r.
+    # carrier_ghz in env.yaml is documentation-only: the 3.5 GHz mid-band point is
+    # fixed by these published UMi coefficients; mmWave/sub-THz propagation is NOT
+    # modelled by this generator (v1.1 scope).
     g_casc = 10 ** (-pl_cascade_db(d_bt, d_tu) / 10)
 
     M, N, K = cfg["dims"]["M"], cfg["dims"]["N"], cfg["dims"]["K"]

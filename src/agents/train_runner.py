@@ -42,25 +42,27 @@ def evaluate_on_frozen_test_set(agent, test_channels: str = "data/test_channels.
     except Exception:
         pass
 
-    # Fallback evaluation if evaluate.py isn't ready yet.
     try:
         from src.ris_env import RISEnv
+        from src import evaluate as _evalmod   # provenance: same frozen channels + scorer (DD-008)
+        from src.precoder import sum_rate
         channels_list = load_dataset(test_channels)
-        env = RISEnv(channels=channels_list, seed=12345)
-        total = 0.0
-        n = N_eval if N_eval is not None else len(env.chs)
-        for i in range(n):
-            obs, _ = env.reset(seed=12345 + i)
+        env = RISEnv(channels=channels_list, seed=12345)   # env RNG idle: order below is fixed
+        rates = []
+        idxs = range(len(channels_list)) if N_eval is None else range(N_eval)
+        for i in idxs:
+            ch = channels_list[i]                       # FIXED evaluation order over the frozen set
+            env.ch = ch
+            env.ch["N"] = env.N
+            obs = env._obs(env.ch)                      # same DD-004 observation stack as training
             if hasattr(agent, "act_deterministic"):
                 a = agent.act_deterministic(obs)
             elif hasattr(agent, "act"):
-                # avoid exploration noise at eval
-                a = agent.act(obs, deterministic=True)
+                a = agent.act(obs, deterministic=True)  # no exploration noise at eval
             else:
                 a = env.action_space.sample()
-            obs2, r, term, trunc, info = env.step(a)
-            total += float(r)
-        return total / max(n, 1)
+            rates.append(float(env.step(a)[4]["rate"]))
+        return sum(rates) / max(len(rates), 1)
     except Exception as e:
         raise RuntimeError(f"Evaluation failed: {e}")
 
