@@ -165,6 +165,10 @@ def build_policy_fn(agent_name, seed, N):
         ]).astype(np.float32)
         
         # agent.act returns the action in radians [0, 2π], which sum_rate expects
-        return agent.act(obs)
+        # DD-043: deterministic=True is REQUIRED by the DD-009 fixed-order
+        # deterministic evaluation contract; the original wrapper omitted the
+        # flag, so re-scores sampled exploration noise (SAC reparameterization,
+        # TD3/DDPG expl noise) and were not reproducible run-to-run.
+        return agent.act(obs, deterministic=True)
         
     return policy_fn

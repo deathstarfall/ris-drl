@@ -5,12 +5,12 @@
 > post-hoc; the gate below checks artifact completeness, seed coverage
 > and statistical discipline, NOT 'DRL beats random'.
 
-**SAC** (seed 0 of available [0, 1, 2, 3, 4]): mean 53.401, Δ=0.223, p=6.3e-02, CI95=(0.001, 0.443), 53% channels > random
-**TD3** (seed 1 of available [0, 1, 2, 3, 4]): mean 53.159, Δ=-0.018, p=8.9e-01, CI95=(-0.249, 0.213), 50% channels > random
-**DDPG** (seed 4 of available [0, 1, 2, 3, 4]): mean 53.144, Δ=-0.034, p=8.1e-01, CI95=(-0.268, 0.197), 51% channels > random
-**DQN_B2** (seed 0 of available [0, 1, 2, 3, 4]): mean 53.219, Δ=0.041, p=4.9e-01, CI95=(-0.187, 0.271), 52% channels > random
-**DQN_B3** (seed 3 of available [0, 1, 2, 3, 4]): mean 53.245, Δ=0.067, p=9.0e-01, CI95=(-0.164, 0.3), 49% channels > random
-**DQN_B4** (seed 3 of available [0, 1, 2, 3, 4]): mean 53.221, Δ=0.044, p=8.1e-01, CI95=(-0.19, 0.274), 51% channels > random
+**SAC** (seed 4 of available [0, 1, 2, 3, 4]): mean 53.278, Δ=0.100, p=5.8e-01, CI95=(-0.123, 0.329), 50% channels > random
+**TD3** (seed 3 of available [0, 1, 2, 3, 4]): mean 53.102, Δ=-0.076, p=6.2e-01, CI95=(-0.311, 0.157), 51% channels > random
+**DDPG** (seed 2 of available [0, 1, 2, 3, 4]): mean 53.111, Δ=-0.067, p=8.3e-01, CI95=(-0.305, 0.169), 52% channels > random
+**DQN_B2** (seed 4 of available [0, 1, 2, 3, 4]): mean 53.207, Δ=0.030, p=9.4e-01, CI95=(-0.193, 0.249), 50% channels > random
+**DQN_B3** (seed 2 of available [0, 1, 2, 3, 4]): mean 53.243, Δ=0.065, p=6.2e-01, CI95=(-0.171, 0.297), 52% channels > random
+**DQN_B4** (seed 2 of available [0, 1, 2, 3, 4]): mean 53.294, Δ=0.116, p=2.9e-01, CI95=(-0.106, 0.339), 53% channels > random
 UNFOLD: mean 62.532, Δ=9.354, p=1.3e-83, gap-to-AO 2.6%, latency 1.298 ms
 AO-bound check: AO/random = 1.207
 
