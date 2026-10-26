@@ -70,7 +70,7 @@ def main() -> int:
     # corrected-rate reference baselines (same frozen channels; fixes itself
     # because src.baselines calls the corrected sum_rate)
     from src.baselines import run_baselines
-    base = run_baselines(chs, seed=123)
+    base = run_baselines(chs, draw_seed=123)
     rnd = np.asarray(base["random"], dtype=float)
     ref = {"random": float(rnd.mean()),
            "zero": float(np.mean(base["zero"])),

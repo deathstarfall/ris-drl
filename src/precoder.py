@@ -17,6 +17,6 @@ def effective_channel(theta, ch):
 def sum_rate(theta, ch):
     Heff = effective_channel(theta, ch)                   # (K,M)
     W    = zf_precoder(Heff, ch["P"])                     # (M,K)
-    gain = np.sum(Heff.conj() * W.T, axis=1)              # h̃_k^H w_k, (K,)
+    gain = np.sum(Heff * W.T, axis=1)                     # h_k . w_k (NO conj: y_k = H_eff[k,:] @ w_k; DD-043 fix)
     snr  = np.abs(gain) ** 2 / ch["sigma2"]               # ZF ⇒ SINR = SNR (noise-limited)
     return float(np.sum(np.log2(1.0 + snr)))

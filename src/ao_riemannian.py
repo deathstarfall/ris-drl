@@ -138,7 +138,7 @@ def sum_rate_phi(phi, ch_t: Dict):
         Hh = Heff.conj().T                                             # (M,K)
         W = Hh @ torch.linalg.inv(Heff @ Hh)                           # ZF
         W = W * torch.sqrt(P / (W.abs() ** 2).sum())
-        gain = torch.einsum("km,mk->k", Heff, W.conj())                # h~_k^H w_k
+        gain = torch.einsum("km,mk->k", Heff, W)   # NO conj on W (DD-043 fix)                # h~_k^H w_k
         snr = (gain.abs() ** 2) / sigma2
         return torch.log2(1.0 + snr).sum()                             # scalar
 
@@ -153,7 +153,7 @@ def sum_rate_phi(phi, ch_t: Dict):
     p_norm = (W.abs() ** 2).sum(dim=(1, 2))                            # (B,)
     scale = P / p_norm if not (torch.is_tensor(P) and P.dim() > 0) else P / p_norm
     W = W * torch.sqrt(scale).reshape(B, 1, 1)
-    gain = torch.einsum("bkm,bmk->bk", Heff, W.conj())                 # h~_k^H w_k
+    gain = torch.einsum("bkm,bmk->bk", Heff, W)   # NO conj on W (DD-043 fix)                 # h~_k^H w_k
     s2 = sigma2.reshape(B, 1) if (torch.is_tensor(sigma2) and sigma2.dim() > 0) else sigma2
     snr = (gain.abs() ** 2) / s2                                       # ZF => SINR = SNR
     return torch.log2(1.0 + snr).sum(dim=1)                            # (B,)
@@ -181,7 +181,7 @@ def sum_rate_numpy(theta, ch: Dict) -> float:
     Hh = Heff.conj().T
     W = Hh @ np.linalg.inv(Heff @ Hh)
     W = W * np.sqrt(float(ch.get("P", 1.0)) / np.sum(np.abs(W) ** 2))
-    gain = np.einsum("km,mk->k", Heff, W.conj())
+    gain = np.einsum("km,mk->k", Heff, W)   # NO conj on W (DD-043 fix)
     snr = np.abs(gain) ** 2 / ch["sigma2"]
     return float(np.sum(np.log2(1 + snr)))
 
