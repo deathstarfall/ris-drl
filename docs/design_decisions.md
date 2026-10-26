@@ -211,5 +211,5 @@ constants-editable-only-via-DD rule; disclosed in sec5/sec5b wording). G1 re-che
 PASS, per-seed artifact inventory now complete (all 6 agents x 5 seeds committed). Pre-fix artifacts retained with
 a _zfbuggy suffix (choice precedent DD-018 legacy backups). Owners: Ayansh (precoder fix, triage, gates,
 paper), Balraj (AO twins + unfolding retrain family), Shreyansh (checkpoint recovery + compute campaigns), all
-executed 2026-10-27 on main; tag v1.0.1-paper re-pointed with full retag disclosure.
+executed 2026-10-27 on main; tag v1.0.1-paper re-pointed with full retag disclosure. Word report (Drive copy) synced to identical corrected numbers (abstract, sec3.2 lr+cap share, sec4.1/4.2, Tables 6-8, discussion, limitations, conclusion); pre-sync copy retained as *_pre_DD043_sync.docx.
 
