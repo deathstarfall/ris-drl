@@ -5,7 +5,7 @@ sum-rate reference at **49.6x lower wall-time**, while a multi-seed DRL
 campaign establishes a **null result** (DRL ~ random) -- shipped as paper tag
 `v1.0.1-paper` (quality pass DD-037, v1.0.2).
 
-- Paper: `paper/` (IEEE OJ-COMS-style, 6 pages, compiles with pdflatex)
+- Paper: `paper/` (journal-style, 6 pages, compiles with pdflatex)
 - Frozen test set: fixed before any evaluation; one frozen 500-channel
   tensor `data/test_channels.npz` covers every solver family.
 - Decision log: `docs/design_decisions.md` (**DD-001 - DD-037**; every

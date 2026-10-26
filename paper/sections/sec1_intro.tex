@@ -40,8 +40,8 @@ best-effort best-run reporting:
 seed split (train/test/generalize)
 fixes all 500 evaluation channels before any policy interacts with
 them; every method---AO reference, unfolding, and all six RL agents---is
-evaluated through one shared scorekeeper on identical hardware and
-identical ZF sum-rate convention (DD-017).
+evaluated through one shared scorekeeper on identical hardware and an
+identical zero-forcing sum-rate convention (\S\ref{sec:intro}).
 \item \textbf{A Riemannian AO reference.} A manifold-constrained
 alternating optimizer reaches $63.04$~bps/Hz mean sum rate
 ($1.439 \times$ the random baseline) on the full frozen test set,
@@ -70,14 +70,13 @@ difference-maker.
 
 Every numeric claim in this paper is emitted from committed JSON
 artifacts by a figure pipeline that accepts no hand-typed values
-(protocol DD-018), and every experimental-convention change en route
-is recorded as a numbered decision (DD-001--DD-033) with date and
-owner. In particular, changes that materially weakened the original
-claim set---replacement of an interference-limited channel model
-(DD-011b), opening of the direct link to $-25$~dB blockage so that
-RIS contribution dominates (G1 sensitivity check
-$3.75$~bps/Hz/flip), and re-casting the RL formulation as a $T{=}1$
-contextual bandit (DD-007)---are logged \emph{as corrections}, not as
+(the pipeline accepts no hand-typed values; see the supplementary
+decision log), and every experimental-convention change en route is
+recorded as a numbered entry with date and owner. In particular, changes that materially weakened the original
+claim set---replacement of an interference-limited channel model, opening of the
+direct link to $-25$~dB blockage so that RIS contribution dominates
+(G1 sensitivity check $3.75$~bps/Hz/flip), and re-casting the RL
+formulation as a $T{=}1$ contextual bandit---are logged \emph{as corrections}, not as
 silent tuning. We argue that such a log is the minimum honest
 protocol for RL-vs-optimization comparisons, where training-budget,
 checkpoint-selection, and test-set-consumption asymmetries otherwise

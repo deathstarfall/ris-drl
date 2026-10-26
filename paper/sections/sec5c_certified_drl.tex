@@ -7,7 +7,7 @@ project's acceptance protocol: six architectures
 (continuous-policy SAC, TD3 and DDPG; discrete codebook DQN at 2, 3 and
 4-bit phase resolution), each trained over five random seeds with an
 identical $200\,000$-step budget on the frozen training split
-(DD-017). The validation-best seed of each agent was subsequently
+(identical evaluation entry point). The validation-best seed of each agent was subsequently
 evaluated on the frozen $500$-channel test set through the shared
 \texttt{evaluate.py} entry point (\S\ref{sec:results-ao}); all rates
 report the same ZF sum-rate convention as every other row.
@@ -63,8 +63,8 @@ model-free exploration within a $T{=}1$ bandit feedback loop.
 
 \paragraph{Why null results belong here.}
 All numbers in this subsection are emitted from committed raw JSON
-artifacts by the project's figure pipeline (DD-018) and recorded as
-decision DD-033; no post-hoc selection, seed replacement, or metric
+artifacts by the project's figure pipeline and recorded as a numbered
+entry in the supplementary decision log; no post-hoc selection, seed replacement, or metric
 re-weighting was performed after certification. A diagnosis of the
 failure modes (reward decomposition, observation-contract coverage,
 exploration coverage vs.\ the best-of-200 oracle) is the subject of a

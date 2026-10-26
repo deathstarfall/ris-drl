@@ -70,9 +70,9 @@ convergence cap at $200$ iterations.
 \begin{center}
 \includegraphics[width=\columnwidth]{figs/fig_ao_convergence.pdf}
 \caption{Riemannian AO convergence: mean sum-rate per projected-gradient
-iteration, averaged over the 500 frozen test channels (DD-009 history
-artifact). The curve saturates at 202 iterations/tolerance floor
-(DD-017 convergence metadata).}
+iteration, averaged over the 500 frozen test channels (per-channel history
+artifact). The curve saturates at the 202-iteration/tolerance floor
+(per-channel convergence metadata).}
 \label{fig:ao_convergence}
 \end{center}
 \end{figure}
@@ -92,7 +92,13 @@ the frozen test set---within \UnfoldGapToAO{}\% of the AO reference
 (criterion: $\leq 10\%$)---while deciding in a median of
 \UnfoldLatencyMedianMS{}~ms per channel ($p95$:
 \UnfoldLatencyP95MS{}~ms), a $\UnfoldVsAOLatencyRatio{}\times$ speed-up over
-the reference, on identical channels, budgets, and seeds. The loss-ablation table
+the reference, on identical channels, budgets, and seeds. All latency
+figures refer to the protocol's evaluation pass: one channel per
+batch decision, torch complex128 arithmetic on a desktop-class CPU
+(measured medians in three settings: dedicated 200-trial inference
+benchmark 6.73~ms; training-time metrics 9.57~ms, $p95$ 11.3~ms,
+reported here; per-channel evaluation recording 9.86~ms, $p95$
+$13.4$~ms). The loss-ablation table
 confirms the design correction quantitatively:
 $\mathcal{L}_{\mathrm{rate}}$ attains \RateLossMeanRate{}~bps/Hz, the smooth
 circular surrogate \CircularLossMeanRate{}~bps/Hz, and the legacy

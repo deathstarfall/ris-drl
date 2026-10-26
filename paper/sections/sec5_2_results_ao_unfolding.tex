@@ -35,7 +35,7 @@ Trained end-to-end on the rate \eqref{eq:lossrate}, the $L=6$ unrolled stepper
 reaches \UnfoldGapToAo\% of the AO rate on the frozen test set
 (trigger: $\le 10\,\%$), while its decision latency is
 \UnfoldLatencyMs\;ms per channel versus \AoWallMeanMs\;ms per channel for AO
-(both medians; per-channel p95 archiving moves to v1.1, DD-036). Loss ablations
+(both medians; per-channel AO wall p95 archiving is deferred). Loss ablations
 (Table~\ref{tab:ablation}) reproduce the earlier failure mechanism exactly:
 training on the rate dominates; the circular loss lags slightly; the
 MSE-on-wrapped-angles objective collapses -- it optimizes an objective that
@@ -76,7 +76,7 @@ model, Section~\ref{sec:unfolding}), AO degrades from
 \CsiAoZero\ (no CSI error) to \CsiAoPone\ ($\varepsilon = 0.1$), while random
 phases move \CsiRandomZero\ $\to$ \CsiRandomPone\
 (Fig.~\ref{fig:csi_sweep}) -- honest discussion in
-the companion diagnosis note (repository \texttt{docs/}, DD-033).
+the companion diagnosis note (repository \texttt{docs/}).
 
 \subsubsection{Generalization}
 On the \texttt{gen\_channels} split (200 user positions in an UNSEEN zone,
