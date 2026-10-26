@@ -14,6 +14,17 @@ asymmetry between the two epistemologies is not sample-limited (the
 200-draw random oracle sits $8$~bps/Hz above both), it is
 \emph{structure}-limited.
 
+\paragraph{Scope.} All claims above are established within one fixed
+regime: $N{=}64$ RIS elements, $M{=}8$ base-station antennas, $K{=}4$
+downlink users, per-entry circularly symmetric complex Gaussian
+(Rayleigh) i.i.d.\ channel coefficients under 3GPP urban-micro path
+loss with a $-25$~dB-blocked direct path (zero-forcing sum-rate
+objective), and 500 frozen test channels drawn from that generator.
+The null result (no architecture exceeding random) is a statement
+about \emph{this regime and protocol}; richer geometries, correlated
+fading, hardware-quantized RIS ports, and multi-user non-ZF
+objectives are natural places where the null could break.
+
 We offer this not as a verdict against RL writ large, but against an
 evaluation culture in which trained-policy comparisons are reported
 without frozen test sets, written acceptance rules, or disciplined
