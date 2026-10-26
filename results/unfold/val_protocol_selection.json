@@ -1,0 +1,45 @@
+{
+  "protocol": "DD-041 train/val",
+  "grid": {
+    "0.003": {
+      "best_val_rate": 62.599903393745215,
+      "best_iter": 1000,
+      "final_test_rate": 62.4454455751671,
+      "latency": {
+        "median_ms": 1.2648539996007457,
+        "p95_ms": 1.2810410116799176,
+        "mean_ms": 1.2640072946669534,
+        "dtype": "torch.complex128",
+        "n_trials": 200
+      }
+    },
+    "0.01": {
+      "best_val_rate": 62.671616994623925,
+      "best_iter": 3000,
+      "final_test_rate": 62.593062543313316,
+      "latency": {
+        "median_ms": 1.3001249899389222,
+        "p95_ms": 1.4436249912250787,
+        "mean_ms": 1.3227270694915205,
+        "dtype": "torch.complex128",
+        "n_trials": 200
+      }
+    },
+    "0.03": {
+      "best_val_rate": 62.67295491187918,
+      "best_iter": 1000,
+      "final_test_rate": 62.5316530285149,
+      "latency": {
+        "median_ms": 1.2783334823325276,
+        "p95_ms": 1.3225410075392574,
+        "mean_ms": 1.2846705994161312,
+        "dtype": "torch.complex128",
+        "n_trials": 200
+      }
+    }
+  },
+  "winner_lr": "0.03",
+  "selection_rule": "max best_val_rate over lr grid; test evaluated once per run",
+  "promoted_to_canonical": "results/unfold/unfold_L6_rate(.pt)",
+  "dev_protocol_backups": "*_devproto"
+}
