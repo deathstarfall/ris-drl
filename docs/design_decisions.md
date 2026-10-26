@@ -250,3 +250,31 @@ oracle bound). Paper sec5c qualification (i) now cites this number: the null cer
 gradient-based control per se; the full-CSI DRL retraining campaign (DD-041/fruit of obs_mode=full) remains the
 designated v1.1 follow-up. No published AO/unfolding/DRL headline number changed this round; no test was modified.
 
+
+DD-044a (addendum - full-CSI retrain promoted to pre-submission; two latent obs-contract bugs fixed): reviewer round 2
+correctly rejected two position offers. (1) The claim that the closed-form full-phase policy (56.944) is a "ceiling"
+for learned policies overstated the evidence: it is a no-learning FEASIBILITY point, not an upper bound - unfolding and
+AO use the same full channel and reach 62.5/64.2, so a full-CSI DRL policy could land anywhere in that range. Language
+corrected; no outcome will be predicted in the paper before the run. (2) The obs_mode="full" retrain was promoted from
+v1.1-optional to a PRE-SUBMISSION item: the report's Methods must describe what the published runs actually observed
+(partial, fixed in the round-2 docx sync), and the retrain decides whether the headline reads "DRL fails (under the
+stated observation contract)" or "DRL fails". Either outcome is publishable.
+
+Plumbing (Ayansh, smoke-tested end-to-end at 12 env steps with checkpoints quarantined from the canonical namespace):
+ - src/train.py: --obs-mode {partial,full} (DD-041) -> cfg, threaded through train_from_cfg / BanditWrapper / RISEnv.
+ - Artifact isolation: full-CSI runs write ckpt/full_{agent}_seed{S}.pt and results/full_{agent}/seed{S}/metrics.json -
+   the 30 canonical certified partial-obs checkpoints are UNTOUCHABLE from the training path.
+ - src/evaluate.py evaluate_policy/eval_rl/build_policy_fn observe obs_mode; CLI gains --obs-mode; full re-scores store
+   under results/full/{agent}/seed{S}/.
+ - TWO latent DD-041 bugs found by the smoke run, despite obs_mode existing since DD-041: RISEnv.reset()/step() called
+   self._obs(self.ch) WITHOUT the mode (observation_space was resized but the actual observations stayed partial),
+   and evaluate_policy + the train_runner fallback built the eval env with obs_mode but then ALSO called _obs modeless.
+   Impact on existing results: NONE - the canonical DRL checkpoints were trained with partial obs and every committed
+   artifact used the partial path consistently (obs, training, eval all partial); pytest 19/19, policy-eval parity
+   verified. The bugs would only have produced mismatched dims at full-obs eval time.
+
+Campaign plan (Shreyansh, pre-submission): 30 runs with --obs-mode full, same 200k steps/seeds/configs as the
+certified partial campaign. Report both outcomes honestly: if the full-CSI agents remain at the random floor, the
+headline null strengthens to "DRL fails even with full CSI"; if they beat random, the paper's qualification (i)
+expands into a result. No prediction logged; numbers only from committed artifacts per DD-018.
+

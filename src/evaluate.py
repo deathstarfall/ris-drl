@@ -9,19 +9,20 @@ from src.precoder import sum_rate
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
-def evaluate_policy(agent, test_channels="data/test_channels.npz", N_eval=None):
+def evaluate_policy(agent, test_channels="data/test_channels.npz", N_eval=None, obs_mode="partial"):
     """DD-041: fixed-order deterministic evaluation on the frozen test set.
-    No environment RNG: channels are visited in stored order, actions deterministic."""
+    No environment RNG: channels are visited in stored order, actions deterministic.
+    obs_mode MUST match the checkpoint's training observation contract."""
     from src.ris_env import RISEnv
     chs = load_dataset(test_channels)
-    env = RISEnv(channels=chs, seed=0)
+    env = RISEnv(channels=chs, seed=0, obs_mode=obs_mode)
     idxs = range(len(chs)) if N_eval is None else range(N_eval)
     rates = []
     for i in idxs:
         ch = chs[i]
         env.ch = ch
         env.ch["N"] = env.N
-        obs = env._obs(env.ch)
+        obs = env._obs(env.ch, env.obs_mode)
         if hasattr(agent, "act_deterministic"):
             a = agent.act_deterministic(obs)
         elif hasattr(agent, "act"):
@@ -42,10 +43,11 @@ def store(name, rates, extra=None):
 
     print(f"[store] results/{name}/eval_rates.json  mean={np.mean(rates):.3f}")
 
-def eval_rl(agent, seed, N):
-    """Uses Shreyansh's loader (DD-008). Fails cleanly until his agents PR is merged."""
+def eval_rl(agent, seed, N, obs_mode="partial"):
+    """Uses Shreyansh's loader (DD-008). Fails cleanly until his agents PR is merged.
+    obs_mode routes the checkpoint AND the observation stack (DD-041 campaign)."""
     from src.agents.common import build_policy_fn        # lazy import
-    policy = build_policy_fn(agent, seed, N)
+    policy = build_policy_fn(agent, seed, N, obs_mode=obs_mode)
     chs = load_dataset("data/test_channels.npz")
     rates = [sum_rate(policy(ch), ch) for ch in chs]     # NO env RNG here: eval is deterministic
     return np.asarray(rates)
@@ -56,6 +58,8 @@ if __name__ == "__main__":
                     choices=["baselines", "rl", "ao"])
     ap.add_argument("--agent", default=None); ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--N", type=int, default=None)
+    ap.add_argument("--obs-mode", default="partial", choices=["partial", "full"],
+                    help="match the checkpoint's training observation contract (DD-041)")
     args = ap.parse_args()
     chs = load_dataset("data/test_channels.npz")
 
@@ -67,9 +71,13 @@ if __name__ == "__main__":
         for k, v in res.items():
             store(f"baselines/{k}", v, {"description": k})
     elif args.method == "rl":
-        rates = eval_rl(args.agent, args.seed, args.N or chs[0]["h_r"].shape[1])
-        store(f"{args.agent}/seed{args.seed}", rates, {"agent": args.agent,
-              "seed": args.seed, "ckpt": f"ckpt/{args.agent}_seed{args.seed}.pt"})
+        rates = eval_rl(args.agent, args.seed, args.N or chs[0]["h_r"].shape[1],
+                        obs_mode=args.obs_mode)
+        prefix = "full_" if args.obs_mode == "full" else ""
+        store(f"full/{args.agent}/seed{args.seed}" if args.obs_mode == "full"
+              else f"{args.agent}/seed{args.seed}", rates,
+              {"agent": args.agent, "seed": args.seed, "obs_mode": args.obs_mode,
+               "ckpt": f"ckpt/{prefix}{args.agent}_seed{args.seed}.pt"})
     elif args.method == "ao":
         # AO rates come from Balraj's own runner; this only re-validates provenance (DD-006)
         f = ROOT / "results" / "ao" / "ao_rates.json"

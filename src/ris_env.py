@@ -44,8 +44,8 @@ class RISEnv(gym.Env):
         super().reset(seed=seed)
         self.ch = self.chs[self.rng.integers(len(self.chs))]   # FIX of old bug #2:
         self.ch["N"] = self.N                                  # channel FIXED for the episode
-        return self._obs(self.ch), {}
+        return self._obs(self.ch, self.obs_mode), {}
 
     def step(self, theta):
         r = sum_rate(np.asarray(theta).reshape(-1), self.ch)
-        return self._obs(self.ch), float(r), True, False, {"rate": r}   # T=1: episode ends
+        return self._obs(self.ch, self.obs_mode), float(r), True, False, {"rate": r}   # T=1: episode ends

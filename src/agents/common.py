@@ -119,12 +119,15 @@ def load_yaml(path):
         return yaml.safe_load(f)
 
 
-def build_policy_fn(agent_name, seed, N):
-    """Reconstructs the agent policy from a checkpoint for evaluation (DD-008)."""
+def build_policy_fn(agent_name, seed, N, obs_mode="partial"):
+    """Reconstructs the agent policy from a checkpoint for evaluation (DD-008).
+    obs_mode: DD-041 — "partial" (canonical certified runs) or "full"
+    (full-CSI campaign, DD-044 addendum; ckpts live at ckpt/full_{name}_seed{S}.pt)."""
     import torch
     import numpy as np
-    
-    ckpt_path = f"ckpt/{agent_name}_seed{seed}.pt"
+
+    prefix = "full_" if str(obs_mode).lower() == "full" else ""
+    ckpt_path = f"ckpt/{prefix}{agent_name}_seed{seed}.pt"
     
     # Load checkpoint
     sd = torch.load(ckpt_path, map_location="cpu", weights_only=False)
@@ -151,19 +154,10 @@ def build_policy_fn(agent_name, seed, N):
     agent.load_state_dict(sd)
     
     def policy_fn(ch):
-        # Reconstruct the observation exactly as DD-004 specifies:
-        # obs = concat(|h_r|, ∠h_r, |G|, |h_d|) flat float32
-        h_r = ch["h_r"]
-        G = ch["G"]
-        h_d = ch["h_d"]
-        
-        obs = np.concatenate([
-            np.abs(h_r).flatten(),
-            np.angle(h_r).flatten(),
-            np.abs(G).flatten(),
-            np.abs(h_d).flatten()
-        ]).astype(np.float32)
-        
+        # Reconstruct the observation exactly as the DD-004 (partial) / DD-041
+        # (full) contracts specify — RISEnv._obs is the single source of truth:
+        from src.ris_env import RISEnv
+        obs = RISEnv._obs(ch, obs_mode=obs_mode)
         # agent.act returns the action in radians [0, 2π], which sum_rate expects
         # DD-043: deterministic=True is REQUIRED by the DD-009 fixed-order
         # deterministic evaluation contract; the original wrapper omitted the

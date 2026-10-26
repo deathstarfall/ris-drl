@@ -14,6 +14,9 @@ def main():
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--bits", type=int, default=None, choices=[2, 3, 4])
     p.add_argument("--config", default=None)
+    p.add_argument("--obs-mode", default="partial", choices=["partial", "full"],
+                   help="DD-004 partial (canonical certified runs) or DD-041 full "
+                        "(full-CSI retrain campaign; writes full_-prefixed artifacts)")
     args = p.parse_args()
 
     if args.config is None:
@@ -30,6 +33,7 @@ def main():
             cfg["bits"] = int(args.bits)
         elif "bits" not in cfg:
             cfg["bits"] = 2
+    cfg["obs_mode"] = args.obs_mode
     # write a transient merged config if needed (keep original)
     out_cfg = os.path.join(".tmp_cfg.yaml")
     with open(out_cfg, "w",encoding="utf-8") as f:

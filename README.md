@@ -109,6 +109,14 @@ python crossref_check.py    # ALL ENTRIES VERIFIED (12/12)
 - `paper/figs/unified_framework.png`, `paper/figs/csi_robustness.png` ->
   Word-report Figures 1-2 (scripts/make_report_figs.py)
 
+## Pre-submission (promoted from v1.1 by DD-044a, reviewer round 2)
+- **Full-CSI DRL retrain campaign**: 30 runs with `--obs-mode full`
+  (`python -m src.train --agent {sac,td3,ddpg} --seed {0..4}` etc.), same
+  protocol as the certified partial campaign; artifacts quarantined under
+  `ckpt/full_*` + `results/full_*`. Decides the null's headline wording
+  ("under the stated observation contract" vs "even with full CSI");
+  either outcome is publishable.
+
 ## Deferred to v1.1 (documented, DD-036/037)
 - AO per-channel wall p95 (needs a new gate2 artifact)
 - PG generalization column (`run_generalization.py` naming the pg field)
