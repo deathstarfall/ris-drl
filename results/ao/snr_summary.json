@@ -1,0 +1,7 @@
+{
+ "random_mean_snr_db": 39.89552118998401,
+ "ao_mean_snr_db": 48.30966743754272,
+ "sigma2_db": -137.0,
+ "n": 500,
+ "note": "ZF SINR == SNR; mean per-user SNR over 4 users x 500 channels; random draws seed 123"
+}

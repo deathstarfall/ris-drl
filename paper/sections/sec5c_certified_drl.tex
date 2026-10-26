@@ -34,6 +34,17 @@ which $\angle G$ and $\angle h_{d}$ are absent, so the null applies to
 policies under this observation design; a full-CSI observation mode is
 implemented and released for follow-up campaigns
 (supplementary decision log).
+% DD-044: committed quantification of the observation-contract scope,
+% artifact results/baselines/closed_form_full_csi.json (external-review round 2).
+To size this qualification, we evaluate a no-learning closed-form alignment
+policy with \emph{full} phase access on the same frozen channels: it reaches
+$56.944 \pm 1.884$~bps/Hz ($+3.77$ over random) while the restricted-observation
+DRL checkpoints are statistically at the random floor (rate gap
+$\delta \in [-0.10, +0.04]$~bps/Hz across thirty committed
+checkpoints)---so the null
+certifies the observation contract, not gradient-based phase control per se,
+and the full-CSI retraining campaign is the designated follow-up
+(supplementary decision log).
 (ii)~In-training monitoring used the frozen evaluation set for
 visualization; the loss and the selection rule that produced the
 trained policies never consumed it for optimization, and the unfolding

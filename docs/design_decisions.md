@@ -213,3 +213,40 @@ a _zfbuggy suffix (choice precedent DD-018 legacy backups). Owners: Ayansh (prec
 paper), Balraj (AO twins + unfolding retrain family), Shreyansh (checkpoint recovery + compute campaigns), all
 executed 2026-10-27 on main; tag v1.0.1-paper re-pointed with full retag disclosure. Word report (Drive copy) synced to identical corrected numbers (abstract, sec3.2 lr+cap share, sec4.1/4.2, Tables 6-8, discussion, limitations, conclusion); pre-sync copy retained as *_pre_DD043_sync.docx.
 
+
+DD-044 (v1.0.1 close-out - external-review round 2, docx + matched-discipline baselines): a second external review of the
+Word report (stale pre-DD-043 copy in part; current-state diff in part) confirmed the paper-side certification and flagged
+report-only gaps plus two deeper fairness issues, all now resolved and logged.
+
+(1) DOC TEXT AND REPORT. Fixed in TeamNo_6_24BDS0166_RIS_6G_Report.docx (pre-round2 backup kept as
+*_pre_round2_sync.docx): leftover MDP/previous-configuration sentences rewritten to the T=1 bandit framing; SAC described
+as a 3-bit-codebook agent rewritten to the actual action spaces (DDPG/TD3/SAC continuous, DQN codebook arms at 2/3/4
+bits); DRL observation description corrected from the non-existent "800 complex coefficients" stack to the actual
+DD-004 stack concat(|h_r|, angle h_r, |G|, |h_d|) (256 real values) with an explicit note that angle(G), angle(h_d) are
+hidden; Table 6 hyperparameters corrected to the committed checkpoint configs (DDPG: replay 300,000, batch 256, critic lr
+1e-3, Gaussian exploration noise sigma=0.1, MSE critic loss; SAC: continuous Gaussian policy with auto-tuned entropy);
+missing ablation numbers added (rate 62.532 / circular 61.860 / MSE 59.327); quantization table added as Table 10 from
+results/bits_sweep.json (AO gaps 2.936/0.730/0.182 bps/Hz at B=2/3/4); CSI-sweep scope note added (DRL agents evaluated
+under clean CSI only, v1.1); "slower than random" -> "below random in sum rate"; "107 devices" -> 10^7;
+"tb per second" -> terabits per second; DD-log code leaks in prose removed; affiliation and corresponding-author lines
+added before Keywords; world-initiatives paragraph condensed; Figures 1 and 2 receive actual images
+(paper/figs/unified_framework.png from scripts/make_report_figs.py, paper/figs/csi_robustness.png from
+results/unfold/csi_sweep.json). Per-user SNR statement added (39.9 dB random / 48.3 dB AO, artifacts
+results/ao/snr_summary.json).
+
+(2) MATCHED-DISCIPLINE BASELINES (fair-completion of the unfolding comparison). Reviewer point taken: the 1044x latency
+ratio is six layers vs a 200-iteration solver. Committed artifacts: results/unfold/unfold_untrained_pg6.json - an
+untrained L=6 unrolled forward pass (default step sizes) reaches 59.390 mean bps/Hz on the frozen test set, i.e. the six
+gradient-ascent steps alone supply +6.21 over random (53.178) and training adds +3.14 (62.532); this confirms the
+in-training init_model_rate=59.45 seen during retraining. The paper states the latency ratio as an architecture ratio,
+not a matched-compute claim.
+
+(3) OBSERVATION-CONTRACT SCOPE QUANTIFIED. Reviewer correctly notes the certified DRL null under DD-004 partial
+observation is a weaker claim than "DRL cannot": angle(G), angle(h_d) are hidden and the optimal phases depend on
+them. Committed artifact results/baselines/closed_form_full_csi.json: a no-learning closed-form alignment policy with
+FULL phase access scores 56.944 +/- 1.884 (+3.77 over random) on the same frozen channels, above every
+restricted-observation DRL checkpoint (rate gap delta in [-0.10,+0.04], p>=0.37) and above best-of-200 (57.145 is the
+oracle bound). Paper sec5c qualification (i) now cites this number: the null certifies the observation contract, not
+gradient-based control per se; the full-CSI DRL retraining campaign (DD-041/fruit of obs_mode=full) remains the
+designated v1.1 follow-up. No published AO/unfolding/DRL headline number changed this round; no test was modified.
+

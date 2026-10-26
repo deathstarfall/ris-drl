@@ -103,6 +103,20 @@ channel per batch decision, torch complex128 arithmetic on a desktop-class
 CPU, recorded for all 500 frozen channels
 (supplementary decision log: the in-training monitoring latencies and the
 retired float32 bench are disclosed as benchmarks, not headline numbers).
+% DD-044 matched-discipline baselines (external-review round 2), artifacts:
+%   results/unfold/unfold_untrained_pg6.json  (untrained L=6 forward pass)
+%   results/baselines/closed_form_full_csi.json (no-learning full-phase policy)
+%   results/ao/snr_summary.json (per-user SNR under ZF)
+The latency ratio is an architecture ratio (six unrolled layers versus a
+200-iteration solver), not a matched-compute claim; we therefore report two
+matched-discipline baselines. First, an \emph{untrained} forward pass of the
+same six-layer network (default step sizes, no optimization) already reaches
+$59.390$~bps/Hz on the frozen test set: the fixed gradient-ascent structure
+alone supplies $+6.21$ over random, and training contributes a further
+$+3.14$~bps/Hz. Second, per-user link conditions are noise-limited: the mean
+post-ZF SNR is $39.9$~dB at random phases and $48.3$~dB under the AO phases
+($\sigma^2=-107$~dBm; SINR~$=$~SNR under ZF), so the RIS phase vector is the
+controllable degree of freedom.
 The loss-ablation table
 confirms the design correction quantitatively (all three losses retrained
 under the audited train/validation protocol at the winning learning rate

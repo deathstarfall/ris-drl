@@ -1,0 +1,7 @@
+{
+ "method": "unfold_untrained_pg6",
+ "mean": 59.38974326973369,
+ "latency_median_ms": 13.745999999999814,
+ "n": 500,
+ "note": "DD-044 matched baseline: L=6 unrolled rate-ascent, default step sizes, no training"
+}

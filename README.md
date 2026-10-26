@@ -78,7 +78,10 @@ python crossref_check.py    # ALL ENTRIES VERIFIED (12/12)
   zero TBD/stubs, zero undefined refs; DD-036 (close-out) + DD-037 (quality
   pass) recorded. Re-pointed again on the DD-044/043 re-certification round
   (corrected ZF pairing; corrected AO/unfolding/DRL artifacts + G2 re-baseline;
-  sec5c disclosure). Last pre-fix paper commit: `fe1813c` (superseded).
+  sec5c disclosure). Re-pointed again on the DD-044 round-2 review round
+  (matched-discipline baselines: untrained L=6 PG 59.390, closed-form
+  full-phase policy 56.944, per-user SNR artifact; docx round-2 text fixes;
+  no headline number changed). Last pre-fix paper commit: `fe1813c` (superseded).
 - `v1.0-paper` - pre-release, superseded
 
 ## Artifacts <-> paper map
@@ -97,6 +100,14 @@ python crossref_check.py    # ALL ENTRIES VERIFIED (12/12)
   CSI tables + figures
 - `results/ao/generalization.json`, `pg_test_channels.json` -> generalization
   figure + AO-vs-PG figure
+- `results/unfold/unfold_untrained_pg6.json` -> DD-044 matched baseline:
+  untrained L=6 forward pass (59.390; six steps +6.21 over random, training +3.14)
+- `results/baselines/closed_form_full_csi.json` -> DD-044 observation-contract
+  scope: closed-form full-phase policy 56.944 +/- 1.884 (+3.77 over random)
+- `results/ao/snr_summary.json` -> per-user SNR under ZF (39.9 dB random /
+  48.3 dB AO)
+- `paper/figs/unified_framework.png`, `paper/figs/csi_robustness.png` ->
+  Word-report Figures 1-2 (scripts/make_report_figs.py)
 
 ## Deferred to v1.1 (documented, DD-036/037)
 - AO per-channel wall p95 (needs a new gate2 artifact)
