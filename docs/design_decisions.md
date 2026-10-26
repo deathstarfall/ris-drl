@@ -120,9 +120,6 @@ DD-025 (D3): (B12) No conftest.py / src/__init__.py from my side — tests self-
              sys.path, modules use dual-mode imports; PR2 adds zero shared-file conflicts.
 
 DD-026 — batch_slice indexed by batch length, not dataset size
-<<<<<<< HEAD
-batch_slice's condition (v.shape[0] == len(idx)) never matched per-datasettensors (theta 1500 vs ref 128), so the rate loss silently ran full-batch,circular/mse crashed on the mismatch, and latency was measured as one500-channel forward pass. Fixed to slice by T["h_r"].shape[0] with av.dim() >= 1 guard; all three loss ablations retrained and the latency tablere-measured (true per-channel) before G3.
-=======
 batch_slice's condition (v.shape[0] == len(idx)) never matched per-datasettensors (theta 1500 vs ref 128), so the rate loss silently ran full-batch,circular/mse crashed on the mismatch, and latency was measured as one500-channel forward pass. Fixed to slice by T["h_r"].shape[0] with av.dim() >= 1 guard; all three loss ablations retrained and the latency tablere-measured (true per-channel) before G3.
 
 DD-017 (ratified D2/D3): GATE G2 PASSED — AO/random = 1.445 over the FULL frozen
@@ -136,12 +133,14 @@ DD-019 (Balraj B1–B12, renumbered): <one-line mapping table: B1→DD-019 ... B
 DD-031 (D3 — LATENCY CRITERION VOTE): measured unfolding inference = 6.8 ms vs AO 0.388 s
 => 57.6x speedup (Balraj DD-029). Original acceptance text said "<1 ms". TEAM VOTE:
 (a) implement forward-only inference path (no autograd at eval) as a fix task, OR
-(b) revise acceptance to "<7 ms, >=57x vs AO; sub-ms as future work". DECISION: ____.
+(b) revise acceptance to "<7 ms, >=57x vs AO; sub-ms as future work". DECISION: (b) - taken (ratified later by DD-033 latency unification: published median comes from the deployed per-channel protocol).
 
-DD-032 (transiently — resolving): results/unfold/unfold_rates.json (DD-009) absent;
-per-channel unfold rates must land there (rates[500] + latency_ms[500] + channel_seed
-2000) before run_gate3 can produce its unfold row. Owner: Balraj.
->>>>>>> fbde7a1b7defa9ac4177a9952806c43cfb139815
+DD-032 (RESOLVED): the unfold per-channel artifact concern was transient -
+results/unfold/unfold_L6_rate/metrics.json (DD-009) now carries rates[500] +
+latency_ms[500] on the frozen channel_seed 2000 test set.
+
+[dd-026 conflict block reconciled 2026-10-26; HEAD-side kept, stale duplicates
+removed, DD-031 marked (b)-taken via DD-033, DD-032 marked resolved.]
 DD-033 (GATE G3 — certified final assessment): Direct-DRL NULL, certified on the frozen 500-ch test set (seed 2000) for the validation-best seed of all six architectures (SAC, TD3, DDPG, codebook-DQN at 2/3/4 bits). No agent achieves a positive mean gain over frozen random; certified Δ range −0.07…−0.33 bps/Hz, all CIs covering zero, all p ≥ 0.25. Training-curve plateaus corroborate (last-10 validation eval 43.5–43.9 ≈ random 43.80) across 30 runs × 200k-step budget. Exploitable headroom demonstrably exists: best-of-200 random phases = 51.8; deep unfolding (trained, model-aware) = 59.9 (within 5.0% of Riemannian-AO bound 63.0; latency 9.7 ms; DD-031). Decision: paper reframed — headline = unfolding-vs-AO-bound; the DRL bandit framing is reported as a certified negative result (§ limitations + §6 diagnosis link, owner Shreyansh). Original G3 DRL-beats-random criterion: FAILED as framed; supersedes it and clears the paper to assemble. Budget footnote: pending Shreyansh's confirmation of 198k-vs-200k step accounting (fairness table, §5).
 DD-034 (budget confirmation): Shreyansh confirms all 30 campaign runs stepped 0→199,999 inclusive — exactly 200,000 uniform updates (the 198k remainder was the last eval-logging checkpoint, not a short run). DD-033's "pending" budget footnote is resolved: fairness criterion satisfied as specified; no deviation.
 DD-035 (paper freeze): All figures/tables derive from committed artifacts (DD-018); bibliography 8/8 crossref-verified; certified-null DRL framing in place (DD-033/034); MoM tout NULL-claims consistent; latency declaration 9.683 ms median, float64; remaining TBD macros resolved by [owner/date]. Submission candidate tagged at v1.0-paper.
@@ -155,3 +154,34 @@ DD-039 (v1.0.4 related-work depth pass): bibliography 12 -> 16 entries, all cros
 
 DD-040 (v1.0.5 hygiene + scope + venue recheck): (1) Lane runbooks (BALRAJ_RUNBOOK.md, DESIGN_DECISIONS_balraj.md, README_SHREYANSH.md) untracked from git (kept on disk for history), and paper build artifacts (main.aux/main.out; .bbl/.blg/.log already ignored) removed from tracking and gitignored. (2) Conclusion gains an explicit scope paragraph: the null result and the unfolding-vs-AO comparison hold within a fixed regime (N=64, M=8, K=4, per-entry complex Gaussian i.i.d. channels under 3GPP urban-micro path loss, -25 dB blocked direct path, ZF sum-rate, 500 frozen test channels); potential null-breakers (richer geometry, correlated fading, hardware-quantized ports, non-ZF objectives) named. (3) Venue recheck per review: with the DRL outcome now a null, higher-tier venues that expected an RL-superiority study are out of fit; the appropriate target remains a mid-tier comparison/dependency venue (IEEE OJ-COMS-tier). Definition: "strong study" per the reviews table (frozen protocol + artifact provenance + certified null) is present, but the one-regime scope is a fair reviewer objection; if a higher-tier shot is wanted in v1.1, add multi-regime replication before submitting there. Repo stays venue-neutral.
 
+
+DD-041 (v1.1-audit round 2 - unfolding protocol correction + obs-mode disclosure + per-seed scope): (1) Audit finding
+accepted: the dev-era protocol selected the reported checkpoint ON the frozen test set (endpoint selection by test
+reward), plus LR-grid calls sampling fresh test channels from the env RNG. Remedy: canonical retraining under an audited
+protocol - deterministic train/validation split of the 1500 training channels (first 1200 train / last 300 val, no
+shuffle), LR grid {0.003, 0.01, 0.03} selected ONLY on validation rate, best-val checkpoint restored, and the frozen
+500-channel test set evaluated exactly ONCE per run (single final release number, no test-side selection anywhere).
+New canonical winner: lr 0.003 (val 59.9664 @ it 3000), test-once 59.7491 bps/Hz (per-channel SD 1.86) -> published
+headline moves 59.88/94.98% -> 59.75/94.78% (honest val-selection cost, accepted). (2) 5-seed protocol breadth at the
+same protocol: 59.78 +/- 0.04 (59.749/59.796/59.841/59.740/59.786); ablations retrained at lr 0.003: circular 59.840
+(statistically tied with rate on test; decision made on validation where rate led), wrapped-angle MSE 58.501
+(reproducing the earlier qualitative finding). (3) Downstream consumers regenerated from the promoted checkpoint:
+unfold_rates.json (DD-009; latency median 8.196 / mean 8.357 / p95 10.280 ms, measured on idle CPU, n=500),
+bits_sweep.json, csi_sweep.json, generalization.json; macro generator scripts/make_balraj_macros.py updated to DD-006
+frozen-ratio policy (43.797) reading unfold_rates.json instead of the retired latency bench. Published speed-up
+49.6x -> 58.0x (475 ms / 8.196 ms). (4) DRL observation-mode disclosure: published DRL artifacts use the partial-CSI
+view (|h_r|+G magnitudes and |h_d|), by design of the original study; src/ris_env.py now supports obs_mode="full"
+(|G|+angleG+|h_d|+angle h_d) as a v1.1 option - full-CSI DRL retraining campaign deferred to v1.1 and disclosed in
+gate3/manuscript wording. (5) Per-seed DRL eval artifacts (30 runs x preserved test-channel rates) are NOT in the v1.0.x
+artifact tree; disclosed in sec5c scope wording; deferred to v1.1 alongside the full-CSI campaign. Owner: Ayansh
+(2026-10-26 takeover).
+
+DD-042 (v1.1-audit round 2 - channel-model documentation reconciliation, no retrain): implementation truth is
+documented as-is: src/channel.py uses the Wu-Zhang two-hop cascade path-loss form pl_cascade_db, where the effective
+cascade loss takes the WORSE of the two hops (BS-to-RIS and RIS-to-user, blocked direct path), the RIS scattering gain
+G carries unit magnitude, and carrier_ghz=3.5 is mid-band positioning (not mmWave/sub-THz). Paper sec3 wording
+reconciled with the code description (no claim-to-code mismatch remains); README notes updated. Decision: keep the
+existing artifacts (no wholesale channel retrain), because AO, DRL and unfolding all evaluate on the IDENTICAL frozen
+channels - every published comparison is internally consistent on the same geometry and losses; replication across
+regimes (different geometry/fading/carrier) is named as v1.1 scope. Closes the audit finding 'reconcile the claimed
+channel model with the implemented one'; claim language keeps the mid-band 3.5 GHz framing.

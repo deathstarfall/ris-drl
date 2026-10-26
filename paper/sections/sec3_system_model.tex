@@ -32,10 +32,16 @@ Here $G \in \mathbb{C}^{M \times N}$ is the BS--RIS channel, $h_{r,k} \in
 \mathbb{C}^{N}$ is the RIS--user channel, and
 $\boldsymbol{\theta} \in [0, 2\pi)^N$ collects the $N$ reflection phases---%
 \emph{the only optimization variable in this work}. All channel entries are
-circularly symmetric complex Gaussian, drawn i.i.d.\ and scaled by 3GPP
+circularly symmetric complex Gaussian, drawn i.i.d.\ under 3GPP
 urban-micro path-loss models: NLoS for the direct link
-($128.1 + 37.6\log_{10} d_{\mathrm{km}}$~dB) and LoS for both RIS hops
-($61.4 + 35.8\log_{10} d_{\mathrm{km}}$~dB each). The noise power follows the
+($128.1 + 37.6\log_{10} d_{\mathrm{km}}$~dB, with a $-25$~dB blockage
+penalty) and a shared two-hop cascade attenuation for the RIS path
+(Wu--Zhang form, $61.4 + 35.8\log_{10}(\max(d_{\mathrm{BR}},
+d_{\mathrm{RU,k}}))$~dB, applied as a joint factor---the BS--RIS matrix
+$G$ carries unit magnitude and the cascade loss profiles the
+RIS--user hop $h_{r}$). The generator is a 3.5~GHz mid-band
+configuration; frequency-dependent mmWave or sub-THz effects are
+outside its scope. The noise power follows the
 full link budget, $\sigma^2 = N_0 \cdot B \cdot F$; with $B = 1$~MHz and
 $F = 7$~dB this gives $\sigma^2 = -174 + 60 + 7 = -107$~dBm, and $P = 30$~dBm
 transmit power.

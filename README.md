@@ -1,7 +1,7 @@
 # RIS-DRL 2.0 - RIS Sum-Rate Study (frozen-protocol)
 
-**One-line summary:** deep unfolding closes **94.98 %** of the Riemannian AO
-sum-rate reference at **49.6x lower wall-time**, while a multi-seed DRL
+**One-line summary:** deep unfolding closes **94.78 %** of the Riemannian AO
+sum-rate reference at **58.0x lower wall-time** (DD-041 audited train/validation protocol), while a multi-seed DRL
 campaign establishes a **null result** (DRL ~ random) -- shipped as paper tag
 `v1.0.1-paper` (quality pass DD-037, v1.0.2).
 
@@ -16,8 +16,8 @@ campaign establishes a **null result** (DRL ~ random) -- shipped as paper tag
 | Method | Test rate (bps/Hz) | Notes |
 |---|---|---|
 | Riemannian AO (reference) | **63.040 +/- 0.644 (SD, n=500)** | median 0.475 s/channel; strong local solution, not an upper bound (55.6 % of channels reach the 200-iter cap) |
-| Deep unfolding (L=6) | **59.875 +/- 1.26 (SD)** | 94.98 % of AO reference; 9.572 ms median (mean 9.719, p95 11.285, n=200 trials); **49.6x speed-up** |
-| Deep unfolding, 5-seed protocol breadth | 59.723 +/- 0.108 | protocol-breadth number, not the headline |
+| Deep unfolding (L=6) | **59.749 +/- 1.86 (SD)** | 94.78 % of AO reference; 8.196 ms median (mean 8.357, p95 10.280, per-channel DD-009; DD-041 protocol); **58.0x speed-up** |
+| Deep unfolding, 5-seed protocol breadth | 59.783 +/- 0.041 | protocol-breadth number, not the headline |
 | Best-of-200 random | 51.835 +/- 1.083 (SD) | exploitable headroom exists |
 | Random phase | **43.797** (frozen baseline, n=500) | |
 | DRL (6 archs x 5 seeds x 200k steps) | ~ 43.80 | **NULL**: deltas -0.07...-0.33, all p >= 0.25 |
@@ -43,7 +43,7 @@ ckpt/             checkpoints (gitignored)
 git clone https://github.com/deathstarfall/ris-drl.git; cd ris-drl
 python -m venv .venv; .\.venv\Scripts\Activate.ps1
 pip install torch --index-url https://download.pytorch.org/whl/cpu
-pip install numpy scipy matplotlib pyyaml pytest
+pip install numpy scipy matplotlib pyyaml gymnasium pytest
 
 # data
 python scripts/make_datasets.py --channels 500 --N 64 --K 4 --M 8 --seed 2000
@@ -77,12 +77,12 @@ python crossref_check.py    # ALL ENTRIES VERIFIED (12/12)
 
 ## Artifacts <-> paper map
 - `results/ao/gate2_verdict.txt` -> AO block + G3 latency row (DD-037: AO
-  475 ms vs unfolding 9.572 ms median = 49.6x)
+  475 ms vs unfolding 8.196 ms median = 58.0x, DD-009 per-channel)
 - `results/ao/ao_test_channels.(json|npz)` -> AO mean/sd, per-channel (AO wins
   100.0 % of channels vs frozen random)
 - `results/ao/ao_test_channels_history.npz` -> AO convergence figure
 - `results/unfold/unfold_L6_rate/metrics.json` -> deployed-protocol unfolding
-  test rate + per-channel latency (9.572 median / 9.719 mean / 11.285 p95)
+  test rate + per-channel latency (8.196 median / 8.357 mean / 10.280 p95)
 - `results/unfold/*/metrics.json` (seed1-4, lr-grid, circular/mse) -> 5-seed
   aggregate, lr grid, loss-ablation table/figure
 - `results/unfold/latency_float32.json` -> isolated f64/f32 inference bench

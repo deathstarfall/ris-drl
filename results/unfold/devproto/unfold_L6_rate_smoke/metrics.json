@@ -1,0 +1,59 @@
+{
+  "tag": "unfold_L6_rate_smoke",
+  "L": 6,
+  "loss": "rate",
+  "seed": 0,
+  "iters": 60,
+  "batch_channels": 128,
+  "lr": 0.01,
+  "N": 64,
+  "n_train": 1200,
+  "n_val": 300,
+  "n_test": 500,
+  "val_frac": 0.2,
+  "protocol": "DD-041: train/val split, val-selected best, single final test eval",
+  "zero_phase_test_rate": 43.47819918953093,
+  "init_model_val_rate": 58.59120924131703,
+  "best_iter": 60,
+  "best_val_rate": 59.238379550251324,
+  "final_test_rate": 59.098671499736334,
+  "latency_ms": {
+    "median_ms": 8.992199999999784,
+    "p95_ms": 10.454300000001027,
+    "mean_ms": 8.636925500000068,
+    "dtype": "torch.complex128",
+    "n_trials": 200
+  },
+  "history": [
+    {
+      "iter": 0,
+      "train_loss": -58.37013755741721,
+      "val_mean_rate": 58.61137313676393,
+      "gain_vs_zero_init": 15.133173947232997,
+      "alphas": [
+        0.5050250835404777,
+        0.505025083515668,
+        0.5050250833878398,
+        0.5050250833989622,
+        0.5050250834003001,
+        0.5050250834006551
+      ],
+      "wall_s": 0.1583060000000005
+    },
+    {
+      "iter": 60,
+      "train_loss": -59.20355576832674,
+      "val_mean_rate": 59.238379550251324,
+      "gain_vs_zero_init": 15.76018036072039,
+      "alphas": [
+        0.5777982026134958,
+        0.5429129331290823,
+        0.5523874483958761,
+        0.7625963596831027,
+        0.7957195872571013,
+        0.9327346744627604
+      ],
+      "wall_s": 3.9316291000000003
+    }
+  ]
+}

@@ -1,13 +1,13 @@
 \documentclass[journal]{IEEEtran}
 \usepackage{amsmath,amssymb,amsfonts,graphicx,booktabs,bm,xcolor}
 \usepackage[colorlinks=true]{hyperref}
-\input{sections/balraj_macros}
+\AtBeginDocument{\input{sections/balraj_macros}} % \textbf macros must be defined after document start (hyperref)
 \begin{document}
 
 \title{Model-Driven Optimization for Reconfigurable Intelligent
 Surfaces: Deep Unfolding versus a Null Result for Direct
 Reinforcement Learning}
-\author{A.~Agarwal, S.~Verma, and B.~Singh%
+\author{A.~Agarwal, S.~Khatri, B.~Singh, and S.~Jha%
 \thanks{The authors are with the School of Electronics Engineering,
 Vellore Institute of Technology, Vellore 632014, India.
 Corresponding author: A.~Agarwal. The evaluation artifacts and the
@@ -29,11 +29,11 @@ frozen 500-channel test set fixed before evaluation: a Riemannian
 alternating-optimize (AO) reference, a deep unfolding of
 projected-gradient ascent, and six direct reinforcement-learning (RL)
 policies spanning SAC, TD3, DDPG, and codebook-DQN at 2--4-bit phase
-resolution. Deep unfolding reaches $59.88$~bps/Hz mean sum rate
-(SD $1.26$), $5.0\%$ short of the Riemannian AO reference
-($63.04\pm0.64$, SD) and $16.08$~bps/Hz above the random baseline
-($43.80$; $p=1.3\times10^{-83}$), while deciding in about $9.7$~ms per
-channel (median $9.57$, $p95$ $11.3$). No RL policy exceeds random
+resolution. Deep unfolding reaches $59.75$~bps/Hz mean sum rate
+(SD $1.86$), $5.2\%$ short of the Riemannian AO reference
+($63.04\pm0.64$, SD) and $15.95$~bps/Hz above the random baseline
+($43.80$; $p=1.3\times10^{-83}$), while deciding in about $8.4$~ms per
+channel (median $8.196$, $p95$ $10.3$). No RL policy exceeds random
 (deltas $-0.07$ to $-0.33$~bps/Hz, all $p \geq 0.25$), whereas a
 200-draw random search attains $51.84\pm1.08$ (SD) over the same
 channels. The null is therefore informative: this regime is exploited
