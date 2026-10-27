@@ -334,3 +334,34 @@ repository contact, institutional e-mail finalized at submission.
 (5) TAG POLICY (auditor request): v1.0.1-paper is FROZEN at d1168cf and will not move; all round-3+ changes release as
 v1.0.2-paper. Future post-audit rounds bump to new tags rather than retagging.
 
+
+DD-046 (external review round 4 - reproducibility certification + report consistency): auditor's clean-checkout test
+could not run due to DNS failure on their side; the documented workflow was now exercised HERE in a real clean checkout
+(local file clone of bdc72cb) with the following passes, all logged as reproducibility evidence:
+
+ (a) scripts/reproduce_headline.py (NEW, numpy-only, no torch): prints every published number beside its committed
+     artifact and exits 1 on drift. Result in the fresh clone: ALL VERIFIED (15/15 artifact checks + DD-045
+     textbook-ZF identity check at 1e-9).
+ (b) pytest on the fresh clone: 20/20 passed.
+ (c) Dashboard generation re-run in the fresh clone: data/test_channels.npz, train_channels.npz and gen_channels.npz
+     regenerate NUMERICALLY BIT-EXACT against the committed frozen files (np.array_equal on every key for all three
+     datasets). NB: naive .npz MD5 hashes differ because npz embeds zip timestamps - the documented
+     verify-any-dataset recipe is array equality, as used here.
+ (d) Documented AO command exercised verbatim: run_ao_reference.py --channels --out (+ --max-channels smoke) works as
+     written; run_quantization CLI confirmed (no --max-channels flag needed - README commands match).
+
+ README repro-command corrections landed: make_datasets.py takes NO flags (was documented with bogus ones);
+ run_ao_reference.py needs --channels/--out (was --input); quantization/CSI/generalization commands now include the
+ required --ckpt; crossref_check.py runs from repo root (paper/crossref_check.py), count corrected 12/12 -> 16/16
+ (re-run: ALL ENTRIES VERIFIED). Word-bibliography independent verification: docx reference list (16 entries) DOI set
+ is IDENTICAL to repo refs.bib DOI set (13 DOIs, case-insensitive; the other three entries are ICLR/ICML/PMLR by
+ venue and legitimately DOI-less).
+
+ Word report internal-consistency fixes (pre-round4 backup kept): M1/M2 architecture prose reconciled to the Table-6
+ committed configs (DDPG MSE critic loss + Gaussian noise 0.1 + 300k replay/256 batch; SAC continuous Gaussian policy
+ with entropy auto-tuning; Gumbel-Softmax wording removed; DQN codebook arms described as Q-learning epsilon-greedy);
+ the inert discount-factor row deleted from Table 6; the bandit paragraph's Table-6 gamma pointer reworded; Table 5
+ (related-work) repaired - header misalignment fixed and two dead trailing columns removed, so the Limitations column
+ is now populated where data existed; quantization-table scope made explicit (AO/unfolding/random only, DRL arms are
+ clean-CSI-only, matching the paper).
+
