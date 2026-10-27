@@ -48,22 +48,28 @@ python -m venv .venv; .\.venv\Scripts\Activate.ps1
 pip install torch --index-url https://download.pytorch.org/whl/cpu
 pip install numpy scipy matplotlib pyyaml gymnasium pytest
 
-# data
-python scripts/make_datasets.py --channels 500 --N 64 --K 4 --M 8 --seed 2000
-# AO reference + gate 2
-python scripts/run_ao_reference.py --input data/test_channels.npz --out results/ao
+#0 quick headline reproduction from committed artifacts (numpy only, no torch
+#  needed) - prints every published number and checks it against its JSON:
+python scripts/reproduce_headline.py
+
+#1 data (frozen protocol: regenerates the committed npz bit-exactly at the
+#   committed seeds; run in a scratch clone to verify, never overwrite results/)
+python scripts/make_datasets.py
+#2 AO reference + gate 2 (REQUIRED flags are --channels and --out)
+python scripts/run_ao_reference.py --channels data/test_channels.npz --out results/ao
 python scripts/run_gate2.py
-# robustness trio + generalization
-python scripts/run_quantization.py; python scripts/run_csi_sweep.py
-python scripts/run_generalization.py
-# paper macros + figures from artifacts (honesty rule: missing artifact -> __TBD__ + exit 1)
+#3 robustness trio + generalization (unfolding row needs the deployed ckpt)
+python scripts/run_quantization.py --ckpt results/unfold/unfold_L6_rate.pt
+python scripts/run_csi_sweep.py --ckpt results/unfold/unfold_L6_rate.pt
+python scripts/run_generalization.py --ckpt results/unfold/unfold_L6_rate.pt --with-pg
+#4 papers macros + figures from artifacts (honesty rule: missing artifact -> __TBD__ + exit 1)
 python scripts/make_balraj_macros.py
 python scripts/make_all_figures.py
 
-# PDF
+#5 PDF
 cd paper
 pdflatex main.tex; bibtex main; pdflatex main.tex; pdflatex main.tex
-python crossref_check.py    # ALL ENTRIES VERIFIED (12/12)
+python paper/crossref_check.py    # run from repo root; ALL ENTRIES VERIFIED (16/16)
 ```
 
 ## Submission gates (kept for future releases)
