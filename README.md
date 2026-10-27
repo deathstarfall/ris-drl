@@ -74,7 +74,11 @@ python crossref_check.py    # ALL ENTRIES VERIFIED (12/12)
 5. Every number traceable to a `results/**` artifact (DD-018 rule)
 
 ## Tags & releases
-- **`v1.0.1-paper`** - submission candidate (moving pointer, retags disclosed):
+- **`v1.0.2-paper`** - final submission candidate (round-3 auditor fixes:
+  true-ZF unit test DD-045, latency-protocol clarification, G2-relaxation
+  disclosure). `v1.0.1-paper` is henceforth FROZEN and will not move again.
+- `v1.0.1-paper` - DD-043 re-certification + DD-044a/b full-CSI close-out
+  (frozen at `d1168cf`), history of movement disclosed below.
   zero TBD/stubs, zero undefined refs; DD-036 (close-out) + DD-037 (quality
   pass) recorded. Re-pointed again on the DD-044/043 re-certification round
   (corrected ZF pairing; corrected AO/unfolding/DRL artifacts + G2 re-baseline;

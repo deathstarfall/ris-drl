@@ -117,6 +117,15 @@ $+3.14$~bps/Hz. Second, per-user link conditions are noise-limited: the mean
 post-ZF SNR is $39.9$~dB at random phases and $48.3$~dB under the AO phases
 ($\sigma^2=-107$~dBm; SINR~$=$~SNR under ZF), so the RIS phase vector is the
 controllable degree of freedom.
+% DD-045 (external review round 3): latency-protocol clarification. All
+% per-channel latency figures in this paper (AO 1.352 s median, unfolding
+% 1.295 ms median) are SERIALIZED single-solve wall clocks measured the same
+% way on one desktop CPU; the AO verdict file's "wall time" line is the
+% multi-worker parallel elapsed time and is not a per-channel figure.
+All latency figures are serialized single-solve per-channel wall clocks
+measured on one desktop CPU under one protocol; the AO run's total elapsed
+time (multi-worker) is not a per-channel figure. The $\UnfoldVsAOLatencyRatio{}\times$
+figure therefore compares like with like ($1.352$~s vs $1.295$~ms).
 The loss-ablation table
 confirms the design correction quantitatively (all three losses retrained
 under the audited train/validation protocol at the winning learning rate

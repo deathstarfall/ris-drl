@@ -301,3 +301,36 @@ conclusion upgraded to sixty training runs + stale corrected numbers landed (97.
 resolved in favor of the stronger headline, with the observation-contract qualification still disclosed as protocol
 history rather than an open caveat.
 
+
+DD-045 (external review round 3 - verification-independent fixes; tag policy change): final auditor pass at repo head
+8809b47 verified the blocker fix at all four sites, reproduced every headline number independently from raw JSON
+(random 53.178, zero 53.076, no-RIS 42.769, best-of-200 57.145, AO 64.193, unfolding 62.532 = 97.4% of AO), confirmed
+the Tariq 2024 DOI 10.1145/3696414 in Crossref, and confirmed the DRL null (seed-0 re-check per family). Remaining
+items fixed:
+
+(1) TRUE-ZF UNIT TEST (the reviewer's exact suggested test, added): tests/test_sum_rate_is_true_zf in
+tests/test_precoder.py asserts sum_rate == sum(log2(1+|diag(H@W)|^2/sigma2)) with a NON-src-derived reference
+expression, at 1e-9. This is the test that would have caught the DD-043 conjugation bug at commit time (the existing
+brute-force twin only checked vectorization equivalence and finiteness). pytest full suite rises to 20/20.
+
+(2) LATENCY-PROTOCOL CLARIFICATION: run_gate2.py verdict wall-time line and ao json payload now state explicitly that
+"wall time" is multi-worker parallel elapsed time (per-channel figures are serialized single-solve wall clocks on one
+desktop CPU, the one protocol used by every paper latency number); payload gains workers and latency_protocol fields.
+Paper sec5b gains the same clarification plus a retirement note for the dev-stage ~9.6 ms float32 benchmark (DD-037).
+
+(3) G2 ACCEPTANCE-CRITERIA DISCLOSURE surfaced in the Word report: margin criterion was set at ratio >= 1.30 during
+protocol design; the conjugation fix invalidated its calibration scale; it was re-baselined to >= 1.15 with 100%
+per-channel dominance before reading the corrected result - disclosed post-hoc change (DD-043), with the plain
+statement that AO beats random on 100% of channels but the margin is modest (1.21x) so the study's headline rests on
+the unfolding-vs-random gain.
+
+(4) WORD REPORT round-3 sync (pre-round3 backup kept): leftover Markov-decision-process paragraph removed; abstract
+"technical components of the future 6G" claim rewritten neutrally; intro 5G data-rate paragraph replaced by a
+non-6G-dependent framing; duplicate 3.5 GHz disclaimers merged into one; "certified null"/"pre-registered"/DD-code
+prose leaks (incl. DD-009, DD-037, DD-043) removed; "Crossref-verified" dropped from table captions; affiliation typo
+"Electronic Engineering" -> "Electronics Engineering"; corresponding author now carries a name (Ayansh Agarwal) with
+repository contact, institutional e-mail finalized at submission.
+
+(5) TAG POLICY (auditor request): v1.0.1-paper is FROZEN at d1168cf and will not move; all round-3+ changes release as
+v1.0.2-paper. Future post-audit rounds bump to new tags rather than retagging.
+

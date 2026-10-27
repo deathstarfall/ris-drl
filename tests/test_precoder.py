@@ -35,6 +35,19 @@ def test_rate_matches_bruteforce():
     assert np.allclose(Heff_vec, Heff_bf, atol=1e-12)
     assert np.isfinite(sum_rate(theta, ch))
 
+def test_sum_rate_is_true_zf():
+    """DD-045 (external review round 3): the shared rate function must equal the
+    textbook post-ZF sum rate |<h_k, w_k>|^2/sigma2 with the *non-conjugated*
+    inner product. The line below is deliberately written WITHOUT using
+    src.sum_rate, so a future conjugation regression cannot hide behind a twin:
+    the pre-DD-043 bug produced |<h, w*>|^2 which this test fails on."""
+    rng = np.random.default_rng(5); ch = _mk_ch(rng)
+    th = rng.uniform(0, 2 * np.pi, 16)
+    H = effective_channel(th, ch)
+    W = zf_precoder(H, ch["P"])
+    exp = np.sum(np.log2(1 + np.abs(np.diag(H @ W))**2 / ch["sigma2"]))
+    assert abs(sum_rate(th, ch) - exp) < 1e-9
+
 def test_direct_link_alone_rates_positive():
     """no-RIS path must still give a positive, finite rate (sanity of the whole pipeline)"""
     rng = np.random.default_rng(3); ch = _mk_ch(rng); ch["h_r"] = np.zeros_like(ch["h_r"])

@@ -157,9 +157,11 @@ def main() -> int:
     lines.append(f" termination quality      : tol-hit {100 * tol_hits.mean():5.1f} %  | "
                  f"numerical-stall {100 * (1 - tol_hits.mean()):5.1f} %  | "
                  f"||rgrad|| at stop: median {np.median(ao_rgrad):.2e}, max {ao_rgrad.max():.2e}")
-    lines.append(f" wall time               : {wall:.1f} s total | median {np.median(ao_times):.3f} s/channel"
-                 f" | p95 {np.percentile(ao_times, 95):.3f} s/channel"
-                 f"   (AO is the seconds-scale upper bound for the G3 latency table; DD-036 leftover closed)")
+    lines.append(f" wall time               : {wall:.1f} s total [{args.workers} worker(s), parallel elapsed -"
+                 f" NOT a per-channel figure] | per-channel median {np.median(ao_times):.3f} s"
+                 f" | p95 {np.percentile(ao_times, 95):.3f} s"
+                 f"   (per-channel timings are serialized single-solve wall clocks on one desktop CPU;"
+                 f" that is the protocol used by every other latency number in the paper, DD-045)")
     lines.append("-" * 62)
     lines.append(f" G2 VERDICT: {'PASS' if pass_gate else 'FAIL'}")
     if not pass_gate:
@@ -197,6 +199,8 @@ def main() -> int:
                "median_time_s": float(np.median(ao_times)),
                "mean_time_s": float(ao_times.mean()),
                "p95_time_s": float(np.percentile(ao_times, 95)),   # DD-036 leftover: AO wall p95
+               "workers": int(args.workers),
+               "latency_protocol": "serialized single-solve per-channel wall clock",
                "per_channel": ao_rates.tolist()},
         "random": {"mean": float(rand_means.mean()), "sd": float(rand_means.std(ddof=1)),
                    "pooled_sd": float(rand_all.std(ddof=1)), "n_draws": args.n_random},
