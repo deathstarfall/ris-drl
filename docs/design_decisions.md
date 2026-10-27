@@ -772,3 +772,32 @@ affiliations on the title page - to be added only if the target venue requires t
 Gates after fixes: pytest 20/20, crossref 27/27, pdflatex+bibtex clean 9 pages zero undefined
 refs/citations, reproduce_headline (34 checks) ALL VERIFIED. Scripts docx_round14_sync.py.
 Word-final visual check (page breaks, table splits, PDF export) remains the human step.
+
+## DD-057 --- External-audit round 15 (v7): figures regression FIX + layout (2026-10-28)
+The v7 auditor caught a REGRESSION introduced in round 14, confirmed real on the live file:
+
+(1) CRITICAL: Figures 1 and 2 were MISSING from the live docx (zip media parts = 0). Root cause:
+    the round-14 editorial loop assigned p.text on EVERY paragraph unconditionally, which wipes
+    drawing (image) runs from any paragraph containing one. Fix: both figures re-embedded from the
+    fresh make_report_figs output (paper/figs/unified_framework.png at 6.0" before the Figure 1
+    caption; csi_robustness.png at 5.2" before the Figure 2 caption; centred). Verified:
+    inline_shapes == 2. LESSON recorded: never assign p.text unconditionally in docx-surgery
+    loops; only replace text on paragraphs positively matched by substring AND known image-free.
+
+(2) Table 6 (surveys) was 9.0" wide inside a 6.63" text column (grown under the old landscape
+    section); rescaled to 6.61" total ([0.80,0.62,0.72,1.10,1.69,1.68]) with 8 pt cell text.
+
+(3) Abstract re-trimmed to 175 whitespace tokens (~220+ on word-processor counters) with the same
+    content priority: protocol, DRL null + tests, unfolding + 51x, full-observation reproduction,
+    robustness scope, regime limitation.
+
+(4) Stale "for 19 entries in total. All 19 bibliographic entries are verified..." -> "The reference
+    list contains 27 entries in total. All 27 bibliographic entries are verified by the repository
+    checker: DOI resolution ... for the twenty-four entries that carry a DOI, and metadata
+    verification through the arXiv/PMLR identifiers for the three DOI-less conference entries".
+
+(5) Trailing blank page: 12 trailing empty paragraphs after the reference list removed; document
+    now ends at "[27] P. K. Nishad ...".
+
+Gates: pytest 20/20, crossref 27/27, reproduce_headline ALL VERIFIED. Script docx_round15_sync.py.
+Word/PDF visual re-check of both figures and Table 6 remains the human step.
