@@ -549,3 +549,29 @@ DD-051 (external review round 9 - consistency + phrasing accuracy):
 
 Gates: reproduce_headline ALL VERIFIED (34 checks), pytest 20/20, crossref 19/19, pdflatex clean.
 
+
+
+
+DD-052 (external review round 10 - report wording/literature hygiene):
+
+(1) Sixteen-vs-19 clarified in Section 2 of the report: "sixteen" refers specifically to the Tables 1-to-5
+    corpus; the bibliography totals 19 (the three Table 6 survey entries [17]-[19]). Verification claim made
+    precise: all 19 entries verified against Crossref publisher metadata (checker run: ALL ENTRIES VERIFIED).
+
+(2) Table 1 SAC relevance cell corrected: "Foundation of the SAC + codebook arm" -> "Foundation of the
+    continuous SAC policy arm (the discrete codebook arms are DQN)".
+
+(3) Equations (1)/(2) cleaned: Eq (1) index fixed (last term now e^{j theta_M} with m = 1..M explicit),
+    "Whereby" wording replaced, Eq (2) stray max-theta subscripts corrected (max over Theta, sum over
+    k = 1..K, |[Theta]_{m,m}| = 1 for all m), and a new definition sentence states SINR_k is user k's SINR
+    under the ZF precoder with total power P.
+
+(4) Research-gap claims narrowed to "to our knowledge" wording in both intro paragraphs; residual audit in
+    the report returns zero unsubstantiated priority claims ("no one"/"no paper"/"never"). The paper never
+    had such claims (its "never" usages are protocol facts: never consumed by selection rule, never
+    regenerated, reviewer control never outperforms).
+
+(5) Final artifact consistency: every published number already derives from committed artifacts via
+    scripts/reproduce_headline.py (34 checks, ALL VERIFIED); README snapshot source-checked in DD-050. The
+    standing claim is that every number is machine-checkable, not that the auditor has rerun training.
+
