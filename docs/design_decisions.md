@@ -729,3 +729,46 @@ page breaks/table placement before export.
 
 
 
+
+## DD-056 --- External-audit round 14 (v6): seed-selection reconciliation + final template items (2026-10-28)
+Artifact-verified reconciliation, per the auditor's instruction to check the scripts/artifacts
+BEFORE changing wording:
+
+(1) TRUTH established: results/baselines/zf_rescore/certified_table_det.json records every
+    certified DRL entry explicitly with "seed": 0 (per-channel rates, Wilcoxon p, bootstrap CI,
+    %channels>random). The published partial-observation DRL rows / inline numbers (SAC 53.22,
+    TD3 53.08, DDPG 53.08, DQN@2bit 53.08, DQN@3bit 53.12, DQN@4bit 53.19; deltas -0.10..+0.04,
+    p >= 0.37) ARE the deterministic seed-0 re-scores under the corrected rate function
+    (DD-043 close-out "frozen-everything-but-rate-function re-scoring"). The DD-033-era
+    "validation-best seed" phrasing (from the PRE-fix assessment) does NOT describe the current
+    artifacts: last-10 training plateaus would have picked seeds (1,1,0,0,1,3) - i.e. NOT
+    uniformly seed 0 - and the test-best seeds would all be 2s. Fixed accordingly: docx sec 3.4
+    sentence (the "validation-best seed of each agent was evaluated" paragraph) rewritten to the
+    canonical seed-0 truth with the artifact pointer; paper sec5c
+    "(validation-best seed per agent" -> "(canonical seed-0 checkpoints per agent". The
+    full-observation Table 12 is unchanged (5-seed family means + seed-averaged Wilcoxon,
+    artifacts results/full/*). Zero "validation-best" residues in the docx.
+
+(2) Abstract: live word count was 229 (the auditor's copy counts differently or is again a stale
+    variant); trimmed further to 209 words keeping equal content priority (protocol context, DRL
+    null, unfolding + 51x same-machine latency, observation-equivalence caveat, scope).
+
+(3) Title: page-1 title (16 words) shortened to 12: "Model-Driven Optimization for Reconfigurable
+    Intelligent Surfaces: Deep Unfolding versus Deep Reinforcement Learning"; docx
+    core-properties title updated to match (stale old title removed); subject/keywords/comments
+    metadata set.
+
+(4) Table 6 caption renamed to what its rows contain: "The three survey papers reviewed in this
+    literature review ([17],[18],[19]), with their coverage, evaluation metrics and limitations";
+    the research-gap paragraph now points to Table 6 (surveys) and Table 7 (prior-study
+    comparison) correctly.
+
+(5) Editorial: missing sentence spaces fixed (4 sites), "matching Table 8(Training
+    hyperparameters" spacing fixed, "as in the paper"/"the paper's" -> "the report" (2 sites).
+
+Deferred to the team (never fabricate): ORCID identifiers and individual departmental
+affiliations on the title page - to be added only if the target venue requires them.
+
+Gates after fixes: pytest 20/20, crossref 27/27, pdflatex+bibtex clean 9 pages zero undefined
+refs/citations, reproduce_headline (34 checks) ALL VERIFIED. Scripts docx_round14_sync.py.
+Word-final visual check (page breaks, table splits, PDF export) remains the human step.

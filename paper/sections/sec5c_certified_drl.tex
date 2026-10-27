@@ -7,10 +7,13 @@ project's acceptance protocol: six architectures
 (continuous-policy SAC, TD3 and DDPG; discrete codebook DQN at 2, 3 and
 4-bit phase resolution), each trained over five random seeds with an
 identical $200\,000$-step budget on the frozen training split
-(identical evaluation entry point). The validation-best seed of each agent was subsequently
-evaluated on the frozen $500$-channel test set through the shared
-\texttt{evaluate.py} entry point (\S\ref{sec:results-ao}); all rates
-report the same ZF sum-rate convention as every other row.
+(identical evaluation entry point). The published DRL rows are each architecture's canonical
+seed-0 checkpoint, evaluated deterministically on the frozen $500$-channel test
+set through the shared \texttt{evaluate.py} entry point (\S\ref{sec:results-ao});
+the per-channel rows, Wilcoxon $p$-values and bootstrap intervals are
+carried in the committed artifact \texttt{certified\_table\_det.json} (one entry per
+architecture, recording seed 0); all rates report the same ZF sum-rate convention as
+every other row.
 
 \paragraph{Null result.}
 No architecture shows a \emph{statistically significant} positive
@@ -99,7 +102,7 @@ pre-fix numbers, which are retained in the archive with a
 \begin{table}[t]
 \centering\small
 \caption{Frozen-test-set evaluation of all six DRL agents
-(validation-best seed per agent; paired statistics vs.\ the frozen
+(canonical seed-0 checkpoints per agent; paired statistics vs.\ the frozen
 random baseline over the same 500 channels).}
 \label{tab:certified-drl}
 \begin{tabular}{lrrrrr}
