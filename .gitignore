@@ -7,6 +7,8 @@ __pycache__/
 
 # Experiments
 ckpt/
+!ckpt/full_*.pt
+!results/full/**
 *.pt
 !results/unfold/*.pt
 !results/unfold/**/*.pt
