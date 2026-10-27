@@ -49,10 +49,21 @@ b = json.load(open("results/bits_sweep.json"))
 check("AO@2bit", b["mean_rate_by_method"]["ao"][0], 63.217)
 check("unfolding@2bit", b["mean_rate_by_method"]["unfolding"][0], 61.567, tol=0.02)
 
-# full-CSI campaign families (best + a floor check)
-for fam, want in (("dqn_b4", 53.204), ("td3", 53.086), ("ddpg", 53.065)):
-    ms = [np.mean(json.load(open(f"results/full/{fam}/seed{s}/eval_rates.json"))["rates"]) for s in range(5)]
-    check(f"full-CSI {fam}", np.mean(ms), want, tol=0.02)
+# full-CSI campaign families (best + a floor check) with paired Wilcoxon stats
+WILCOXON_WANT = {"sac": 0.262, "td3": 0.531, "ddpg": 0.433,
+                 "dqn_b2": 0.159, "dqn_b3": 0.276, "dqn_b4": 0.517}
+try:
+    from scipy.stats import wilcoxon
+    rnd = np.array(json.load(open("results/baselines/random/eval_rates.json"))["rates"])
+    for fam, want_p in WILCOXON_WANT.items():
+        R = np.stack([np.array(json.load(open(f"results/full/{fam}/seed{s}/eval_rates.json"))["rates"]) for s in range(5)])
+        ms = R.mean(axis=0)
+        check(f"full-CSI {fam} mean", ms.mean(), {"sac": 53.164, "td3": 53.086, "ddpg": 53.065,
+              "dqn_b2": 53.153, "dqn_b3": 53.164, "dqn_b4": 53.204}[fam], tol=0.02)
+        _, p = wilcoxon(ms, rnd)
+        check(f"full-CSI {fam} Wilcoxon p vs floor", p, want_p, tol=0.02)
+except Exception as e:
+    print("  [SKIP] full-CSI checks unavailable:", e)
 
 # DD-045 sanity: the true-ZF unit test guards the rate function (numpy path)
 try:

@@ -365,3 +365,33 @@ could not run due to DNS failure on their side; the documented workflow was now 
  is now populated where data existed; quantization-table scope made explicit (AO/unfolding/random only, DRL arms are
  clean-CSI-only, matching the paper).
 
+
+DD-047 (external review round 5 - report polish + full-CSI statistical table + self-caught p-value correction):
+
+(1) Table 7 header label corrected: "M2: SAC + codebook" -> "M2: SAC (continuous); DQN codebook arms", reconciling
+    the params table with the round-4 rewritten architecture prose (SAC continuous; DQN carries the 2/3/4-bit arms).
+
+(2) Related-work layout repaired at the LAYOUT level (not just extracted text): the Table 6 caption previously sat
+    BELOW its table (detached heading); moved above the table; broken "()" citation placeholders cleaned from the
+    Table 2/3/4/5 captions.
+
+(3) Editorial: abstract tail de-duplicated (the "never published" repetition produced by two programmatic append
+    passes collapsed into one clean sentence); Introduction first paragraph completed (it had become a truncated
+    fragment) and the methods paragraph rewritten (subject-verb fix, "high frequency" phrasing, one clear taxonomy:
+    DQN discrete, DDPG/PPO/SAC/TD3 continuous, unfolding separate).
+
+(4) Full-CSI stress test made reproducible in the report: new Table 11 (observation setting, 6 architectures x 5
+    seeds x 200k steps, frozen set, family means + deltas + paired per-channel Wilcoxon p-values) inserted after
+    the discussion paragraph in the results narrative. IMPORTANT self-caught correction: an initially drafted
+    "p >= 0.94" claim from memory was WRONG; the committed per-channel artifacts give Wilcoxon p = 0.16 (dqn_b2) to
+    0.53 (td3), none significant - the numbers in the table are now the computed values, and the identical checks
+    are pinned in scripts/reproduce_headline.py (full-CSI family p-values verified artifact-side, run: ALL
+    VERIFIED). Lesson logged: every statistical claim, even in a summary table caption, must be emitted from the
+    artifact, never from memory (extends DD-018).
+
+(5) Reproduction instructions: already corrected in the repository at bdc72cb (DD-046) - make_datasets takes no
+    flags, run_ao_reference needs --channels/--out, robustness scripts document --ckpt, crossref_check path and
+    16/16 count fixed - and the documented workflow was exercised in a real clean checkout (reproduce_headline ALL
+    VERIFIED, pytest 20/20, datasets regenerate bit-exact). No further repo change needed this round; the auditor's
+    remaining gap is execution on their side, now covered by scripts/reproduce_headline.py.
+
