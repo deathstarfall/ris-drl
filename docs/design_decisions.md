@@ -449,3 +449,42 @@ DD-048 (external review round 6 - common-footing latency protocol, obs-size fix,
 (6) reproduce_headline.py extended with the DD-048 same-machine latency checks + full-CSI Wilcoxon p pins
     (run: ALL VERIFIED, 25 checks).
 
+
+
+
+DD-049 (external review round 7 - report self-audit fallout + citation-coverage extension):
+
+(1) Title de-duplicated: the report title paragraph contained the full title twice (editing artifact);
+    reduced to a single copy. Abstract stray ").;" before "an untrained forward pass" fixed.
+
+(2) DD-log codes stripped from report body prose and the two Table 8 latency cells (policy: DD codes live in
+    the repo + the reproducibility subsection; never paper/docx prose). Re-checked: zero DD codes remain in
+    the docx.
+
+(3) SAC prose (Section 3.3) corrected: "lr 3e-4 for actor, critic and temperature" -> "actor and temperature
+    lr 3e-4, critic lr 1e-3, matching Table 7 and the released configs" (checkpoint cfg: sac lr_critic 0.001).
+
+(4) Table 7 columns: verified the live file retains six columns (DDPG / TD3 / SAC / DQN-2-3-4-bit / unfolding,
+    with unfolding lr 3e-2, 3,000 iterations, batch 128) - the round-6 report of "lost columns" was a stale
+    copy. Caption updated to enumerate what the columns are.
+
+(5) Table 6 author cells synced to the Crossref entities: "F. Puspitasari, I. Lee" -> "A. A. Puspitasari,
+    B. M. Lee"; "A. Faisal, W. Choi" -> "K. M. Faisal, W. Choi"; "M. Tariq, S. Ahmad, M. Ahmad Jan, et al."
+    -> "M. Tariq, S. Ahmad, M. A. Jan, H. Song."
+
+(6) Citation coverage extended: paper/refs.bib now carries [17] tariq2024deep (doi 10.1145/3696414),
+    [18] faisal2022machine (doi 10.1109/ACCESS.2022.3157651), [19] puspitasari2023survey (doi 10.3390/s23052554)
+    and crossref_check.py verifies ALL 19 entries (run: ALL ENTRIES VERIFIED). Verification wording unified:
+    Section 2 and the Table 1 caption now both say "verified against Crossref publisher metadata".
+
+(7) Intro testbed citation narrowed from [8], [17] to [8] alone ([17] is a survey, not a testbed paper).
+
+(8) Figure 1 re-laid out: the red consumption annotations now live INSIDE the method boxes (previously they
+    sat on top of the DQN/unfolding box text); the AO reference now enters the scorer through a red elbow
+    routed through the free corridor (no box crossings); docx caption states what the red notes mean.
+
+(9) Added the batch-1 autograd note to the unfolding latency paragraph (8.26 ms is dominated by batch-1
+    autograd overhead over six lightweight steps; batched evaluation amortizes it; serialized per-channel
+    figures are the honest single-solve protocol). Corresponding-author contact kept as the personal e-mail
+    for now - institutional address is a submission-time replacement if the team provides one.
+
