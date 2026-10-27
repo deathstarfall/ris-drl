@@ -575,3 +575,52 @@ DD-052 (external review round 10 - report wording/literature hygiene):
     scripts/reproduce_headline.py (34 checks, ALL VERIFIED); README snapshot source-checked in DD-050. The
     standing claim is that every number is machine-checkable, not that the auditor has rerun training.
 
+## DD-053 --- External-audit round 11: null wording, notation, propagation-model description (2026-10-28)
+Auditor items (all verified against the LIVE docx/HEAD before acting; the quoted copy was again a
+stale variant, `...(3).docx`, but items 1-9 reproduced on the live file):
+
+(1) Null-result wording: "no positive mean gain" -> "no STATISTICALLY SIGNIFICANT positive mean
+    gain" in docx abstract/discussion/conclusion and paper abstract/sec1/sec5c/sec7; explicit note
+    that small positive/negative sample means occur (SAC +0.036, DQN-4b +0.026 full-CSI) and none
+    is distinguishable from random under bootstrap + paired Wilcoxon (equivalence not provable).
+
+(2) Notation: code dims are M=8 (BS antennas), N=64 (RIS) while the docx prose used N=BS/M=RIS.
+    Docx now uses explicit N_BS = 8, N_RIS = 64 everywhere (incl. Eq 1/2 subscripts) with an
+    implementation note mapping to the code's M/N. The LaTeX paper ALREADY used M=BS/N=RIS
+    consistently -- no paper change needed.
+
+(3) Propagation model: code (src/channel.py) uses ONE cascade attenuation Wu-Zhang form,
+    61.4+35.8*log10(max(d_BR, d_RU)) dB with METRES, applied to h_r, G unit magnitude (DD-042
+    design). The docx had claimed per-hop km treatment. Docx now describes exactly what is
+    simulated, calls it a deliberate disclosed simplification, notes it does not resolve per-hop
+    propagation. Results retained (model unchanged); DISCLOSED, not regenerated.
+
+(4) Acceptance-protocol wording: conclusion's "fixed in advance acceptance rules" -> "criteria
+    frozen before test-set evaluation, with ONE documented post-hoc revision (AO-to-random ratio
+    1.30 -> 1.15 after the conjugation fix), disclosed; DRL-vs-random null and unfolding-vs-AO
+    ratio are threshold-independent". Same independence note added to paper sec5c protocol
+    qualifications.
+
+(5) reproduce_headline.py: legacy 1.295 ms per-channel latency check relabelled "[LEGACY
+    cross-machine artifact provenance]" (artifact contents check, not a paper claim). README
+    submission-gate counts reconciled: pytest 20/20, crossref 19/19 (the historical release note
+    "pytest 19/19" refers to the v1.0.2-era state and stays).
+
+(6) Table 10 (quantization) moved with its caption + interpretation into Results, after the
+    CSI-error block, ahead of the conclusion; body position verified programmatically.
+
+(7) Table 11 statistical definitions: +/- = sample SD (ddof=1) across the five training seeds of
+    the per-seed mean test rate (verified numerically: sac 0.129, dqn_b4 0.037 pop 0.033);
+    Wilcoxon paired on seed-averaged per-channel rates, 500 paired observations.
+
+(8) Intro "hereoices"/comparison paragraph rewritten in academic English; research-gap claims
+    already "to our knowledge". Reference-verification claim made exact: DOI resolution for the
+    16 entries carrying a DOI; arXiv/PMLR metadata verification for the 3 DOI-less entries.
+
+(9) "Deep unfolding's an 8.26 ms decision latency" grammar fixed; "the decision log documents the
+    project decision log" redundancy fixed.
+
+Gates after fixes: pytest 20/20, crossref 19/19, pdflatex clean (9 pages), reproduce_headline
+(34 checks) ALL VERIFIED. Docx surgery via scripts/docx_round11_sync.py. Tag v1.0.10-paper.
+
+
