@@ -843,3 +843,9 @@ correct tblPr order, bold+shaded (D9D9D9) header row with vAlign, grid unchanged
 the existing per-cell tcW widths.
 Real-Word COM verification (per DD-059 rule): opens with NO repair, 18 pages, 12 tables, 2
 inline figures, PDF re-export OK (report_check.pdf, 595 KB, previewed).
+
+## DD-061 --- Round 19: Table 7 header colour/size matched exactly (2026-10-28)
+Header fill changed grey D9D9D9 -> light-blue D9E2F3 (same as results tables T8-T11) and header
+bold removed (results-table headers are not bold); body font unchanged (inherits document
+default, as the other tables). Verified: fill=D9E2F3; real-Word COM re-check 18 pages, 12
+tables, 2 figures, PDF re-export 521 KB previewed; trusted snapshot refreshed.
