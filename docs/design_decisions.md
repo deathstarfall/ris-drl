@@ -801,3 +801,15 @@ The v7 auditor caught a REGRESSION introduced in round 14, confirmed real on the
 
 Gates: pytest 20/20, crossref 27/27, reproduce_headline ALL VERIFIED. Script docx_round15_sync.py.
 Word/PDF visual re-check of both figures and Table 6 remains the human step.
+
+## DD-058 --- External-audit round 16: literature tables clipped - tblGrid fix (2026-10-28)
+(1) Root cause of the persistent clipping: Word sizes tables by tblGrid, and the round-15
+    tcW-only reset left the grid at the original 9.0" widths grown under the old landscape
+    section. Tables 1-6 (docx tables[0..5]) were therefore still 9.0" wide in a 6.63" text
+    column. Fixed at XML level: gridCol widths rebuilt (6.58" total, 0.50" floor), every cell
+    tcW rewritten, w:tblW set, w:tblLayout fixed, and cell font reduced to 8 pt. Per-table
+    proportions retained (widest columns = "Method / key finding" and "Relevance"). Verified by
+    re-opening: grid totals now 6.58" for all six tables; tables 7-12 were already 6.63".
+(2) Regression guards unchanged: inline_shapes == 2, 12 tables, abstract 175 tokens.
+Gates: (docx-only round; pytest/crossref/reproduce_headline all green at last run and unaffected).
+Script docx_round16_sync.py. Human step: export to PDF and inspect every table edge.
