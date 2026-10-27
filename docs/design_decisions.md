@@ -520,3 +520,32 @@ DD-050 (external review round 8 - full-reconciliation audit on live HEAD):
     outside the generator's scope; no 6G/mmWave performance claim exists in the paper or README; all reported
     spreads are labeled SD (no SEM anywhere in the paper text).
 
+
+
+
+DD-051 (external review round 9 - consistency + phrasing accuracy):
+
+(1) Report Discussion carried a stale "~1.3 ms" latency (the retired cross-machine figure) alongside the
+    8.26 ms / 51x same-machine results; replaced with "8.26 ms (same-machine protocol, Section 5)". Verified:
+    no retired latency figure remains anywhere in the report.
+
+(2) Quantization "dB-equivalent" phrasing dropped in BOTH report and paper. The table's linear bps/Hz gaps
+    were annotated with a dB conversion whose derivation does not follow from the stated numbers (an
+    unspecified per-something factor); per reviewer guidance the losses are now reported directly in bps/Hz
+    (AO: 2.936/0.730/0.182 against 64.193; unfolding: 0.965/0.233/0.060 against 62.532), with an explicit
+    disclosure that the earlier dB phrasing did not use a defined conversion. A mathematically valid dB
+    reading would require defining a multiplicative spectral-efficiency factor (10 log10(2^dR) = 3.0103 dR,
+    i.e. 8.84 dB at the 2-bit point) - noted here for the record, not used in prose.
+
+(3) CSI-error random baseline provenance clarified in report and paper: 53.172 (the sweep's own 200-draw
+    Monte-Carlo realization, seed fixed) vs the canonical frozen random baseline 53.178 (committed artifact,
+    used for every headline delta); the two differ by < 0.01 bps/Hz as independent realizations of the same
+    expectation. Random draws verified to share the channel set (channel_seed 2000).
+
+(4) Conclusion wording check: the live report's conclusion already read "the verified null holds across the
+    tested DRL architectures and observation settings under the specified simulation protocol" (narrowed in
+    DD-048/050 rounds); the audit's "unconditionally within the regime" quote is not present in the live file
+    (stale copy again). Zero occurrences of "unconditional" remain in paper or report.
+
+Gates: reproduce_headline ALL VERIFIED (34 checks), pytest 20/20, crossref 19/19, pdflatex clean.
+

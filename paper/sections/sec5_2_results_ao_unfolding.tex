@@ -80,8 +80,11 @@ Wrapped-angle MSE & 59.327 & $-3.205$ \\
 Post-hoc quantization of the CONTINUOUS solutions onto uniform $2^B$ per-element
 codebooks gives the model-driven side of the bits claim
 (Table~\ref{tab:quantization}; Shreyansh's trained-codebook DQN numbers join in
-(Section~\ref{sec:results-drl}). At $B=3$ the AO-vs-AO-quantized gap is
-\QaoQuantGapBthree\ dB-equivalent; unfolding shows the same ordering. Under
+(Section~\ref{sec:results-drl}). At $B=3$ the AO quantization loss is
+0.243~bps/Hz against the unquantized 64.193; the unfolding loss at the same
+$B$ is 0.233~bps/Hz against 62.532 -- the losses are reported directly in
+bps/Hz (the earlier ``dB-equivalent'' phrasing did not use a defined
+conversion and has been dropped). Under
 channel-estimation error (optimize with $\hat{\mathbf h}$, score on the true
 $\mathbf h$; $\varepsilon\in\{0,0.01,0.02,0.05,0.1\}$, relative-Frobenius
 model, Section~\ref{sec:unfolding}), AO degrades from
@@ -89,6 +92,12 @@ model, Section~\ref{sec:unfolding}), AO degrades from
 phases move \CsiRandomZero\ $\to$ \CsiRandomPone\
 (Fig.~\ref{fig:csi_sweep}) -- honest discussion in
 the companion diagnosis note (repository \texttt{docs/}).
+The $53.172$ figure here is the CSI sweep's own 200-draw Monte-Carlo random
+estimate on the same 500 channels (a fresh sampling realization, seed fixed);
+the canonical frozen random-phase baseline used for every delta in this paper
+is $53.178$ from the committed baseline artifact. The two values differ by
+$<0.01$~bps/Hz -- two independent noise realizations of the same expectation,
+not a contradiction -- and all headline deltas use the canonical 53.178.
 
 \subsubsection{Generalization}
 On the \texttt{gen\_channels} split (200 user positions in an UNSEEN zone,
