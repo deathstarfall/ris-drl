@@ -813,3 +813,24 @@ Word/PDF visual re-check of both figures and Table 6 remains the human step.
 (2) Regression guards unchanged: inline_shapes == 2, 12 tables, abstract 175 tokens.
 Gates: (docx-only round; pytest/crossref/reproduce_headline all green at last run and unaffected).
 Script docx_round16_sync.py. Human step: export to PDF and inspect every table edge.
+
+## DD-059 --- Round 17 EMERGENCY REPAIR: Word repair-on-open fixed (2026-10-28)
+User symptom: "you vanished everything" - Word triggered repair-on-open and the repair dropped
+visible content. Root cause: round-16 hand-appended XML put w:tcW at the END of tcPr (schema
+order requires it near-first) and appended w:tblLayout/w:tblW in wrong tblPr order; Word's
+strict parser then "repaired" the document.
+
+Repair (scripts/docx_round17_repair.py + docx_round17b_fixtcw.py):
+(1) Removed the hand-appended w:tblLayout/w:tblW from tblPr; redid Table 1-6 sizes via
+    python-docx's own schema-correct API: t.autofit=False, column.width (gridCol, twips),
+    cell.width (tcW via get_or_add_tcPr). Grids verified: 6.58 in total per table.
+(2) Moved 106 out-of-order w:tcW elements to their schema position (tcW before
+    tcBorders/tcMar); zero out-of-order tcPr remain across all 12 tables.
+(3) REAL-WORD VERIFICATION via COM: opens with NO repair, wdStatisticPages = 18 (blank
+    page-19 trailing content already removed), 12 tables, 2 inline figures intact, 7982
+    words; PDF export succeeds (report_check.pdf, 592 KB, Temp, shown via preview).
+(4) Validated snapshot copied to backups/Report_word_clean_2026-10-28.docx.
+
+LESSON (hard rule): never hand-append OOXML children; always use python-docx property
+setters (schema-order insertion) and verify by opening the real Word application before
+declaring any docx work done.
