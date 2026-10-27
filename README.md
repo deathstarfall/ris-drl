@@ -81,7 +81,10 @@ python crossref_check.py    # ALL ENTRIES VERIFIED (12/12)
   sec5c disclosure). Re-pointed again on the DD-044 round-2 review round
   (matched-discipline baselines: untrained L=6 PG 59.390, closed-form
   full-phase policy 56.944, per-user SNR artifact; docx round-2 text fixes;
-  no headline number changed). Last pre-fix paper commit: `fe1813c` (superseded).
+  no headline number changed). Re-pointed finally on the DD-044b close-out
+  (full-CSI campaign integrated, 30 ckpts LFS; null made unconditional;
+  paper re-headlined; pytest 19/19, pdflatex clean). Last pre-fix paper
+  commit: `fe1813c` (superseded).
 - `v1.0-paper` - pre-release, superseded
 
 ## Artifacts <-> paper map
