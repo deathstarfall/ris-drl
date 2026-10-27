@@ -71,13 +71,13 @@ python scripts/make_all_figures.py
 #5 PDF
 cd paper
 pdflatex main.tex; bibtex main; pdflatex main.tex; pdflatex main.tex
-python paper/crossref_check.py    # run from repo root; ALL ENTRIES VERIFIED (19/19 incl. the three revision surveys)
+python paper/crossref_check.py    # run from repo root; ALL ENTRIES VERIFIED (27/27: 19 original + 8 round-13 additions)
 ```
 
 ## Submission gates (kept for future releases)
 1. Stub grep `TBD|XX\.X|\{X\.X\}` over `paper/sections/*.tex` -> must be silent
 2. `main.log`: zero `Warning: (Reference|Citation)` and zero `!` errors
-3. `pytest tests/ -q` green (20/20); `crossref_check.py` all-verified (19/19 entries)
+3. `pytest tests/ -q` green (20/20); `crossref_check.py` all-verified (27/27 entries)
 4. Moji-bake sweep over `paper/**/*.tex` -> silent
 5. Every number traceable to a `results/**` artifact (DD-018 rule)
 

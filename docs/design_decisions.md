@@ -670,5 +670,62 @@ made), item D verified (Table 10 caption scope intact: AO/unfolding/random only)
 Gates: pytest 20/20, crossref 19/19, pdflatex clean (9 pages), reproduce_headline ALL VERIFIED.
 Docx surgery via scripts/docx_round12_sync.py.
 
+## DD-055 --- Final submission audit v5: template compliance round 13 (2026-10-28)
+Auditor reviewed the rendered docx against `documentation format.docx` template. All blockers
+addressed on the live submission file:
+
+(1) Page orientation: section 0 was LANDSCAPE letter (11x8.5) vs section 1 portrait A4; section 0
+    reset to portrait A4 with section-1 margins. All sections now portrait A4 (8.27 x 11.69).
+
+(2) Abstract rewritten to 229 words (was 313/expanded): frozen-protocol context, DRL null with
+    deltas/tests, unfolding result + 51x same-machine latency, full-observation null reproduction,
+    CSI-sweep/quantization scope limited to unfolding/AO/random, scope-limitation closing. No
+    retired-measurement history left in the abstract.
+
+(3) Contributions block (4 bullet items) inserted at the end of the introduction: shared frozen
+    protocol; empirical null finding; same-machine operating point (97.41% @ ~51x lower latency);
+    full-observation stress test separating information bottleneck from learning failure.
+
+(4) NEW Table 7 "Comparison of representative prior studies with this study" (7 rows: [9],[13],
+    [22],[23],[24],[20]/[21], and THIS STUDY; columns: study / what evaluated / its setting / what
+    this report evaluates differently). Old Tables 7-11 renumbered 8-12 incl. the two in-text
+    citations (P: hyperparameter table -> Table 8; Wilcoxon-in-Table-11 -> Table 12). Table
+    numbering now globally in order 1..12.
+
+(5) Declarations completed: Acknowledgements (institution hardware + the PyTorch/NumPy projects),
+    Funding ("received no specific grant..."), Conflict of interest (none), before the existing
+    Data availability + Author contributions blocks.
+
+(6) Statistical interpretation: explicit scope sentence added (main-table checkpoints are the
+    protocol-certified seed-0 runs; paired per-channel tests certify those checkpoints; cross-seed
+    variability quantified in Table 12 across five seeds; conclusions limited to evaluated
+    configurations; five seeds cannot rule out rare-seed effects or prove equivalence).
+
+(7) Reproducibility details in 3.4: Python 3.9 / PyTorch 2.8.0+CPU / NumPy 2.0.2 / SciPy 1.13.1 /
+    Gymnasium 1.1.1; training seeds 0-4; baseline draw seed 123; channel-gen seeds 1000/2000/3000;
+    unfolding validation = final 300 of the 1,500 training channels, learning rate selected by
+    validation rate alone (DD-041), selection artifact val_protocol_selection.json.
+
+(8) References extended 19 -> 27 (all 8 verified by DOI resolution against Crossref, added to both
+    the docx bibliography and paper/refs.bib): Kundu&McKay OJ-COMS 2021, Shen et al. TCOM 2023,
+    Xu&Ai WCL 2022, Peng&Wang TWC 2023, Aasa SciRep 2026, Sivasankar&Markkandan IEEE Access 2025,
+    Ahmadinejad&Talebi Phycom 2025, Nishad&Prasad EngResExpress 2026. Prose citations added in
+    docx 2.2/2.3 and paper sec1 intro. No padding-only entries.
+
+(9) Cross-referencing: every table 1-12 and both figures now explicitly cited in text in numerical
+    order (e.g. "(Table 9)", "(Table 10; Figure 2)", "(architecture in Figure 1)", "summarized in
+    Table 1"). Figure 2 caption states axes, sweep levels {0,0.01,0.02,0.05,0.1}, that series are
+    grand means over the 500 channels and why no error bars.
+
+(10) Conclusion rewritten to 164 words (150-200 required): null, unfolding+latency, scope
+     conditions, one dominant future direction. Doubled-negative discussion wording fixed
+     ("the six DRL architectures ... showed no statistically significant positive mean gain").
+
+Gates: pytest 20/20; crossref 27/27; pdflatex+bibtex clean, main.pdf 9 pages zero undefined
+refs/citations; reproduce_headline (34 checks) ALL VERIFIED. Scripts docx_round13_sync.py +
+docx_round13b_sync.py. Remaining human step per checklist: open the final docx in Word and inspect
+page breaks/table placement before export.
+
+
 
 
