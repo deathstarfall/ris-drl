@@ -623,4 +623,52 @@ stale variant, `...(3).docx`, but items 1-9 reproduced on the live file):
 Gates after fixes: pytest 20/20, crossref 19/19, pdflatex clean (9 pages), reproduce_headline
 (34 checks) ALL VERIFIED. Docx surgery via scripts/docx_round11_sync.py. Tag v1.0.10-paper.
 
+## DD-054 --- External-audit round 12: round-11 collateral fixes, effective-channel dims (2026-10-28)
+Round-11 string replacements introduced duplications; auditor's copy was again the stale
+`...(4).docx` variant, but every item verified/reproduced on the live file:
+
+(1) Deduped: abstract & conclusion "(53.18 bps/Hz) (53.18 bps/Hz)" -> single; discussion repeated
+    clause "showed a statistically significant positive mean gain: a statistically significant..."
+    -> "showed no statistically significant positive mean gain over random phase selection"; the
+    "does.. No trained" double-period artifact from the round-11 conclusion splice removed.
+
+(2) Research-gap paragraph (docx P20) was mangled ("...solutionsnes in continuous spectrum.
+    There is no single fair comparison of deep unfolding approach..."): fully rewritten into clean
+    academic English stating the two gaps (myopic heuristics bound to fixed discrete grids;
+    no matched-CSI-error/unseen-user shared-protocol unfolding-vs-model-free comparison in our
+    knowledge).
+
+(3) Effective-channel dimension mismatch (item A): code (src/precoder.py, DD-002) computes
+    H_eff = h_d + (h_r * e^{j theta}) G.conj().T, i.e. per-user h_eff_k = h_d_k + (h_r_k o e^{j
+    theta}) G^H; stacked with Theta diagonal: H_eff = H_d + (h_r Theta) G^H, shape K x N_BS.
+    Docx P63 now states exactly this with all shapes (h_d K x N_BS, G N_BS x N_RIS, h_r K x N_RIS,
+    Theta N_RIS x N_RIS). Paper Eq (2) had G^H Phi^H h_r (conjugate-phase sign inconsistent with
+    the code's e^{+j theta}); corrected to G^H Phi h_r. Code stats unchanged; text-only.
+
+(4) Notation unified: docx bandit/action paragraphs "M=64 dimensional phase vector" ->
+    "N_RIS = 64-dimensional"; the single code-mapping definition stays in the P59 implementation
+    note (M = 8 BS, N = 64 RIS in the released code).
+
+(5) Results/discussion null wording: "No trained DRL architecture exceeds random" -> "showed a
+    statistically significant positive gain over random"; "every DRL policy ... below random" ->
+    "no evaluated policy shows a statistically reliable positive gain (sample-level deltas -0.10
+    to +0.04)". Latency sentence grammar: "Deep unfolding's decision latency of 8.26 ms ... is
+    only one component".
+
+(6) Conclusion acceptance summary: "criteria were frozen before test-set evaluation" ->
+    "criteria were fixed before test-set evaluation except for one documented post-hoc revision
+    (AO-to-random ratio 1.30 -> 1.15 after the conjugation fix)". Threshold independence of the
+    DRL-vs-random null and unfolding-vs-AO ratio retained.
+
+(7) Data-availability phrase simplified to "the full decision log is provided in
+    docs/design_decisions.md".
+
+Item B verified (channel description matches src/channel.py + configs/env.yaml exactly; no change
+made), item D verified (Table 10 caption scope intact: AO/unfolding/random only), item E verified
+(equivalence-not-proven wording retained in the discussion note).
+
+Gates: pytest 20/20, crossref 19/19, pdflatex clean (9 pages), reproduce_headline ALL VERIFIED.
+Docx surgery via scripts/docx_round12_sync.py.
+
+
 
