@@ -62,7 +62,8 @@ inference latency of $1.3$~ms (median) per decision and an absorbed
 quantization sweep at 2/3/4-bit phase codebooks (\S\ref{sec:results-ao}).
 \item \textbf{A null result for direct DRL policies.} Six
 architectures $\times$ five seeds of SAC/TD3/DDPG/coded-codebook
-DQN trains inherit zero positive mean gain over random on the frozen
+DQN trains show no statistically significant positive mean gain over
+random on the frozen
 test set ($\Delta \in [-0.10,+0.04]$ bps/Hz, all $p \geq 0.37$,
 \S\ref{sec:results-drl}); a follow-up full-observation campaign that
 retrains all thirty checkpoints with complete channel-phase access

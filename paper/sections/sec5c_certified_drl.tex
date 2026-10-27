@@ -13,10 +13,12 @@ evaluated on the frozen $500$-channel test set through the shared
 report the same ZF sum-rate convention as every other row.
 
 \paragraph{Null result.}
-No architecture achieves a positive mean gain over the frozen random
-baseline ($53.18$~bps/Hz). The test-set deltas range from
-$-0.10$ (TD3, DQN@2bit) to $+0.04$~bps/Hz (SAC), every 95\% bootstrap
-interval covers zero, and every paired Wilcoxon test yields
+No architecture shows a \emph{statistically significant} positive
+mean gain over the frozen random baseline ($53.18$~bps/Hz). The
+test-set deltas range from $-0.10$ (TD3, DQN@2bit) to
+$+0.04$~bps/Hz (SAC); small positive and negative sample means occur,
+but none is statistically distinguishable from random: every 95\%
+bootstrap interval covers zero, and every paired Wilcoxon test yields
 $p \geq 0.37$
 (Table~\ref{tab:certified-drl}); training-time evaluation plateaus
 over all seeds corroborate the plateau at random-level values
@@ -28,7 +30,12 @@ feedback, and we report this as a null result rather than tuning
 toward it.
 
 \paragraph{Protocol qualifications.} This null is certified for the
-stated protocol, and stated as such: (i)~the agents observe a
+stated protocol, and stated as such: the acceptance-threshold
+revision of the AO gate ($1.30 \to 1.15$, documented post-hoc after
+the conjugation fix invalidated the original calibration and disclosed
+in the decision log) affects only the AO-gate pass/fail summary; the
+DRL-versus-random comparison below and the unfolding-versus-AO rate
+ratio do not depend on that threshold. (i)~the agents observe a
 partial-CSI stack---$|h_{r}|$, $\angle h_{r}$, $|G|$, $|h_{d}|$---in
 which $\angle G$ and $\angle h_{d}$ are absent, so the null applies to
 policies under this observation design; a full-CSI observation mode is

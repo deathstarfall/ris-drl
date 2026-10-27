@@ -77,7 +77,7 @@ python paper/crossref_check.py    # run from repo root; ALL ENTRIES VERIFIED (19
 ## Submission gates (kept for future releases)
 1. Stub grep `TBD|XX\.X|\{X\.X\}` over `paper/sections/*.tex` -> must be silent
 2. `main.log`: zero `Warning: (Reference|Citation)` and zero `!` errors
-3. `pytest tests/ -q` green; `crossref_check.py` all-verified (12 entries)
+3. `pytest tests/ -q` green (20/20); `crossref_check.py` all-verified (19/19 entries)
 4. Moji-bake sweep over `paper/**/*.tex` -> silent
 5. Every number traceable to a `results/**` artifact (DD-018 rule)
 

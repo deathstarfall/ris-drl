@@ -33,7 +33,9 @@ u = json.load(open("results/unfold/unfold_L6_rate/metrics.json"))
 u = json.load(open("results/unfold/unfold_rates.json"))
 check("unfolding mean", np.mean(u["rates"]), 62.532)
 lat = np.percentile(u["latency_ms"], 50)
-check("unfolding latency median (ms)", lat, 1.295, tol=0.05)
+check("unfolding per-channel latency median (ms) [LEGACY cross-machine artifact provenance; "
+      "the paper cites the DD-048 same-machine figure instead]",
+      lat, 1.295, tol=0.05)
 
 # PG twin
 pg = json.load(open("results/ao/pg_test_channels.json"))
