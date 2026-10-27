@@ -25,7 +25,7 @@ class TD3:
         self.opt_a = torch.optim.Adam(self.actor.parameters(), lr=cfg["lr_actor"])
         self.opt_c1 = torch.optim.Adam(self.critic1.parameters(), lr=cfg["lr_critic"])
         self.opt_c2 = torch.optim.Adam(self.critic2.parameters(), lr=cfg["lr_critic"])
-        self.gamma = float(cfg.get("gamma", 1.0))
+                # DD-007: T=1 contextual bandit - every transition is terminal, the`n        # bootstrap term never fires ((1 - d) = 0), so the target degenerates`n        # to y = r regardless of this value. Kept explicit for clarity.`n        self.gamma = 1.0
         self.tau = float(cfg.get("tau", 0.005))
         self.expl_noise = float(cfg.get("expl_noise", 0.1))
         self.policy_delay = int(cfg.get("policy_delay", 2))
@@ -114,3 +114,4 @@ class TD3:
         if sd.get("critic1_t"): self.critic1_t.load_state_dict(sd["critic1_t"])
         if sd.get("critic2_t"): self.critic2_t.load_state_dict(sd["critic2_t"])
         if sd.get("norm") and self.norm: self.norm.load_state_dict(sd["norm"])
+

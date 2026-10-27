@@ -488,3 +488,35 @@ DD-049 (external review round 7 - report self-audit fallout + citation-coverage 
     figures are the honest single-solve protocol). Corresponding-author contact kept as the personal e-mail
     for now - institutional address is a submission-time replacement if the team provides one.
 
+
+
+
+DD-050 (external review round 8 - full-reconciliation audit on live HEAD):
+
+(1) "README vs manuscript mismatch" BLOCKER CHECKED AND CLEARED against the live repository: the audit's
+    contradictory numbers (59.88 / 63.04 / 43.80 / 51.84 / 9.57 ms / 1044x) are the PRE-DD-044/048 values from
+    the previously uploaded ris-drl-main ZIP - the live main.tex abstract already reports the artifact-derived
+    set (62.53 / 64.19 / 53.18 / 57.14, same-machine 0.424 s vs 8.257 ms, 51x). The auditor's own preamble
+    concedes the live repo has moved past the ZIP. Lesson (recurring): reviews must be issued against HEAD
+    tags, not stale archives.
+
+(2) Reconciliation nonetheless executed as demanded - every headline value is now pinned to committed
+    artifacts in scripts/reproduce_headline.py: baselines (random 53.178 / zero 53.076 / no-RIS 42.769 /
+    best-of-200 57.145), AO 64.193 (+rate provenance: 500 ch, channel_seed 2000), unfolding 62.532, PG twin
+    63.790, AO/random 1.207, same-machine latency quartet, quantization, closed-form full-CSI 56.944, the
+    PARTIAL-OBSERVATION five-seed aggregates for all six families (53.217/53.080/53.082/53.142/53.166/53.181)
+    re-scored from the raw per-seed eval_rates.json, and the full-CSI five-seed family means + Wilcoxon p's.
+    Run: ALL VERIFIED, 34 checks.
+
+(3) Contextual-bandit simplification: all four agents (sac/td3/ddpg/dqn_codebook) now hard-set gamma = 1.0
+    with the DD-007 terminal-transition note at the target computation (y = r + gamma*(1-d)*q, d=1 => y=r);
+    configurable discount removed from the agent init path. The paper already states the T=1 bandit in
+    sec1/4b/5c.
+
+(4) Reference coverage note in README updated to 19/19 (crossref_check.py verifies all entries incl. the
+    three revision surveys; ALL ENTRIES VERIFIED).
+
+(5) Scope hygiene confirmed in-repo: sec3_system_model states mmWave/sub-THz frequency-dependent effects are
+    outside the generator's scope; no 6G/mmWave performance claim exists in the paper or README; all reported
+    spreads are labeled SD (no SEM anywhere in the paper text).
+

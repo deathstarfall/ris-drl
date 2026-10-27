@@ -38,7 +38,10 @@ class DDPG:
         self.critic_t = deepcopy(self.critic)
         self.opt_a = torch.optim.Adam(self.actor.parameters(), lr=cfg["lr_actor"])
         self.opt_c = torch.optim.Adam(self.critic.parameters(), lr=cfg["lr_critic"])
-        self.gamma = float(cfg.get("gamma", 1.0))
+        # DD-007: T=1 contextual bandit - every transition is terminal, the
+        # bootstrap term never fires ((1 - d) = 0), so the target degenerates
+        # to y = r regardless of this value. Kept explicit for clarity.
+        self.gamma = 1.0
         self.tau = float(cfg.get("tau", 0.005))
         self.expl_noise = float(cfg.get("expl_noise", 0.1))
         # buffer handled by base via train_runner? train_runner stores via agent.store; better attach

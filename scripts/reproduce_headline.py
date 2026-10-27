@@ -59,7 +59,18 @@ b = json.load(open("results/bits_sweep.json"))
 check("AO@2bit", b["mean_rate_by_method"]["ao"][0], 63.217)
 check("unfolding@2bit", b["mean_rate_by_method"]["unfolding"][0], 61.567, tol=0.02)
 
-# full-CSI campaign families (best + a floor check) with paired Wilcoxon stats
+# closed-form full-CSI no-learning anchor (round-2 matched baseline)
+cf = np.array(json.load(open("results/baselines/closed_form_full_csi.json"))["rates"])
+check("closed-form full-CSI mean", np.mean(cf), 56.944, tol=0.02)
+
+# partial-observation campaign: all 6 families x 5 seeds re-scored from per-seed artifacts
+PART = {"sac": 53.217, "td3": 53.080, "ddpg": 53.082,
+        "dqn_b2": 53.142, "dqn_b3": 53.166, "dqn_b4": 53.181}
+for fam, want in PART.items():
+    seeds = [np.mean(json.load(open(f"results/{fam}/seed{s}/eval_rates.json"))["rates"]) for s in range(5)]
+    check(f"partial-obs {fam} (5-seed mean)", float(np.mean(seeds)), want, tol=0.02)
+
+# full-CSI campaign families (all six) with paired Wilcoxon stats with paired Wilcoxon stats
 WILCOXON_WANT = {"sac": 0.262, "td3": 0.531, "ddpg": 0.433,
                  "dqn_b2": 0.159, "dqn_b3": 0.276, "dqn_b4": 0.517}
 try:

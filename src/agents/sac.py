@@ -48,7 +48,7 @@ class SAC:
         self.opt_p = torch.optim.Adam(self.policy.parameters(), lr=cfg["lr_actor"])
         self.opt_q1 = torch.optim.Adam(self.q1.parameters(), lr=cfg["lr_critic"])
         self.opt_q2 = torch.optim.Adam(self.q2.parameters(), lr=cfg["lr_critic"])
-        self.gamma = float(cfg.get("gamma", 1.0))
+                # DD-007: T=1 contextual bandit - every transition is terminal, the`n        # bootstrap term never fires ((1 - d) = 0), so the target degenerates`n        # to y = r regardless of this value. Kept explicit for clarity.`n        self.gamma = 1.0
         self.tau = float(cfg.get("tau", 0.005))
         self.alpha_auto = bool(cfg.get("alpha_auto", True))
         self.target_entropy = -float(act_dim)
@@ -160,3 +160,4 @@ class SAC:
             self.log_alpha = sd["log_alpha"].to(self.device).requires_grad_(True)
             self.opt_alpha = torch.optim.Adam([self.log_alpha], lr=self.cfg.get("lr_alpha", 3e-4))
         if sd.get("norm") and self.norm: self.norm.load_state_dict(sd["norm"])
+

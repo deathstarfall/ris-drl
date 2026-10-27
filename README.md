@@ -36,7 +36,7 @@ artifact-informational, never published).
 paper/            LaTeX source (main.tex + sections/); figures in paper/figs
 scripts/          experiment runners + figure/table generators
 src/              Riemannian AO + unfolding (ao_riemannian.py, unfolding.py)
-tests/            pytest suite (19 tests: gradient/shape/latency invariants)
+tests/            pytest suite (20 tests: gradient/shape/latency invariants)
 results/          ALL committed raw JSON/NPZ artifacts paper numbers derive from
 docs/             design_decisions.md, sec6-diagnosis.md, math notes
 data/             train/test/gen channel tensors (committed .npz)
@@ -71,7 +71,7 @@ python scripts/make_all_figures.py
 #5 PDF
 cd paper
 pdflatex main.tex; bibtex main; pdflatex main.tex; pdflatex main.tex
-python paper/crossref_check.py    # run from repo root; ALL ENTRIES VERIFIED (16/16)
+python paper/crossref_check.py    # run from repo root; ALL ENTRIES VERIFIED (19/19 incl. the three revision surveys)
 ```
 
 ## Submission gates (kept for future releases)
@@ -150,3 +150,4 @@ python paper/crossref_check.py    # run from repo root; ALL ENTRIES VERIFIED (16
 
 Maintainers: Ayansh (integration), Balraj (AO/unfolding lanes), Shreyansh
 (DRL + diagnosis note).
+

@@ -40,7 +40,7 @@ class DQNCodebook:
         self.q = NHeadDQN(obs_dim, N, self.num_actions).to(self.device)
         self.q_t = deepcopy(self.q)
         self.opt = torch.optim.Adam(self.q.parameters(), lr=cfg["lr"])
-        self.gamma = float(cfg.get("gamma", 1.0))
+                # DD-007: T=1 contextual bandit - every transition is terminal, the`n        # bootstrap term never fires ((1 - d) = 0), so the target degenerates`n        # to y = r regardless of this value. Kept explicit for clarity.`n        self.gamma = 1.0
         self.target_update = int(cfg.get("target_update", 1000))
         self.eps_start = float(cfg.get("eps_start", 1.0))
         self.eps_end = float(cfg.get("eps_end", 0.05))
@@ -142,3 +142,4 @@ class DQNCodebook:
         if sd.get("codebook") is not None:
             self.codebook = np.array(sd["codebook"])
         if sd.get("bits"): self.bits = int(sd["bits"]); self.num_actions = 2 ** self.bits
+
