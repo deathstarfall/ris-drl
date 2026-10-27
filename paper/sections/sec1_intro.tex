@@ -64,10 +64,15 @@ quantization sweep at 2/3/4-bit phase codebooks (\S\ref{sec:results-ao}).
 architectures $\times$ five seeds of SAC/TD3/DDPG/coded-codebook
 DQN trains inherit zero positive mean gain over random on the frozen
 test set ($\Delta \in [-0.10,+0.04]$ bps/Hz, all $p \geq 0.37$,
-\S\ref{sec:results-drl}); the study reports this outcome rather than
+\S\ref{sec:results-drl}); a follow-up full-observation campaign that
+retrains all thirty checkpoints with complete channel-phase access
+reproduces the null to within $+0.03$~bps/Hz of the floor, so the
+result reflects the learning problem, not the observation design. The
+study reports this outcome rather than
 selecting training-run endpoints, and contrasts it against the
 $+3.97$~bps/Hz obtainable from a simple 200-draw random oracle,
-isolating \emph{learned structure}---not sample count---as the
+isolating \emph{learned structure}---not sample count, not information
+access---as the
 difference-maker.
 \end{enumerate}
 

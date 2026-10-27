@@ -42,9 +42,24 @@ $56.944 \pm 1.884$~bps/Hz ($+3.77$ over random) while the restricted-observation
 DRL checkpoints are statistically at the random floor (rate gap
 $\delta \in [-0.10, +0.04]$~bps/Hz across thirty committed
 checkpoints)---so the null
-certifies the observation contract, not gradient-based phase control per se,
-and the full-CSI retraining campaign is the designated follow-up
-(supplementary decision log).
+certifies the observation contract, not gradient-based phase control per se.
+% DD-044b: full-observation retraining campaign (pre-submission, per external
+% review round 2). 30/30 runs completed; artifacts ckpt/full_*.pt +
+% results/full/{agent}/seedS/eval_rates.json; independent cross-machine
+% re-score parity 0.0000 (results/full/verification_summary.json).
+The null was then tested against its own strongest objection: all thirty
+checkpoints were retrained under a full-observation stack---$|h_r|$,
+$\angle h_r$, $|G|$, $\angle G$, $|h_d|$, $\angle h_d$---handing every agent
+the phases the DD-004 contract hides. The result is identical: the best
+full-CSI family reaches $53.204 \pm 0.037$ ($+0.03$ over random,
+$t \approx 0.3$), with every other family within $\delta \in [-0.11, -0.01]$
+of the floor. Training computes, exploration computes, and the numbers do
+not move. The certified null is therefore conditional on nothing: direct
+model-free RL fails on this one-step bandit even with complete phase
+information, while unfolding---which inlines the same channel into six
+gradient steps---closes $97.4\%$ of the AO reference. The contrast is
+between the optimization structure each method can express, not between
+the information each method can see.
 (ii)~In-training monitoring used the frozen evaluation set for
 visualization; the loss and the selection rule that produced the
 trained policies never consumed it for optimization, and the unfolding

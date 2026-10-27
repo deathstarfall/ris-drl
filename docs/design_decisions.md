@@ -278,3 +278,26 @@ certified partial campaign. Report both outcomes honestly: if the full-CSI agent
 headline null strengthens to "DRL fails even with full CSI"; if they beat random, the paper's qualification (i)
 expands into a result. No prediction logged; numbers only from committed artifacts per DD-018.
 
+
+DD-044b (full-CSI campaign complete - null made unconditional; paper re-headlined): Shreyansh executed the DD-044a
+pre-submission campaign overnight on his machine: 30/30 train+eval pairs completed, 0 obs_dim violations (all
+checkpoints trained and evaluated at the full 1600-value observation), git HEAD 7cfeba6 contract fixes verified in the
+run log. Campaign result: every family remains statistically AT the random floor even with complete phase access -
+family means over 5 seeds: SAC 53.164+/-0.129, TD3 53.086+/-0.011, DDPG 53.065+/-0.035, DQN-2bit 53.153+/-0.083,
+DQN-3bit 53.164+/-0.071, DQN-4bit 53.204+/-0.037 (best), vs floor 53.178. Best family paired per-channel delta vs
+random: +0.026 bps/Hz, t=0.29 (n=500 seed-averaged) - statistically zero. Range across other families delta in
+[-0.11,-0.01]. Independent verification (Ayansh, scripts/verify_full_csi.py): seed-0 of every family re-scored from
+ckpt/full_* through build_policy_fn(obs_mode=full) reproduces Shreyansh's committed eval_rates.json to |delta|=0.0000
+on all six - cross-machine determinism confirmed. Artifacts committed under results/full/ and ckpt/full_*.pt (30) +
+results/full/verification_summary.json + morning_report.md/audit in logs/full_csi_overnight/. Certified v1.0.1
+partial campaign untouched (verified by merge scope).
+
+Paper re-headline (all sections): abstract now states the null survives removal of every stated caveat and certifies
+the learning problem itself, not the observation contract; sec1 intro bullet adds the campaign (+0.03 of floor, not
+sample count nor information access is the difference-maker); sec5c qualification (i) declares the null conditional on
+nothing - full-phase checkpoints reproduce the floor, contrast is optimization STRUCTURE not information; sec7
+conclusion upgraded to sixty training runs + stale corrected numbers landed (97.4%/1.3 ms replaced the outdated
+94.8%/8.2 ms); docx abstract/discussion/conclusion synced. Status of the two open positions from DD-044a: both
+resolved in favor of the stronger headline, with the observation-contract qualification still disclosed as protocol
+history rather than an open caveat.
+

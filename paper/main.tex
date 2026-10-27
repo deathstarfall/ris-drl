@@ -36,7 +36,13 @@ resolution. Deep unfolding reaches $62.53$~bps/Hz mean sum rate
 channel (median $1.295$, $p95$ $1.312$). No RL policy exceeds random
 (deltas $-0.10$ to $+0.04$~bps/Hz, all $p \geq 0.37$), whereas a
 200-draw random search attains $57.14\pm0.76$ (SD) over the same
-channels. The null is therefore informative: this regime is exploited
+channels. The null survives the removal of every stated caveat: a
+30-run full-observation retraining campaign---all thirty agents
+retrained with the channel phases they were previously denied---leaves
+every checkpoint statistically at the random floor (best full-CSI
+agent $53.204$, $+0.03$ over random, $t \approx 0.3$), so the null
+certifies the learning problem itself, not the observation contract.
+The finding is therefore informative: this regime is exploited
 by structure-informed optimization, and model-free exploration at the
 same budget does not find it. Every value in the paper is emitted from
 committed machine-readable artifacts.

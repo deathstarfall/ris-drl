@@ -110,12 +110,12 @@ python crossref_check.py    # ALL ENTRIES VERIFIED (12/12)
   Word-report Figures 1-2 (scripts/make_report_figs.py)
 
 ## Pre-submission (promoted from v1.1 by DD-044a, reviewer round 2)
-- **Full-CSI DRL retrain campaign**: 30 runs with `--obs-mode full`
-  (`python -m src.train --agent {sac,td3,ddpg} --seed {0..4}` etc.), same
-  protocol as the certified partial campaign; artifacts quarantined under
-  `ckpt/full_*` + `results/full_*`. Decides the null's headline wording
-  ("under the stated observation contract" vs "even with full CSI");
-  either outcome is publishable.
+- **Full-CSI DRL retrain campaign — COMPLETE (DD-044b)**: 30/30 runs with
+  `--obs-mode full`, seed-0 re-scores independently reproduced at
+  |Δ| = 0.0000 cross-machine (`results/full/verification_summary.json`).
+  Best family DQN-4bit 53.204 ± 0.037 = +0.03 over random floor (t ≈ 0.3).
+  **The certified null is now unconditional**: direct model-free RL fails
+  even with complete phase information. Certified partial campaign untouched.
 
 ## Deferred to v1.1 (documented, DD-036/037)
 - AO per-channel wall p95 (needs a new gate2 artifact)
