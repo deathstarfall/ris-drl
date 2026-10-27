@@ -1,0 +1,22 @@
+{
+  "protocol": "DD-048 same-machine serialized single-solve wall clocks on one idle desktop CPU: AO (iters<=200, tol=1e-4 frozen gate settings), unfolding trained and untrained forward passes, batch 1, complex128; AO rate determinism checked against results/ao/ao_test_channels.json.",
+  "machine_note": "TIMES ARE MACHINE-SPECIFIC; only same-machine ratios are publishable.",
+  "n_channels": 500,
+  "ao_time_s": {
+    "median": 0.4240426500000041,
+    "mean": 0.444332194,
+    "p95": 0.694805080000001
+  },
+  "unfold_trained_ms": {
+    "median": 8.25664999999276,
+    "mean": 8.24359020000037,
+    "p95": 10.076010000014435
+  },
+  "unfold_untrained_ms": {
+    "median": 8.346799999998211,
+    "mean": 8.301697399999851
+  },
+  "ratio_ao_over_unfold_trained": 51.35771166276588,
+  "ao_iters_vs_unfold_layers": "median AO iterations / L=6 layers",
+  "ao_rate_determinism_max_abs_diff_vs_frozen": 0.0
+}

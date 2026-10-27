@@ -46,7 +46,7 @@ $\boldsymbol{z} = \boldsymbol{1}$.
 \providecommand{\RandomSD}{1.956}
 \providecommand{\AOpercentAboveRandom}{100.0}
 \providecommand{\AOMedianIters}{193}
-\providecommand{\AOMedianTimeS}{1.352}
+\providecommand{\AOMedianTimeS}{0.424}   % DD-048: same-machine idle serial protocol (contended-run 1.352 s retired, disclosed)
 \providecommand{\AOpercentTolHit}{54.2}
 On the frozen $500$-channel test set the reference achieves
 $\AOMeanRate{} \pm \AOMeanSD{}$~bps/Hz (SD, $n{=}500$) against
@@ -84,10 +84,12 @@ artifact). The curve saturates at the 200-iteration/tolerance floor
 \providecommand{\UnfoldMeanRate}{62.532}
 \providecommand{\UnfoldSD}{0.853}
 \providecommand{\UnfoldGapToAO}{97.41}
-\providecommand{\UnfoldLatencyMedianMS}{1.295}
-\providecommand{\UnfoldLatencyMeanMS}{1.298}
-\providecommand{\UnfoldLatencyP95MS}{1.312}
-\providecommand{\UnfoldVsAOLatencyRatio}{1044}
+\providecommand{\UnfoldLatencyMedianMS}{8.257}   % DD-048 same-machine protocol
+\providecommand{\UnfoldLatencyMeanMS}{8.244}     % DD-048 same-machine protocol
+\providecommand{\UnfoldLatencyP95MS}{10.076}     % DD-048 same-machine protocol
+\providecommand{\UnfoldVsAOLatencyRatio}{51.4}   % DD-048 same-machine ratio (replaces cross-machine 1044x)
+\providecommand{\SameMachineAOMedianS}{0.424}    % DD-048
+\providecommand{\SameMachineUnfoldMS}{8.257}     % DD-048
 \providecommand{\RateLossMeanRate}{62.532}
 \providecommand{\CircularLossMeanRate}{61.860}
 \providecommand{\MSEnaLossMeanRate}{59.327}
@@ -96,19 +98,34 @@ the frozen test set---attaining \UnfoldGapToAO{}\% of the AO reference
 (shortfall $2.6\%$, criterion: shortfall $\leq 10\%$)---while deciding in a median of
 \UnfoldLatencyMedianMS{}~ms per channel (mean \UnfoldLatencyMeanMS{}~ms, $p95$:
 \UnfoldLatencyP95MS{}~ms), a $\UnfoldVsAOLatencyRatio{}\times$ speed-up over
-the reference, on identical channels, budgets, and seeds. All latency
-figures refer to the protocol's per-channel evaluation pass (supplementary
-decision log, artifacts \texttt{unfold\_rates.json}): one
-channel per batch decision, torch complex128 arithmetic on a desktop-class
-CPU, recorded for all 500 frozen channels
-(supplementary decision log: the in-training monitoring latencies and the
-retired float32 bench are disclosed as benchmarks, not headline numbers).
+the reference, on identical channels, budgets, and seeds.
+% DD-048 (external review round 6): all latency figures below are from ONE
+% same-machine protocol run on one idle desktop CPU (serialized single-solve
+% wall clocks; AO iters<=200 tol=1e-4 frozen gate settings; AO rates
+% determinism-checked 0.0 vs the frozen artifact; trained AND untrained
+% unfolding timed as a protocol control -- identical graphs, 8.26 vs 8.35 ms).
+% Cross-machine figures from earlier commits (AO 1.352 s under worker
+% contention; unfolding 1.295 ms deployment machine) are retained in the
+% artifacts for provenance and are NOT used for ratios.
+(artifacts \texttt{results/unfold/latency\_common\_protocol.json}, protocol:
+one channel per batch decision, torch complex128 arithmetic, one idle desktop
+CPU for ALL methods; supplementary decision log discloses the retired
+float32 dev bench and the contended AO timings).
 % DD-044 matched-discipline baselines (external-review round 2), artifacts:
 %   results/unfold/unfold_untrained_pg6.json  (untrained L=6 forward pass)
 %   results/baselines/closed_form_full_csi.json (no-learning full-phase policy)
 %   results/ao/snr_summary.json (per-user SNR under ZF)
+% DD-048: decomposition replaces the "175x per solver step" arithmetic error
+% (1044/6). Same-machine numbers: AO 0.424 s / median 193 iterations =
+% 2.196 ms per iteration; unfolding 8.257 ms / 6 layers = 1.376 ms per layer;
+% 193/6 = 32.2 (fewer iterations) x 1.60 (cost per operation) = 51.4.
 The latency ratio is an architecture ratio (six unrolled layers versus a
-200-iteration solver), not a matched-compute claim; we therefore report two
+median-$193$-iteration solver), not a matched-compute claim; the
+$\UnfoldVsAOLatencyRatio{}\times$ same-machine figure decomposes as
+$(\AOMedianIters{}/6) \approx 32\times$ from the iteration budget times
+$\approx 1.6\times$ from cheaper per-iteration operations
+($0.424$~s$/193 \approx 2.2$~ms per AO iteration versus
+$8.257$~ms$/6 \approx 1.4$~ms per unrolled layer). We therefore report two
 matched-discipline baselines. First, an \emph{untrained} forward pass of the
 same six-layer network (default step sizes, no optimization) already reaches
 $59.390$~bps/Hz on the frozen test set: the fixed gradient-ascent structure
@@ -117,15 +134,20 @@ $+3.14$~bps/Hz. Second, per-user link conditions are noise-limited: the mean
 post-ZF SNR is $39.9$~dB at random phases and $48.3$~dB under the AO phases
 ($\sigma^2=-107$~dBm; SINR~$=$~SNR under ZF), so the RIS phase vector is the
 controllable degree of freedom.
-% DD-045 (external review round 3): latency-protocol clarification. All
-% per-channel latency figures in this paper (AO 1.352 s median, unfolding
-% 1.295 ms median) are SERIALIZED single-solve wall clocks measured the same
-% way on one desktop CPU; the AO verdict file's "wall time" line is the
-% multi-worker parallel elapsed time and is not a per-channel figure.
-All latency figures are serialized single-solve per-channel wall clocks
-measured on one desktop CPU under one protocol; the AO run's total elapsed
-time (multi-worker) is not a per-channel figure. The $\UnfoldVsAOLatencyRatio{}\times$
-figure therefore compares like with like ($1.352$~s vs $1.295$~ms).
+% DD-045 (external review round 3) + DD-048 (round 6): all publishable
+% latency figures come from the DD-048 SAME-MACHINE idle protocol
+% (results/unfold/latency_common_protocol.json): AO 0.424 s median,
+% unfolding 8.257 ms median, ratio 51.4x. The earlier committed figures
+% (AO 1.352 s recorded under 4-worker contention; unfolding 1.295 ms on a
+% different deployment machine) and the derived cross-machine "1044x" are
+% retired from headline use and disclosed as machine-specific provenance.
+All publishable latency figures are serialized single-solve per-channel wall
+clocks measured in one process on one idle desktop CPU, with trained and
+untrained unfolding timed as control (identical graphs, $8.26$ vs $8.35$~ms).
+The $\UnfoldVsAOLatencyRatio{}\times$ figure therefore compares like with
+like ($0.424$~s vs $8.257$~ms); the retired cross-machine ratio ($1044\times$)
+and contended AO timing ($1.352$~s) are disclosed in the supplementary
+decision log and are not used for any paper ratio.
 The loss-ablation table
 confirms the design correction quantitatively (all three losses retrained
 under the audited train/validation protocol at the winning learning rate

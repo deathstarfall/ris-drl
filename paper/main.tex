@@ -32,16 +32,23 @@ policies spanning SAC, TD3, DDPG, and codebook-DQN at 2--4-bit phase
 resolution. Deep unfolding reaches $62.53$~bps/Hz mean sum rate
 (SD $0.85$), $2.6\%$ short of the Riemannian AO reference
 ($64.19\pm0.58$, SD) and $9.35$~bps/Hz above the random baseline
-($53.18$; $p=1.3\times10^{-83}$), while deciding in about $1.3$~ms per
-channel (median $1.295$, $p95$ $1.312$). No RL policy exceeds random
+($53.18$; $p=1.3\times10^{-83}$); on one common idle machine the AO
+solver spends a median of $0.424$~s per channel against $8.26$~ms for
+one unfolding decision---a $51\times$ latency advantage ($\approx
+32\times$ from the $193$-versus-$6$ iteration budget, $\approx 1.6\times$
+from per-operation cost; committed deployment-machine figures are
+disclosed separately). No RL policy exceeds random
 (deltas $-0.10$ to $+0.04$~bps/Hz, all $p \geq 0.37$), whereas a
 200-draw random search attains $57.14\pm0.76$ (SD) over the same
 channels. The null survives the removal of every stated caveat: a
 30-run full-observation retraining campaign---all thirty agents
 retrained with the channel phases they were previously denied---leaves
 every checkpoint statistically at the random floor (best full-CSI
-agent $53.204$, $+0.03$ over random, $t \approx 0.3$), so the null
-certifies the learning problem itself, not the observation contract.
+agent $53.204$, $+0.03$ over random, $t \approx 0.3$), while a
+no-learning closed-form full-CSI policy reaches $56.944$ ($+3.77$) on
+the same channels, so under these budgets and default hyperparameters the
+DRL configurations fail to learn rather than fail for lack of
+information.
 The finding is therefore informative: this regime is exploited
 by structure-informed optimization, and model-free exploration at the
 same budget does not find it. Every value in the paper is emitted from

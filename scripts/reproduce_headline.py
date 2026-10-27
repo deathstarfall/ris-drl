@@ -44,6 +44,16 @@ ratio = float(np.mean(ao["rates"])) / float(np.mean(
     json.load(open("results/baselines/random/eval_rates.json"))["rates"]))
 check("AO/random ratio", ratio, 1.207)
 
+# DD-048 same-machine latency protocol (results/unfold/latency_common_protocol.json)
+try:
+    lp = json.load(open("results/unfold/latency_common_protocol.json"))
+    check("same-machine AO median (s)", lp["ao_time_s"]["median"], 0.424, tol=0.02)
+    check("same-machine unfolding trained median (ms)", lp["unfold_trained_ms"]["median"], 8.257, tol=0.5)
+    check("same-machine unfolding untrained control (ms)", lp["unfold_untrained_ms"]["median"], 8.347, tol=0.5)
+    check("same-machine latency ratio", lp["ratio_ao_over_unfold_trained"], 51.358, tol=2.0)
+except Exception as e:
+    print("  [SKIP] same-machine latency checks unavailable:", e)
+
 # quantization sweep
 b = json.load(open("results/bits_sweep.json"))
 check("AO@2bit", b["mean_rate_by_method"]["ao"][0], 63.217)

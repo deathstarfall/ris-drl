@@ -1,8 +1,10 @@
 # RIS-DRL 2.0 - RIS Sum-Rate Study (frozen-protocol)
 
 **One-line summary:** deep unfolding closes **97.41 %** of the Riemannian AO
-sum-rate reference at **1044x lower wall-time** (DD-041 audited train/validation
-protocol, re-certified under the DD-043 corrected ZF pairing), while a
+sum-rate reference at a **~51x same-machine latency advantage** (DD-048
+protocol: 0.424 s per AO solve vs 8.26 ms per unfolding decision, serialized
+single-solve wall clocks on one idle desktop CPU; DD-041 audited
+train/validation protocol; DD-043 corrected ZF pairing), while a
 multi-seed DRL
 campaign establishes a **null result** (DRL ~ random) -- shipped as paper tag
 `v1.0.1-paper` (quality pass DD-037, v1.0.2).
@@ -17,8 +19,8 @@ campaign establishes a **null result** (DRL ~ random) -- shipped as paper tag
 
 | Method | Test rate (bps/Hz) | Notes |
 |---|---|---|
-| Riemannian AO (reference) | **64.193 +/- 0.582 (SD, n=500)** | median 1.352 s/channel; strong local solution, not an upper bound (45.8 % of channels stop at the 200-iter cap) |
-| Deep unfolding (L=6, lr 0.03) | **62.532 +/- 0.853 (SD)** | 97.41 % of AO reference; 1.295 ms median (mean 1.298, p95 1.312, per-channel DD-009; DD-041 protocol); **1044x speed-up** |
+| Riemannian AO (reference) | **64.193 +/- 0.582 (SD, n=500)** | median 0.424 s/channel under the DD-048 same-machine idle protocol (contended-run 1.352 s retired); strong local solution, not an upper bound (45.8 % of channels stop at the 200-iter cap) |
+| Deep unfolding (L=6, lr 0.03) | **62.532 +/- 0.853 (SD)** | 97.41 % of AO reference; 8.257 ms median (p95 10.08, DD-048 same-machine; trained == untrained 8.35 ms control); **~51x speed-up = 32x fewer iterations x 1.6x cheaper per operation** |
 | Deep unfolding, 5-seed protocol breadth | 62.526 +/- 0.041 | protocol-breadth number, not the headline |
 | Best-of-200 random | 57.145 +/- 0.764 (SD) | exploitable headroom exists |
 | Random phase | **53.178** (frozen baseline, n=500) | |
@@ -98,8 +100,18 @@ python paper/crossref_check.py    # run from repo root; ALL ENTRIES VERIFIED (16
 - `v1.0-paper` - pre-release, superseded
 
 ## Artifacts <-> paper map
-- `results/ao/gate2_verdict.txt` -> AO block + G3 latency row (DD-037: AO
-  1352 ms vs unfolding 1.295 ms median = 1044x, DD-009 per-channel)
+- `results/ao/gate2_verdict.txt` -> AO block + G3 latency row (DD-037;
+  the committed per-channel AO timing there was recorded under 4-worker CPU
+  contention - superseded for latency claims by DD-048, kept for rates)
+- `results/ao_rerun_serial/` -> DD-048 idle single-worker full gate re-run
+  (500 ch): per-channel AO median 0.376 s / p95 0.644 s, verdict PASS with
+  p95 line; aggregates identical to the canonical set
+- `results/unfold/latency_common_protocol.json` -> DD-048 SAME-MACHINE
+  protocol (one process, one idle CPU, AO rates determinism-checked 0.0 vs
+  frozen): AO 0.424 s median, unfolding trained 8.257 ms / untrained 8.347 ms
+  control, ratio 51.4x = 32 iterations-ratio x 1.6 per-op ratio; the
+  cross-machine pair (AO 1352 ms contended, unfolding 1295 ms deployment
+  machine) and its 1044x quotient are retired from headline use
 - `results/ao/ao_test_channels.(json|npz)` -> AO mean/sd, per-channel (AO wins
   100.0 % of channels vs frozen random)
 - `results/ao/ao_test_channels_history.npz` -> AO convergence figure

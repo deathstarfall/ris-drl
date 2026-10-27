@@ -395,3 +395,57 @@ DD-047 (external review round 5 - report polish + full-CSI statistical table + s
     VERIFIED, pytest 20/20, datasets regenerate bit-exact). No further repo change needed this round; the auditor's
     remaining gap is execution on their side, now covered by scripts/reproduce_headline.py.
 
+
+
+
+DD-048 (external review round 6 - common-footing latency protocol, obs-size fix, narrow null, report repair):
+
+(1) LATENCY HEADLINE CHANGED: the published 1044x quotient was a cross-machine ratio - the AO per-channel
+    time (1.352 s) was recorded inside a 4-worker parallel run on one desktop (per-channel clocks consumed
+    that CPU under contention) while the 1.295 ms unfolding figure came from a different deployment machine.
+    Rerun on ONE idle desktop, one process, serialized single-solve wall clocks
+    (scripts/latency_common_protocol.py, artifacts results/unfold/latency_common_protocol.json +
+    results/ao_rerun_serial/ full SERIAL gate re-run, workers=1, p95 archived, AO rates
+    determinism-checked 0.0 vs the frozen artifact):
+        AO modal median 0.424 s (serial gate re-run: 0.376 s), p95 0.695 s;
+        unfolding trained 8.257 ms median (p95 10.08); untrained control 8.347 ms (identical graph - the
+        earlier 10x trained/untrained spread was a machine difference, not a protocol effect);
+        same-machine ratio 51.4x, decomposed as 193/6 = 32.2x iteration budget x ~1.6x per-operation cost
+        (2.2 ms per AO iteration vs 1.4 ms per unrolled layer) - replacing the reviewer-caught "175x per
+        solver step" arithmetic error (1044/6). The retired figures (1.352 s contended, 1.295 ms, 1044x)
+        remain in the committed artifacts for provenance and are disclosed in paper + report; paper macros
+        and report tables now use the DD-048 numbers.
+
+(2) OBSERVATION SIZE CORRECTED: the partial-CSI stack is 2x256 (|h_r|, angle h_r) + 512 (|G| magnitudes) +
+    32 (|h_d| magnitudes) = 1,056 real values; the full observation is 1,600 (adds angle G 512 + angle
+    h_d 32). The report said 256 -> 1600 in four places (abstract, 3.2, 3.3, 5, Table 11 caption); all
+    fixed. The paper used no absolute size (checked); Figure 1 regenerated to show the input asymmetry
+    (DRL consumes the 1,056-real partial stack, unfolding/AO consume full CSI).
+
+(3) NULL NARROWED (report + paper): "certifies the learning problem itself" / "unconditional" / the
+    symmetric "certified outcome" wording replaced by configuration-level statements: under these budgets
+    (1,500 train channels, 200k steps, one scalar reward per 64-dim action, default hyperparameters) these
+    DRL configurations FAIL TO LEARN while a no-learning closed-form full-CSI policy reaches 56.944
+    (+3.77, p < 0.001). Table 11 gains two no-learning anchor rows: all-zero phases 53.076 (-0.102,
+    p = 0.51) and the closed-form full-CSI policy; a disclosure notes that TD3/DDPG sit at the all-zero
+    level (53.07-53.09) and that the seed-averaged Wilcoxon tests hide the seed-level shortfall of the
+    weakest families.
+
+(4) TABLE 7 (report hyperparameter table) reconciled to checkpoint configs (ckpt/*_seed0.pt cfg +
+    configs/dqn.yaml): SAC column replay 100,000 -> 300,000, critic lr 3e-4 -> Actor 3e-4 + critic 1e-3;
+    NEW TD3 column (buffer 300k, batch 256, actor 3e-4 / critic 1e-3, sigma 0.1, target smoothing) and
+    NEW DQN column (lr 3e-4, target sync 1,000, eps-greedy 1.0 -> 0.05 decay 100k, Huber 1.0).
+
+(5) REPORT REPAIR: title "xx" prefix stripped; duplicated abstract sentence fixed; abstract process notes
+    moved to body; Table 6 caption moved ABOVE its table (was detached); broken "()" caption placeholders
+    cleaned; Table 1 caption fixed; Section 2 verified-corpus claim softened; "as described in earlier
+    drafts" residue checked (already gone in the current file - auditor stale copy); Table 11 borders
+    forced; refs [17]-[19] added and entity-verified on Crossref (M. Tariq / S. Ahmad / M. A. Jan / H.
+    Song, ACM CSUR 57(3), doi 10.1145/3696414; K. M. Faisal / W. Choi, IEEE Access 10, doi
+    10.1109/ACCESS.2022.3157651; A. A. Puspitasari / B. M. Lee, Sensors 23(5):2554, doi
+    10.3390/s23052554); intro testbed sentence now cites [8], [17]; affiliation de-scoped to plain VIT;
+    corresponding e-mail in report front matter.
+
+(6) reproduce_headline.py extended with the DD-048 same-machine latency checks + full-CSI Wilcoxon p pins
+    (run: ALL VERIFIED, 25 checks).
+

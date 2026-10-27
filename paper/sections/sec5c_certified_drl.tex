@@ -41,8 +41,9 @@ policy with \emph{full} phase access on the same frozen channels: it reaches
 $56.944 \pm 1.884$~bps/Hz ($+3.77$ over random) while the restricted-observation
 DRL checkpoints are statistically at the random floor (rate gap
 $\delta \in [-0.10, +0.04]$~bps/Hz across thirty committed
-checkpoints)---so the null
-certifies the observation contract, not gradient-based phase control per se.
+checkpoints)---so at the partial-observation stage an information-limited
+reading was still plausible; the full-observation retrain below rules it
+out for these configurations.
 % DD-044b: full-observation retraining campaign (pre-submission, per external
 % review round 2). 30/30 runs completed; artifacts ckpt/full_*.pt +
 % results/full/{agent}/seedS/eval_rates.json; independent cross-machine
@@ -53,8 +54,13 @@ $\angle h_r$, $|G|$, $\angle G$, $|h_d|$, $\angle h_d$---handing every agent
 the phases the DD-004 contract hides. The result is identical: the best
 full-CSI family reaches $53.204 \pm 0.037$ ($+0.03$ over random,
 $t \approx 0.3$), with every other family within $\delta \in [-0.11, -0.01]$
-of the floor. Training computes, exploration computes, and the numbers do
-not move. The certified null is therefore conditional on nothing: direct
+of the floor. TD3 and DDPG sit at $53.07$--$53.09$~bps/Hz, essentially the
+all-zero-phase value $53.076$ (they collapse toward a static policy, and the
+seed-averaged Wilcoxon tests in Table~\ref{tab:certified-drl} hide that
+seed-level shortfall; we note it here as disclosed). Training computes,
+exploration computes, and the numbers do not move. The null is therefore
+a configuration-level statement: under these budgets, this one-scalar
+reward and the default hyperparameters, direct
 model-free RL fails on this one-step bandit even with complete phase
 information, while unfolding---which inlines the same channel into six
 gradient steps---closes $97.4\%$ of the AO reference. The contrast is

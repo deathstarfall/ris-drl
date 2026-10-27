@@ -1,0 +1,15 @@
+================ G2 — AO BOUND GATE (Balraj) ================
+ channels evaluated      : 500  (N=64, from data\test_channels.npz)
+ AO mean rate            :   64.193 ± 0.582 bps/Hz
+ random mean rate        :   53.172 ± 0.636 bps/Hz   (mean of 200 draws/channel, seed 0)
+ best-of-200 mean rate   :   57.104 ± 0.757 bps/Hz
+ PG-twin mean rate       :   63.790 ± 0.658 bps/Hz   (AO/PG = 1.006)
+--------------------------------------------------------------
+ AO / random mean ratio  :    1.207    [criterion >= 1.15 (DD-043)]
+ AO > random per-channel :   100.0 %    [criterion == 100% (DD-043)]
+ iters to terminate       : median 193, max 200 (cap 200)    [criterion <= 200]
+ termination quality      : tol-hit  54.2 %  | numerical-stall  45.8 %  | ||rgrad|| at stop: median 9.91e-05, max 1.22e-01
+ wall time               : 193.3 s total [1 worker(s), parallel elapsed - NOT a per-channel figure] | per-channel median 0.376 s | p95 0.644 s   (per-channel timings are serialized single-solve wall clocks on one desktop CPU; that is the protocol used by every other latency number in the paper, DD-045)
+--------------------------------------------------------------
+ G2 VERDICT: PASS
+==============================================================

@@ -28,12 +28,24 @@ def arrow(a, b, rad=0.0):
     ax.add_patch(FancyArrowPatch((x1 + w1, y1 + h1 / 2), (x2, y2 + h2 / 2),
                                  connectionstyle=f"arc3,rad={rad}",
                                  arrowstyle="-|>", mutation_scale=12, color="#3a5a8c", lw=1.1))
-arrow(boxes[0], boxes[1], 0.15); arrow(boxes[0], boxes[2], -0.15); arrow(boxes[0], boxes[3])
+def arrow_lab(a, b, label, rad=0.0, dy=0.055):
+    """Arrow with a small label at the midpoint (visually distinguishes what each method consumes)."""
+    x1, y1, w1, h1, _ = a; x2, y2, w2, h2, _ = b
+    mx, my = (x1 + w1 + x2) / 2, (y1 + h1 / 2 + y2 + h2 / 2) / 2 + dy
+    ax.add_patch(FancyArrowPatch((x1 + w1, y1 + h1 / 2), (x2, y2 + h2 / 2),
+                                 connectionstyle=f"arc3,rad={rad}",
+                                 arrowstyle="-|>", mutation_scale=12, color="#3a5a8c", lw=1.1))
+    ax.text(mx, my, label, ha="center", va="center", fontsize=7.0, color="#a03030")
+OBS = "observes 1,056 reals\n(stress: 1,600)"
+arrow_lab(boxes[0], boxes[1], OBS, 0.15, dy=0.045)
+arrow_lab(boxes[0], boxes[2], OBS, -0.15, dy=-0.075)
+arrow_lab(boxes[0], boxes[3], "uses full CSI")
 for b in boxes[1:4]:
     arrow(b, boxes[4], 0.0)
 arrow(boxes[4], boxes[5])
-arrow(casc, boxes[5], -0.25)
-ax.text(0.5, 0.95, "All methods share one evaluation entry point, one frozen test set, one rate function",
+arrow_lab(casc, boxes[5], "uses full CSI", -0.25, dy=-0.085)
+ax.text(0.5, 0.95, "All methods share one evaluation entry point, one frozen test set, one rate function - "
+        "but not the same channel information",
         ha="center", fontsize=8.6, style="italic")
 plt.tight_layout()
 plt.savefig(os.path.join(OUT, "unified_framework.png"), dpi=200, bbox_inches="tight")

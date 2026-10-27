@@ -44,8 +44,9 @@ exactly this floor.
 Trained end-to-end on the rate \eqref{eq:lossrate}, the $L=6$ unrolled stepper
 reaches \UnfoldGapToAo\% of the AO rate on the frozen test set
 (trigger: $\le 10\,\%$), while its decision latency is
-\UnfoldLatencyMs\;ms per channel versus \AoWallMeanMs\;ms per channel for AO
-(both medians; per-channel AO wall p95 archiving is deferred). Loss ablations
+8.257~ms per channel versus 0.424~s per AO solve
+(DD-048 same-machine protocol: medians, one idle desktop CPU, serialized
+single-solve wall clocks; AO wall p95 0.695~s). Loss ablations
 (Table~\ref{tab:ablation}) reproduce the earlier failure mechanism exactly:
 training on the rate dominates; the circular loss lags slightly; the
 MSE-on-wrapped-angles objective collapses -- it optimizes an objective that
