@@ -834,3 +834,12 @@ Repair (scripts/docx_round17_repair.py + docx_round17b_fixtcw.py):
 LESSON (hard rule): never hand-append OOXML children; always use python-docx property
 setters (schema-order insertion) and verify by opening the real Word application before
 declaring any docx work done.
+
+## DD-060 --- Round 18: Table 7 restyled to match the other tables (2026-10-28)
+The round-13-created comparison table had inherited no formatting (docx default "Normal Table",
+no borders/shading/fixed layout), unlike the "Table Grid1"-styled results tables. Restyled via
+scripts/docx_round18_sync.py: style=Table Grid1, autofit=False, table-level single borders in
+correct tblPr order, bold+shaded (D9D9D9) header row with vAlign, grid unchanged at 6.63 in with
+the existing per-cell tcW widths.
+Real-Word COM verification (per DD-059 rule): opens with NO repair, 18 pages, 12 tables, 2
+inline figures, PDF re-export OK (report_check.pdf, 595 KB, previewed).
