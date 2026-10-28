@@ -881,3 +881,55 @@ PDF export OK (659 KB, previewed). Gates: pytest 20/20; reproduce_headline ALL V
 pdflatex 9 pages clean; crossref 27/27. Snapshot refreshed.
 Remaining (with team): fix 1 regime probe (Balraj), fix 2 positive-control probe (Shreyansh),
 fix 3 re-baseline numbers (AO@6/PG@6/constant-step) + FLOPs bench, then re-foot all numbers.
+
+## DD-064 --- Fix 3 COMPLETED: equal-compute rebaseline + latency variance + FLOPs (2026-10-28)
+Eval-only runs on this machine (scripts/fix3_rebaseline.py, artifact results/fix3/rebaseline.json):
+all methods limited to SIX iterations on the frozen 500-channel test set:
+- AO truncated @6:  61.578 +/- 0.749
+- PG (Armijo) @6:   59.390 +/- 0.810
+- constant-step PG @6, step alpha=3.0 (grid over 0.05..14 selected on the same
+  300-channel validation hold-out as the unfolding LR; optimum interior, tested
+  0.05-3.0 and 4-14): 62.412 +/- 0.743
+- learned step sizes (this network): 62.532 (existing)
+=> the trained network IS the best 6-iteration method, beating truncated AO by
++0.95 and the tuned constant step by +0.12 bps/Hz. The headline ratio is
+therefore dominated by iteration budget, not architecture - now stated in both
+docx (new Table 13) and paper.
+FLOPs (analytic, complex MACs): AO ~1.37 M/decision (193 x ~7.1k) vs network
+~28.5 k (6 x ~4.7k) => ~48x = 32x iterations x ~1.5x per-op.
+Latency: torch.enable_grad() in latency_common_protocol.py is CORRECT and
+there to stay - autograd is INTRINSIC (each unrolled layer is a gradient step;
+no_grad is not defined for this model). Independent same-protocol re-measure
+2026-10-28 (latency_common_protocol_rerun_2026-10-28.json): AO 0.340 s /
+8.39 ms / ratio 40.5x vs the frozen 0.424 s / 8.26 ms / 51.4x => same-machine
+ratio carries ~ +/-25% session variance; manuscript now quotes "order 40-50x"
+with both artifacts disclosed. Frozen committed artifact remains the primary
+(reproduce_headline unchanged). Paper grew to 10 pages.
+Gates: pytest 20/20, reproduce_headline ALL VERIFIED, pdflatex 10pp clean.
+Word-COM: 20 pages, 13 tables, 4 figures, no repair. Snapshot refreshed.
+
+## DD-065 --- Round 24: audit fixes applied to the TEAM'S HUMANIZED docx (2026-10-28)
+Context: the team produced a humanized rewrite of the report (AI-detection concern); my earlier
+"restore to snapshot" overwrote it (mea culpa, DD-062 covers the doc-side work on my rendered
+base only). The humanized file was recovered from OneDrive versions, snapshotted to
+backups/humanized_base_final.docx BEFORE any edit, then ALL fixes were applied surgically on
+the humanized text (scripts/docx_round24_surgical.py + docx_round24_phase2.py), touching only
+bug-carrying sentences per the user's instruction: rest of the humanized wording byte-untouched.
+
+Surgical fixes on the humanized base:
+- Fix 4: quantization losses 2.936/0.730/0.182 -> 0.976/0.243/0.061 (bits_sweep.json); over 70%
+  -> 91.1%; relative-loss rewording (1.54% vs 1.52%).
+- Fix 3: unfolding renamed L=6 unrolled PG with six learned step sizes; latency ratio now
+  "roughly 40-50x" with both protocol artifacts (51.4x frozen / 40.5x re-measure), equal-compute
+  + FLOPs (~48x) + autograd-intrinsic sentences appended; Table 13 inserted after Table 12;
+  conclusion and abstract-bullet ratios updated to 40-50x.
+- Fix 7: factored-DQN limitation sentence appended; Fix 8: HMY representation note appended;
+  Fix 6: training-curve composite + AO convergence figures inserted before 4.2 (Figures 2/3;
+  CSI figure + its in-text ref renumbered to Figure 4 - the only structural additions requested).
+- Jargon stripped from rendered prose (DD 002/041, artifact paths, decision log, repository
+  checker, retired pair, v1.1, Auditor Round 3) -> zero hits.
+Images 4, tables 13 (captions ordered 1-13), Word-COM verified: 20 pages, 9002 words, 13
+tables, 4 figures, no repair prompt; PDF exported (750 KB). Verified snapshots saved.
+Target file neighbors: backups/FINAL_Report_dd065_humanized.docx (post-fix humanized),
+backups/humanized_base_final.docx (pre-fix humanized), backups/Report_word_clean_2026-10-28.docx
+(my earlier machine-rendered line, kept for diffing only - NOT the submission file).
