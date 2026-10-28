@@ -111,6 +111,20 @@ the reference, on identical channels, budgets, and seeds.
 one channel per batch decision, torch complex128 arithmetic, one idle desktop
 CPU for ALL methods; a float32 development benchmark and AO timings under
 CPU contention are disclosed in the supplementary material).
+An independent re-measure of the same frozen protocol on 2026-10-28 gives
+AO $0.340$~s vs. $8.39$~ms (ratio $40.5\times$;
+\texttt{latency\_common\_protocol\_rerun\_2026-10-28.json}), so the same-machine
+ratio carries roughly $\pm 25\%$ session variance and is quoted as an
+order-of-magnitude $40$--$50\times$ throughout; only the ratio, never the
+absolute times, is publishable.
+In floating-operation terms one AO decision is roughly
+$1.37\,\mathrm{M}$ complex multiply--accumulate operations ($193$ iterations
+$\times$ $\approx 7.1\,$k each) versus roughly $28.5\,$k for the network
+($6$ layers $\times$ $\approx 4.7\,$k), a $\approx 48\times$ FLOPs ratio that
+decomposes as $32\times$ iteration budget $\times$ $\approx 1.5\times$
+per-iteration cost; gradient computation per layer is intrinsic to the method,
+as each layer's update is itself a gradient step evaluated with the same
+autograd engine the AO reference uses.
 % DD-044 matched-discipline baselines (external-review round 2), artifacts:
 %   results/unfold/unfold_untrained_pg6.json  (untrained L=6 forward pass)
 %   results/baselines/closed_form_full_csi.json (no-learning full-phase policy)
@@ -125,8 +139,16 @@ $\UnfoldVsAOLatencyRatio{}\times$ same-machine figure decomposes as
 $(\AOMedianIters{}/6) \approx 32\times$ from the iteration budget times
 $\approx 1.6\times$ from cheaper per-iteration operations
 ($0.424$~s$/193 \approx 2.2$~ms per AO iteration versus
-$8.257$~ms$/6 \approx 1.4$~ms per unrolled layer). We therefore report two
-matched-discipline baselines. First, an \emph{untrained} forward pass of the
+$8.257$~ms$/6 \approx 1.4$~ms per unrolled layer), and is itself bounded by a
+compute-matched experiment: with every method limited to six iterations, the
+learned step sizes reach $62.53$~bps/Hz, a validation-grid-searched constant
+step reaches $62.41$, truncated AO reaches $61.58$, and Armijo-step projected
+gradient reaches $59.39$ (frozen test set;
+\texttt{results/fix3/rebaseline.json}) --- the trained network is the best
+six-iteration method, but only by $\approx 0.12$~bps/Hz over a tuned constant
+step, so the headline advantage is dominated by the iteration budget. Two
+further matched-discipline observations frame this. First, an \emph{untrained}
+forward pass of the
 same six-layer network (default step sizes, no optimization) already reaches
 $59.390$~bps/Hz on the frozen test set: the fixed gradient-ascent structure
 alone supplies $+6.21$ over random, and training contributes a further

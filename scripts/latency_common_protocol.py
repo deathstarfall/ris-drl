@@ -56,6 +56,14 @@ def main() -> int:
         det = float(np.abs(ao_rates - ref).max())
 
     # ---------------- unfolding, trained + untrained ----------------
+    # DD-064 finding: autograd is INTRINSIC to this model — each unrolled
+    # layer's update is itself a gradient step, so inference cannot run under
+    # no_grad. The deployed per-decision time legitimately includes one
+    # autograd evaluation per layer. Both this network and the AO reference
+    # compute their gradients through the same torch autograd engine, so the
+    # paired same-machine ratio remains on equal footing; FLOPs are reported
+    # separately in the manuscript (fix3_rebaseline.py, ~48x complex-MAC
+    # ratio).
     def unfold_times(model, label):
         with torch.enable_grad():
             model(batch_slice(T, torch.arange(min(8, n))), create_graph=False)  # warmup
