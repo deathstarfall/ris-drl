@@ -52,7 +52,7 @@ On the frozen $500$-channel test set the reference achieves
 $\AOMeanRate{} \pm \AOMeanSD{}$~bps/Hz (SD, $n{=}500$) against
 $\RandomMeanRate{}$~bps/Hz for random phases---a mean ratio of
 \AoRandomRatio{} (criterion: $\geq 1.15$, re-baselined from the original
-$1.3$ during the DD-043 decision-log round, with an added requirement
+$1.3$ in a disclosed pre-testing protocol revision, with an added requirement
 that AO beat the random-phase mean on $\AOpercentAboveRandom{}\%$ of
 channels individually). The optimizer
 terminates in a median of $\AOMedianIters{}$ iterations
@@ -109,8 +109,8 @@ the reference, on identical channels, budgets, and seeds.
 % artifacts for provenance and are NOT used for ratios.
 (artifacts \texttt{results/unfold/latency\_common\_protocol.json}, protocol:
 one channel per batch decision, torch complex128 arithmetic, one idle desktop
-CPU for ALL methods; supplementary decision log discloses the retired
-float32 dev bench and the contended AO timings).
+CPU for ALL methods; a float32 development benchmark and AO timings under
+CPU contention are disclosed in the supplementary material).
 % DD-044 matched-discipline baselines (external-review round 2), artifacts:
 %   results/unfold/unfold_untrained_pg6.json  (untrained L=6 forward pass)
 %   results/baselines/closed_form_full_csi.json (no-learning full-phase policy)
