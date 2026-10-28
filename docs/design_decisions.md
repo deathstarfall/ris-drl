@@ -849,3 +849,35 @@ Header fill changed grey D9D9D9 -> light-blue D9E2F3 (same as results tables T8-
 bold removed (results-table headers are not bold); body font unchanged (inherits document
 default, as the other tables). Verified: fill=D9E2F3; real-Word COM re-check 18 pages, 12
 tables, 2 figures, PDF re-export 521 KB previewed; trusted snapshot refreshed.
+
+## DD-062 --- Round 20-21: auditor must-fix lane C + RECOVERY from docx reversion (2026-10-28)
+INCIDENT: the live docx was found silently REVERTED to a pre-audit version (old mangled intro
+wording, "4 gaps exist", pre-DD-048 latency text) - a OneDrive sync conflict replaced the file
+between the DD-061 snapshot and round-20. Round-20 edits landed on the stale base and were
+discarded; recovered by restoring the Word-verified snapshot and replaying fixes matched to
+that wording (scripts/docx_round21_recovery.py). LESSON: before ANY docx surgery, assert the
+file contains a sentinel of the LATEST round's wording; never trust the live path after
+external sync activity.
+
+Auditor fixes landed (non-computing lane):
+- Fix 4: quantization losses corrected from the stale 2.936/0.730/0.182 (the paper's old
+  undefined "dB" column, mislabeled bps/Hz) to bits_sweep.json truth: AO 0.976/0.243/0.061
+  bps/Hz; retained share 70% -> 91.1% (over 90%). Paper sec5b dB column replaced with the
+  per-method bps/Hz losses; QaoQuantGapBthree macro 0.730 -> 0.243.
+- Fix 3 wording: unfolding renamed "L = 6 unrolled projected-gradient network whose only
+  trainable parameters are six learned step sizes" (verified in code: UnrolledPG(L=6) has
+  exactly 6 alphas).
+- Fix 7: factored-DQN-head limitation added (joint-action DQN over a small codebook = fair
+  discrete comparator, flagged future work).
+- Fix 8: refs [24] (aasa2026deep) and [27] (nishad2026deep) re-verified via DOI resolution
+  (crossref_check ALL ENTRIES VERIFIED); Huang-Mo-Yuen representation sentence added to the
+  discussion (their state-augmented cos/sin representation vs our raw-phase/factored outputs).
+- Fix 6: Figure 2 = training-curve composite (6 families x 5 seeds, built from fig_band_*.png),
+  Figure 3 = AO convergence; CSI figure renumbered 2 -> 4 (captions only; no in-text numeric
+  refs). Docx now 4 inline figures, 12 tables.
+
+Verification: Word COM opens with NO repair - 19 pages, 8195 words, 12 tables, 4 figures,
+PDF export OK (659 KB, previewed). Gates: pytest 20/20; reproduce_headline ALL VERIFIED;
+pdflatex 9 pages clean; crossref 27/27. Snapshot refreshed.
+Remaining (with team): fix 1 regime probe (Balraj), fix 2 positive-control probe (Shreyansh),
+fix 3 re-baseline numbers (AO@6/PG@6/constant-step) + FLOPs bench, then re-foot all numbers.

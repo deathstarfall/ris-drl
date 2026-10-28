@@ -167,26 +167,29 @@ produced a policy indistinguishable from random phases in the earlier study.
 \begin{center}
 \caption{Post-hoc $B$-bit quantization of continuous solutions (frozen test set, seed 0; raw means from \texttt{results/bits\_sweep.json}; rate losses are reported directly in bps/Hz against each method's unquantized value -- 64.193 for AO and 62.532 for unfolding; no dB conversion is implied).}\label{tab:quantization}
 \small\begin{tabular}{lccccc}\toprule
-$B$ & AO@$B$ & Unfold@$B$ & Random@$B$ & $\Delta$AO (bps/Hz) & $\Delta$AO (dB) \\
+$B$ & AO@$B$ & Unfold@$B$ & Random@$B$ & $\Delta$AO (bps/Hz) & $\Delta$Unfold (bps/Hz) \\
 \midrule
-2 & 63.217 & 61.567 & 53.302 & $-0.976$ & $-2.936$ \\
-3 & 63.950 & 62.299 & 53.314 & $-0.242$ & $-0.730$ \\
-4 & 64.132 & 62.472 & 53.372 & $-0.061$ & $-0.182$ \\
+2 & 63.217 & 61.567 & 53.302 & $-0.976$ & $-0.965$ \\
+3 & 63.950 & 62.299 & 53.314 & $-0.242$ & $-0.233$ \\
+4 & 64.132 & 62.472 & 53.372 & $-0.061$ & $-0.060$ \\
 $\infty$ & 64.193 & 62.532 & 53.370 & 0 & 0 \\
 \bottomrule
 \end{tabular}
 \end{center}
 \end{table}
 
-\providecommand{\BitsTwoLossDB}{2.936}
-\providecommand{\BitsThreeLossDB}{0.730}
-\providecommand{\BitsFourLossDB}{0.182}
+\providecommand{\BitsTwoLossBps}{0.976}
+\providecommand{\BitsThreeLossBps}{0.243}
+\providecommand{\BitsFourLossBps}{0.061}
 \subsubsection{Discrete Phase Shifters and Imperfect CSI}
 Real RIS controllers apply quantized phases. Re-mapping the AO, unfolding, and
 random solutions onto uniform $B$-bit codebooks ($B \in \{2,3,4\}$,
-$\Delta = 2\pi/2^{B}$) costs \BitsTwoLossDB{}/\BitsThreeLossDB{}/%
-\BitsFourLossDB{}~dB at $2/3/4$ bits respectively (Table~\ref{tab:quantization}),
-in line with the literature's $2$-bit practicality sweet spot.
+$\Delta = 2\pi/2^{B}$) costs the AO reference
+\BitsTwoLossBps/\BitsThreeLossBps/\BitsFourLossBps~bps/Hz at $2/3/4$ bits
+respectively, and unfolding $0.965/0.233/0.060$~bps/Hz --- at every $B$ the
+two methods retain over $89\%$ of their gain over the random-phase floor
+(Table~\ref{tab:quantization}), in line with the literature's $2$-bit
+practicality sweet spot.
 
 For channel-state errors we perturb every channel tensor as
 \begin{figure}[t]
